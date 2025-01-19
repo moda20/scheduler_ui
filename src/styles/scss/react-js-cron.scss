@@ -1,0 +1,33 @@
+// overriding the pointer events issue with react-js-cron and shadcn
+
+.ant-select-dropdown {
+  &:not(.ant-select-dropdown-hidden) {
+    pointer-events: all;
+  }
+}
+
+.react-js-cron {
+  display: flex;
+  gap: 0.5rem;
+  > div {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .ant-select {
+    .ant-select-selector {
+      color: hsl(var(--sidebar-foreground)) !important;
+      background-color: hsl(var(--sidebar-background)) !important;
+       * {
+         color: hsl(var(--sidebar-foreground)) !important;
+         background-color: hsl(var(--sidebar-background)) !important;
+       }
+    }
+  }
+
+  .react-js-cron-hours, .react-js-cron-minutes {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+}
