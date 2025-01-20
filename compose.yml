@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: DOCKERFILE
       args:
-        SCRAP_SERVER_ENDPOINT: ${SCRAP_SERVER_ENDPOINT}
+        SERVER_ENDPOINT: ${SERVER_ENDPOINT}
     container_name: scheduler_ui
     env_file: .env
     restart: always
