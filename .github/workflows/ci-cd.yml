@@ -24,7 +24,7 @@ jobs:
       # Build and tag the Docker image
       - name: Build Docker image
         run: |
-          docker build --file DOCKERFILE --name scheduler_ui -t ghcr.io/${{ github.repository_owner }}/scheduler_ui:${{ github.sha }} .
+          docker build --file DOCKERFILE -t ghcr.io/${{ github.repository_owner }}/scheduler_ui:${{ github.sha }} .
           docker tag ghcr.io/${{ github.repository_owner }}/scheduler_ui:${{ github.sha }} ghcr.io/${{ github.repository_owner }}/scheduler_ui:latest
 
       # Push the image to GHCR
