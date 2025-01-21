@@ -1,0 +1,10 @@
+@font-face {
+  font-family: 'Geist';
+  src: url('/assets/fonts/geist.ttf') format('ttf');
+  font-weight: 400; /* Adjust for weights */
+  font-style: normal; /* Specify style (normal, italic, etc.) */
+}
+
+:root {
+  --font-geist-sans: 'Geist', sans-serif;
+}

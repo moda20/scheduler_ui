@@ -157,7 +157,7 @@ export const getTableColumns = (
     accessorKey: "averageTime",
     header: "Average time",
     cell: ({ row }) => (
-      <div>{Math.ceil(row.original?.averageTime ?? 0 / 60)} minutes</div>
+      <div>{Math.ceil((row.original?.averageTime ?? 0) / 60)} minutes</div>
     ),
   },
   {

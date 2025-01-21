@@ -1,24 +1,15 @@
-import { Button } from "@/components/ui/button"
-import { CogIcon, DeleteIcon, SaveIcon } from "lucide-react"
 import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { PlayIcon } from "@radix-ui/react-icons"
 import SheetActionDialog from "@/components/sheet-action-dialog"
-import { config, setConfigItem } from "@/app/reducers/uiReducer"
-import { toast } from "@/hooks/use-toast"
-import { useAppDispatch, useAppSelector } from "@/app/hooks"
 import type { ReactNode } from "react"
 import { useEffect, useRef, useState } from "react"
 import jobsService from "@/services/JobsService"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Checkbox } from "@/components/ui/checkbox"
-import { number } from "zod"
-import { ComboBox } from "@/components/ui/combo-box"
 import { DatePickerWithPresets } from "@/components/ui/date-picker-presets"
 import type { DateRange } from "react-day-picker"
 import moment from "moment"
-import { CheckedState } from "@radix-ui/react-checkbox"
+import type { CheckedState } from "@radix-ui/react-checkbox"
 
 export interface DrawerLokiLogsProps {
   start?: Date
@@ -122,7 +113,7 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
           <Checkbox
             id={"watchLogs"}
             checked={watch}
-            onCheckedChange={setWatch}
+            onCheckedChange={toggleWatcher}
           />
           <Label htmlFor="watchLogs">Watch</Label>
         </div>
