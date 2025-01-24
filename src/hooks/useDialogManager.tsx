@@ -1,17 +1,16 @@
-import { useState, useCallback, useId, useEffect, useContext } from "react"
-import { useAppDispatch, useAppSelector } from "@/app/hooks"
-import {
-  closeTopDialog,
-  openDialog,
-  dialogStack,
-} from "@/app/reducers/uiReducer"
+import { useState, useCallback, useId, useContext } from "react"
+import { useAppDispatch } from "@/app/hooks"
+import { closeTopDialog, openDialog } from "@/app/reducers/uiReducer"
 import { ReactReduxContext } from "react-redux"
 import { useHotkeys } from "react-hotkeys-hook"
+import type { Store } from "redux"
 function useDialogueManager({ enableEscapeHotKey = false } = {}) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const dispatch = useAppDispatch()
   const cptId = useId()
-  const { store } = useContext(ReactReduxContext)
+  const { store } = useContext(ReactReduxContext) as {
+    store: Store
+  }
   useHotkeys("esc", () => {
     if (enableEscapeHotKey) {
       setDialogState(false)
@@ -35,7 +34,7 @@ function useDialogueManager({ enableEscapeHotKey = false } = {}) {
     } else {
       if (canClose(cptId)) {
         setIsDialogOpen(open)
-        dispatch(closeTopDialog(cptId))
+        dispatch(closeTopDialog())
         if (callback) {
           callback(open)
         }
