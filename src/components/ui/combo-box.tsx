@@ -18,6 +18,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import useDialogueManager from "@/hooks/useDialogManager"
+import { useId } from "react"
+import { useHotkeys } from "react-hotkeys-hook"
 
 export interface ComboBoxItemInterface {
   value: string
@@ -57,11 +60,12 @@ export function ComboBox({
   triggerClassName,
   inputFieldsText = defaultProps.inputFieldsText,
 }: ComboBoxProps = defaultProps) {
-  const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState(selectedItemValue ?? "")
   const [currentItemList, setCurrentItemList] = React.useState<ComboBoxItem[]>(
     [],
   )
+
+  const { isDialogOpen, setDialogState } = useDialogueManager()
 
   React.useEffect(() => {
     if (typeof itemList === "function") {
@@ -74,14 +78,28 @@ export function ComboBox({
     }
   }, [itemList])
 
+  useHotkeys("esc", () => {
+    setDialogState(false)
+  })
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover
+      open={isDialogOpen}
+      onOpenChange={v => {
+        setDialogState(v)
+      }}
+    >
       <PopoverTrigger asChild>
         <Button
           variant="outline"
           role="combobox"
-          aria-expanded={open}
+          aria-expanded={isDialogOpen}
           className={cn("w-[200px] justify-between", triggerClassName)}
+          onKeyDown={v => {
+            if (v.key === "Escape") {
+              v.preventDefault()
+              setDialogState(false)
+            }
+          }}
         >
           {value
             ? currentItemList.find(item => item?.value === value)?.label
@@ -91,7 +109,15 @@ export function ComboBox({
       </PopoverTrigger>
       <PopoverContent className={cn("w-[200px] p-0", className)}>
         <Command className={"text-foreground bg-background"}>
-          <CommandInput placeholder={searchFieldPlaceholder} />
+          <CommandInput
+            onKeyDown={v => {
+              if (v.key === "Escape") {
+                v.preventDefault()
+                setDialogState(false)
+              }
+            }}
+            placeholder={searchFieldPlaceholder}
+          />
           <CommandList>
             <CommandEmpty>{noFieldsFoundText}</CommandEmpty>
             <CommandGroup>
@@ -101,7 +127,7 @@ export function ComboBox({
                   value={item?.value}
                   onSelect={currentValue => {
                     setValue(currentValue === value ? "" : currentValue)
-                    setOpen(false)
+                    setDialogState(false)
                     onChange(currentValue === value ? undefined : currentValue)
                   }}
                 >

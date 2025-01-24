@@ -65,6 +65,7 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
   }
 
   const fetchLogs = (open?: boolean) => {
+    console.log("fetching logs", open)
     if (open) {
       getlogs()
     }
@@ -114,6 +115,11 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
             id={"watchLogs"}
             checked={watch}
             onCheckedChange={toggleWatcher}
+            onKeyDown={v => {
+              if (v.key === "Escape") {
+                v.preventDefault()
+              }
+            }}
           />
           <Label htmlFor="watchLogs">Watch</Label>
         </div>

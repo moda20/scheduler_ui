@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { CogIcon, DeleteIcon, SaveIcon } from "lucide-react"
+import { CogIcon, DeleteIcon, SaveIcon, Trash2Icon } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { PlayIcon } from "@radix-ui/react-icons"
@@ -8,6 +8,11 @@ import { config, setConfigItem } from "@/app/reducers/uiReducer"
 import { toast } from "@/hooks/use-toast"
 import { useAppDispatch, useAppSelector } from "@/app/hooks"
 import { useEffect, useRef, useState } from "react"
+import ConfirmationDialogAction, {
+  ConfirmationDialogActionType,
+} from "@/components/confirmationDialogAction"
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
+import { jobActions } from "@/features/jobsTable/interfaces"
 
 export default function DrawerMenuConfigurator() {
   const [keydownEventSet, setKeydownEventSet] = useState(false)
@@ -68,7 +73,7 @@ export default function DrawerMenuConfigurator() {
     <SheetActionDialog
       side={"right"}
       title={"Configuration"}
-      description={"update server configuration"}
+      description={"Update server configuration"}
       trigger={
         <Button
           variant={"outline"}
@@ -80,7 +85,10 @@ export default function DrawerMenuConfigurator() {
         </Button>
       }
     >
-      <div>
+      <div className="mt-4">
+        <Label htmlFor="target" className="text-left font-bold text-lg">
+          Backend Server Endpoint
+        </Label>
         <div className="grid gap-4 py-4">
           <div className="flex items-center gap-2 justify-between">
             <Label htmlFor="target" className="text-left">
@@ -126,13 +134,24 @@ export default function DrawerMenuConfigurator() {
                   </Label>
                 </div>
                 <div className="flex items-center gap-4">
-                  <Button
-                    variant={"destructive"}
-                    size={"icon"}
-                    onClick={() => removeSavedTarget(e)}
+                  <ConfirmationDialogAction
+                    onOpenChange={e => {
+                      if (!e) document.body.style.pointerEvents = ""
+                    }}
+                    title={`Delete Target server : ${e}`}
+                    description={
+                      "This action will delete the target server from your local browser storage. You can add it back again anytime"
+                    }
+                    takeAction={action => {
+                      if (action === ConfirmationDialogActionType.CANCEL) return
+                      removeSavedTarget(e)
+                    }}
+                    confirmVariant="destructive"
                   >
-                    <DeleteIcon />
-                  </Button>
+                    <Button variant={"destructive"} size={"icon"}>
+                      <DeleteIcon />
+                    </Button>
+                  </ConfirmationDialogAction>
 
                   <Button
                     variant={"default"}

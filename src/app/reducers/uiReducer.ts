@@ -21,6 +21,7 @@ export interface UISliceState {
   routes: Array<RouteObject> | null
   activeRoute: Array<RouteObject> | null
   config: SavedConfigInterface
+  dialogStack: Array<string>
 }
 
 const initialState: UISliceState = {
@@ -28,6 +29,7 @@ const initialState: UISliceState = {
   routes: routesList,
   activeRoute: [routesList[0], routesList[0].items[0]],
   config: {},
+  dialogStack: [],
 }
 
 // If you are not using async thunks you can use the standalone `createSlice`.
@@ -78,6 +80,16 @@ export const UiReducerSlice = createAppSlice({
         saveConfig(state.config)
       },
     ),
+    openDialog: create.reducer(
+      (state: UISliceState, action: PayloadAction<string>) => {
+        if (!state.dialogStack.includes(action.payload)) {
+          state.dialogStack.push(action.payload)
+        }
+      },
+    ),
+    closeTopDialog: create.reducer((state: UISliceState) => {
+      state.dialogStack.splice(-1, 1)
+    }),
   }),
   // You can define your selectors here. These selectors receive the slice
   // state as their first argument.
@@ -85,11 +97,14 @@ export const UiReducerSlice = createAppSlice({
     routes: (state: UISliceState) => state.routes,
     currentRoute: (state: UISliceState) => state.activeRoute,
     config: (state: UISliceState) => state.config,
+    dialogStack: (state: UISliceState) => state.dialogStack,
   },
 })
 
 // Action creators are generated for each case reducer function.
-export const { changeRoute, setConfigItem } = UiReducerSlice.actions
+export const { changeRoute, setConfigItem, openDialog, closeTopDialog } =
+  UiReducerSlice.actions
 
 // Selectors returned by `slice.selectors` take the root state as their first argument.
-export const { routes, currentRoute, config } = UiReducerSlice.selectors
+export const { routes, currentRoute, config, dialogStack } =
+  UiReducerSlice.selectors

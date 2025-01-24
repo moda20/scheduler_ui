@@ -28,7 +28,7 @@ import { AsteriskIcon } from "lucide-react"
 import { ComboBox, ComboBoxItem } from "@/components/ui/combo-box"
 import cronstrue from "cronstrue"
 import { parseCron } from "@/lib/utils"
-import { useRef } from "react"
+import useDialogueManager from "@/hooks/useDialogManager"
 
 export interface JobUpdateDialogProps {
   children: React.ReactNode
@@ -53,7 +53,6 @@ export function JobUpdateDialog({
   onChange,
   itemList,
 }: JobUpdateDialogProps) {
-  const dialogRef = useRef<any>(null)
   const form = useForm<z.infer<typeof jobUpdateSchema>>({
     resolver: zodResolver(jobUpdateSchema),
     defaultValues: {
@@ -63,13 +62,24 @@ export function JobUpdateDialog({
       param: jobDetails?.param,
     },
   })
+  const { isDialogOpen, setDialogState } = useDialogueManager()
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+    <Dialog open={isDialogOpen} onOpenChange={v => setDialogState(v)}>
+      <DialogTrigger
+        onClick={v => {
+          v.preventDefault()
+          setDialogState(true)
+        }}
+      >
+        {children}
+      </DialogTrigger>
       <DialogContent
-        ref={dialogRef}
         className="sm:max-w-[425px] text-foreground bg-background"
+        onEscapeKeyDown={e => {
+          e.preventDefault()
+          setDialogState(false)
+        }}
       >
         <DialogHeader>
           <DialogTitle>{isCreateDialog ? "Create" : "Edit"} Job</DialogTitle>
@@ -85,13 +95,7 @@ export function JobUpdateDialog({
               v => {
                 onChange(v)
                 if (isCreateDialog) {
-                  setTimeout(() => {
-                    ;(
-                      Array.from(
-                        dialogRef.current.querySelectorAll("button"),
-                      ).pop() as HTMLButtonElement
-                    )?.click()
-                  }, 100)
+                  setDialogState(false)
                 }
               },
               err => {
@@ -151,7 +155,7 @@ export function JobUpdateDialog({
                   <FormItem>
                     <FormLabel>Consumer script</FormLabel>
                     <br />
-                    <FormControl>
+                    <FormControl ref={field.ref}>
                       <ComboBox
                         selectedItemValue={jobDetails?.consumer}
                         itemList={itemList}

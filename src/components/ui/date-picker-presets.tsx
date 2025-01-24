@@ -17,8 +17,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import moment from "moment"
-import { addDays, format, subDays } from "date-fns"
+import { format, subDays } from "date-fns"
 import type { DateRange } from "react-day-picker"
+import useDialogueManager from "@/hooks/useDialogManager"
 
 export interface DatePickerWithPresetsProps {
   onChange: (date: DateRange | undefined) => void
@@ -32,6 +33,10 @@ export function DatePickerWithPresets(props: DatePickerWithPresetsProps) {
       to: new Date(),
     },
   )
+
+  const { isDialogOpen, setDialogState } = useDialogueManager({
+    enableEscapeHotKey: true,
+  })
 
   const selectDate = (date: DateRange | undefined) => {
     setDate(date)
@@ -85,7 +90,7 @@ export function DatePickerWithPresets(props: DatePickerWithPresetsProps) {
   }
 
   return (
-    <Popover>
+    <Popover open={isDialogOpen} onOpenChange={v => setDialogState(v)}>
       <PopoverTrigger asChild>
         <Button
           id="date"
@@ -94,6 +99,13 @@ export function DatePickerWithPresets(props: DatePickerWithPresetsProps) {
             "w-[300px] justify-start text-left font-normal",
             !date && "text-muted-foreground",
           )}
+          onClick={() => setDialogState(true)}
+          onKeyDown={v => {
+            if (v.key === "Escape") {
+              v.preventDefault()
+              setDialogState(false)
+            }
+          }}
         >
           <CalendarIcon />
           {date?.from ? (
