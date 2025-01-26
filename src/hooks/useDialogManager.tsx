@@ -16,7 +16,16 @@ import {
 import { ReactReduxContext } from "react-redux"
 import { useHotkeys } from "react-hotkeys-hook"
 import type { Store } from "redux"
-function useDialogueManager({ enableEscapeHotKey = false, inputGroup } = {}) {
+
+export interface DialogueManagerProps {
+  enableEscapeHotKey?: boolean
+  inputGroup?: string
+}
+
+function useDialogueManager({
+  enableEscapeHotKey = false,
+  inputGroup,
+}: DialogueManagerProps = {}) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const dispatch = useAppDispatch()
   const currentStack = useAppSelector(dialogStack)
