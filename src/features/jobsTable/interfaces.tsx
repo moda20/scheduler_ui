@@ -50,6 +50,8 @@ import DrawerLokiLogs from "@/components/custom/DrawerLokiLogs"
 import { subDays } from "date-fns"
 import { DateRange } from "react-day-picker"
 import { ComboBoxItem } from "@/components/ui/combo-box"
+import useDialogueManager from "@/hooks/useDialogManager"
+import ActionDropdown from "@/features/jobsTable/actionDropdown"
 
 export interface jobsTableData {
   id: string
@@ -192,115 +194,11 @@ export const getTableColumns = (
     accessorKey: "actions",
     header: "Actions",
     cell: ({ row }) => (
-      <DropdownMenu modal={false}>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size={"icon"}>
-            <EllipsisVertical />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56 bg-background">
-          <DropdownMenuLabel>Config {row.original?.name}</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <ConfirmationDialogAction
-              title={
-                row.original.status === "STARTED"
-                  ? "un-Scheduele the job"
-                  : "Schedule the job"
-              }
-              description={
-                "this action will schedule the execution of the job based on it's cron setting"
-              }
-              takeAction={action => {
-                if (action === ConfirmationDialogActionType.CANCEL) return
-                props.takeAction(
-                  row,
-                  row.original.status === "STARTED"
-                    ? jobActions.UNSCHEDULE
-                    : jobActions.SCHEDULE,
-                )
-              }}
-            >
-              <DropdownMenuItem onSelect={e => e.preventDefault()}>
-                <Settings />
-                <span>
-                  {row.original.status === "STARTED"
-                    ? "deSchedule"
-                    : "Schedule"}
-                </span>
-                <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-              </DropdownMenuItem>
-            </ConfirmationDialogAction>
-            <JobUpdateDialog
-              jobDetails={row.original}
-              isCreateDialog={false}
-              itemList={props.getAvailableConsumers}
-              onChange={jobData => {
-                props.takeAction(row, jobActions.UPDATE, jobData)
-              }}
-            >
-              <DropdownMenuItem onSelect={e => e.preventDefault()}>
-                <Edit2Icon />
-                <span>Update config</span>
-              </DropdownMenuItem>
-            </JobUpdateDialog>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuLabel>Execution</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem
-              onClick={() => props.takeAction(row, jobActions.EXECUTE)}
-            >
-              <DockIcon />
-              <span>Run now</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() =>
-                props.takeAction(row, jobActions.EXECUTE_IN_THE_BACKGROUND)
-              }
-            >
-              <DockIcon />
-              <span>Run in background</span>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DrawerLokiLogs
-              jobName={row.original.name}
-              start={defaultLogPeriod.from}
-              end={defaultLogPeriod.to}
-              trigger={
-                <DropdownMenuItem onSelect={e => e.preventDefault()}>
-                  <LogsIcon />
-                  <span>Latest Logs</span>
-                </DropdownMenuItem>
-              }
-            />
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <ConfirmationDialogAction
-              title={`Delete Job : ${row.original.name}`}
-              description={
-                "This action will un-schedule and set to inactive the job but will NOT stop it if it's running"
-              }
-              takeAction={action => {
-                if (action === ConfirmationDialogActionType.CANCEL) return
-                props.takeAction(row, jobActions.SOFT_DELETE)
-              }}
-            >
-              <DropdownMenuItem
-                className={"bg-destructive"}
-                onSelect={e => e.preventDefault()}
-              >
-                <Trash2Icon />
-                <span>Delete job</span>
-              </DropdownMenuItem>
-            </ConfirmationDialogAction>
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <ActionDropdown
+        row={row}
+        defaultLogPeriod={defaultLogPeriod}
+        columnsProps={props}
+      />
     ),
   },
 ]

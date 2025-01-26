@@ -10,6 +10,7 @@ import { DatePickerWithPresets } from "@/components/ui/date-picker-presets"
 import type { DateRange } from "react-day-picker"
 import moment from "moment"
 import type { CheckedState } from "@radix-ui/react-checkbox"
+import useInterval from "@/hooks/useInterval"
 
 export interface DrawerLokiLogsProps {
   start?: Date
@@ -30,12 +31,23 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
     to: props.end,
   })
 
-  const getlogs = () => {
+  useInterval(
+    () => {
+      getLogs()
+    },
+    watch ? 10000 : null,
+  )
+
+  const getLogs = () => {
     jobsService
       .jobLogs(
         `{job="${props.jobName}"}`,
         moment(period?.from).unix(),
-        moment(period?.to).unix(),
+        moment(period?.to)
+          .set("hours", 23)
+          .set("minutes", 59)
+          .set("seconds", 59)
+          .unix(),
       )
       .then(res => {
         const parsedLogs = res.data?.result?.[0]?.values?.map((log: any) => {
@@ -50,55 +62,16 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
       })
   }
 
-  const toggleWatcher = () => {
-    if (!logWatcher) {
-      const watcherInterval = setInterval(() => {
-        getlogs()
-      }, 10000)
-      setLogWatcher(watcherInterval)
-      setWatch(true)
-    } else {
-      clearInterval(logWatcher)
-      setLogWatcher(null)
-      setWatch(false)
-    }
-  }
-
   const fetchLogs = (open?: boolean) => {
-    console.log("fetching logs", open)
     if (open) {
-      getlogs()
+      getLogs()
     }
-    toggleWatcher()
   }
 
   const updatePeriod = (period: DateRange | undefined) => {
     setPeriod(period)
-    getlogs()
+    getLogs()
   }
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === "p") {
-        event.preventDefault()
-        if (sideBarTriggerRef?.current) {
-          sideBarTriggerRef.current.click()
-        }
-      }
-    }
-    if (!keydownEventSet) {
-      window.addEventListener("keydown", handleKeyDown)
-      setKeydownEventSet(true)
-    }
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-      setKeydownEventSet(false)
-      logWatcher && clearInterval(logWatcher)
-    }
-  }, [])
-
-  const initialSideBarRef: any = null
-  const sideBarTriggerRef = useRef(initialSideBarRef)
 
   return (
     <SheetActionDialog
@@ -114,7 +87,7 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
           <Checkbox
             id={"watchLogs"}
             checked={watch}
-            onCheckedChange={toggleWatcher}
+            onCheckedChange={setWatch}
             onKeyDown={v => {
               if (v.key === "Escape") {
                 v.preventDefault()

@@ -22,6 +22,9 @@ export interface UISliceState {
   activeRoute: Array<RouteObject> | null
   config: SavedConfigInterface
   dialogStack: Array<string>
+  dialogGroups: {
+    [key: string]: string[]
+  }
 }
 
 const initialState: UISliceState = {
@@ -30,6 +33,7 @@ const initialState: UISliceState = {
   activeRoute: [routesList[0], routesList[0].items[0]],
   config: {},
   dialogStack: [],
+  dialogGroups: {},
 }
 
 // If you are not using async thunks you can use the standalone `createSlice`.
@@ -81,15 +85,36 @@ export const UiReducerSlice = createAppSlice({
       },
     ),
     openDialog: create.reducer(
-      (state: UISliceState, action: PayloadAction<string>) => {
-        if (!state.dialogStack.includes(action.payload)) {
-          state.dialogStack.push(action.payload)
+      (
+        state: UISliceState,
+        action: PayloadAction<{ cptId: string; group?: string }>,
+      ) => {
+        if (!state.dialogStack.includes(action.payload?.cptId)) {
+          state.dialogStack.push(action.payload?.cptId)
+        }
+        if (action.payload?.group) {
+          if (!state.dialogGroups[action.payload?.group]) {
+            state.dialogGroups[action.payload?.group] = [action.payload?.cptId]
+          } else {
+            state.dialogGroups[action.payload?.group]?.push(
+              action.payload?.cptId,
+            )
+          }
         }
       },
     ),
     closeTopDialog: create.reducer((state: UISliceState) => {
       state.dialogStack.splice(-1, 1)
     }),
+    closeAllGroupedDialogs: create.reducer(
+      (state: UISliceState, action: PayloadAction<string>) => {
+        const dialogs = state.dialogGroups[action.payload]
+        dialogs?.forEach(e => {
+          state.dialogStack.splice(state.dialogStack.indexOf(e), 1)
+        })
+        delete state.dialogGroups[action.payload]
+      },
+    ),
   }),
   // You can define your selectors here. These selectors receive the slice
   // state as their first argument.
@@ -102,8 +127,13 @@ export const UiReducerSlice = createAppSlice({
 })
 
 // Action creators are generated for each case reducer function.
-export const { changeRoute, setConfigItem, openDialog, closeTopDialog } =
-  UiReducerSlice.actions
+export const {
+  changeRoute,
+  setConfigItem,
+  openDialog,
+  closeTopDialog,
+  closeAllGroupedDialogs,
+} = UiReducerSlice.actions
 
 // Selectors returned by `slice.selectors` take the root state as their first argument.
 export const { routes, currentRoute, config, dialogStack } =

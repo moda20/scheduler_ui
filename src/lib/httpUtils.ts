@@ -5,8 +5,6 @@ import { auth_token as AUTH_TOKEN } from "@/app/reducers/authReducer"
 import { store } from "@/app/store"
 import { toast } from "@/hooks/use-toast"
 
-console.log(config.apBaseUrl)
-
 const service = axios.create({
   baseURL: config.apBaseUrl,
   timeout: 60000,
