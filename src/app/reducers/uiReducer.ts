@@ -103,9 +103,17 @@ export const UiReducerSlice = createAppSlice({
         }
       },
     ),
-    closeTopDialog: create.reducer((state: UISliceState) => {
-      state.dialogStack.splice(-1, 1)
-    }),
+    closeTopDialog: create.reducer(
+      (state: UISliceState, action?: PayloadAction<string | undefined>) => {
+        if (action?.payload) {
+          if (
+            state.dialogStack[state.dialogStack.length - 1] !== action?.payload
+          )
+            return
+        }
+        state.dialogStack.splice(-1, 1)
+      },
+    ),
     closeAllGroupedDialogs: create.reducer(
       (state: UISliceState, action: PayloadAction<string>) => {
         const dialogs = state.dialogGroups[action.payload]

@@ -38,15 +38,6 @@ function useDialogueManager({
       setDialogState(false)
     }
   })
-  useEffect(() => {
-    if (
-      inputGroup &&
-      (currentStack.length === 0 || !currentStack.includes(cptId)) &&
-      isDialogOpen
-    ) {
-      updateDialogState(false)
-    }
-  }, [currentStack])
 
   const canClose = (dialog: string, canBeDirectClosed: boolean = false) => {
     const stack = store.getState().ui.dialogStack
@@ -72,7 +63,7 @@ function useDialogueManager({
     } else {
       if (canClose(cptId, !!inputGroup)) {
         setIsDialogOpen(open)
-        dispatch(closeTopDialog())
+        isDialogOpen && dispatch(closeTopDialog(inputGroup ? cptId : undefined))
         if (callback) {
           callback(open)
         }
