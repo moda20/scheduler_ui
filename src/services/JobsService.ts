@@ -1,4 +1,5 @@
 import axios, { mongoAxiosService } from "@/lib/httpUtils"
+import { DateRange } from "react-day-picker"
 //import socketManager from '../utils/socketManager';
 
 const jobsService = {
@@ -90,6 +91,20 @@ const jobsService = {
         query: query,
       },
     })
+  },
+
+  jobStats(jobIds?: Array<string>, dateRange?: DateRange) {
+    return axios.get(`/jobs/jobStats`, {
+      params: {
+        jobIds,
+        startDate: dateRange?.from,
+        endDate: dateRange?.to,
+      },
+    })
+  },
+
+  jobMetrics() {
+    return axios.get(`/jobs/jobMetrics`, {})
   },
 }
 

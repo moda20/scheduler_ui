@@ -21,18 +21,63 @@ import { format, subDays } from "date-fns"
 import type { DateRange } from "react-day-picker"
 import useDialogueManager from "@/hooks/useDialogManager"
 
+type DateRangeExtended = DateRange & { label?: string; days?: number }
+
 export interface DatePickerWithPresetsProps {
   onChange: (date: DateRange | undefined) => void
   defaultValue?: DateRange
+  selectRangeList?: Array<DateRangeExtended>
 }
+const presetDates: DateRangeExtended[] = [
+  {
+    from: subDays(new Date(), 1),
+    to: new Date(),
+    label: "Last day",
+    days: 1,
+  },
+  {
+    from: subDays(new Date(), 2),
+    to: new Date(),
+    label: "Last 2 days",
+    days: 2,
+  },
+  {
+    from: subDays(new Date(), 7),
+    to: new Date(),
+    label: "Last week",
+    days: 7,
+  },
+  {
+    from: subDays(new Date(), 30),
+    to: new Date(),
+    label: "Last month",
+    days: 30,
+  },
+]
+
+export const defaultDateRange = presetDates?.slice(-1)[0]
 
 export function DatePickerWithPresets(props: DatePickerWithPresetsProps) {
   const [date, setDate] = React.useState<DateRange | undefined>(
     props.defaultValue ?? {
-      from: subDays(new Date(), 7),
-      to: new Date(),
+      from: defaultDateRange.from,
+      to: defaultDateRange.to,
     },
   )
+
+  const [selectRangeList, setSelectRangeList] = React.useState<
+    Array<DateRangeExtended>
+  >(props.selectRangeList ?? presetDates)
+
+  const mappedPresetDates = React.useMemo(() => {
+    return selectRangeList.reduce(
+      (acc, cur) => {
+        acc[cur.days] = cur
+        return acc
+      },
+      {} as Record<string, DateRange>,
+    )
+  }, [selectRangeList])
 
   const { isDialogOpen, setDialogState } = useDialogueManager({
     enableEscapeHotKey: true,
@@ -44,49 +89,13 @@ export function DatePickerWithPresets(props: DatePickerWithPresetsProps) {
   }
 
   const setPresetDates = (command: string) => {
-    switch (command) {
-      case "0":
-        selectDate({
-          from: subDays(new Date(), 1),
-          to: new Date(),
-        })
-        break
-      case "1":
-        selectDate({
-          from: subDays(new Date(), 2),
-          to: new Date(),
-        })
-        break
-      case "3":
-        selectDate({
-          from: subDays(new Date(), 7),
-          to: new Date(),
-        })
-        break
-      case "7":
-        selectDate({
-          from: subDays(new Date(), 30),
-          to: new Date(),
-        })
-        break
-      default:
-        break
-    }
+    selectDate(presetDates[command?.toString() ?? "0"])
   }
   const parseDateToPreset = () => {
     const currentDateCount = moment(date?.to).diff(moment(date?.from), "days")
-    switch (currentDateCount) {
-      case 1:
-        return "0"
-      case 2:
-        return "1"
-      case 7:
-        return "3"
-      case 30:
-        return "7"
-      default:
-        return undefined
-    }
+    console.log(currentDateCount)
+    console.log(date)
+    return mappedPresetDates[currentDateCount]?.days?.toString()
   }
 
   return (
@@ -96,7 +105,7 @@ export function DatePickerWithPresets(props: DatePickerWithPresetsProps) {
           id="date"
           variant={"outline"}
           className={cn(
-            "w-[300px] justify-start text-left font-normal",
+            "justify-start text-left font-normal",
             !date && "text-muted-foreground",
           )}
           onClick={() => setDialogState(true)}
@@ -137,10 +146,13 @@ export function DatePickerWithPresets(props: DatePickerWithPresetsProps) {
             className="bg-background text-foreground"
             position="popper"
           >
-            <SelectItem value="0">Last day</SelectItem>
-            <SelectItem value="1">Last 2 days</SelectItem>
-            <SelectItem value="3">Last week</SelectItem>
-            <SelectItem value="7">last month</SelectItem>
+            {selectRangeList.map((e, i) => {
+              return (
+                <SelectItem key={i} value={e.days.toString()}>
+                  {e.label}
+                </SelectItem>
+              )
+            })}
           </SelectContent>
         </Select>
         <div className="rounded-md border">
