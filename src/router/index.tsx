@@ -4,6 +4,7 @@ import MainPage from "@/app/dashboard/mainPage"
 import App from "@/App"
 import JobsPage from "@/features/jobsTable/jobsPage"
 import Dashboard from "@/features/dashboard/dashboard"
+import DatabaseDashboard from "@/features/system/database"
 
 const router = createBrowserRouter([
   {
@@ -18,6 +19,11 @@ const router = createBrowserRouter([
         path: "/jobs",
         index: true,
         element: <JobsPage />,
+      },
+      {
+        path: "/db_backups",
+        index: true,
+        element: <DatabaseDashboard />,
       },
     ],
   },

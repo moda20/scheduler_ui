@@ -52,6 +52,7 @@ import { DateRange } from "react-day-picker"
 import { ComboBoxItem } from "@/components/ui/combo-box"
 import useDialogueManager from "@/hooks/useDialogManager"
 import ActionDropdown from "@/features/jobsTable/actionDropdown"
+import HeaderSortButton from "@/components/custom/jobsTable/headerSortButton"
 
 export interface jobsTableData {
   id: string
@@ -106,30 +107,17 @@ export const getTableColumns = (
   {
     accessorKey: "cronSetting",
     cell: ({ row }) => (
-      <div className="text-left" style={{ maxWidth: "200px" }}>
+      <div
+        className="text-left flex flex-col gap-2 max-w-[200px]"
+        style={{ maxWidth: "200px" }}
+      >
         <div>{getStringFromCronExpression(row.getValue("cronSetting"))}</div>
-        <br />
         <small>{row.getValue("cronSetting")}</small>
       </div>
     ),
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className={"px-0"}
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Cron setting
-          {column.getCanSort() && column.getIsSorted() === "desc" ? (
-            <ArrowDownIcon className="ml-2 size-4" aria-hidden="true" />
-          ) : column.getIsSorted() === "asc" ? (
-            <ArrowUpIcon className="ml-2 size-4" aria-hidden="true" />
-          ) : (
-            <CaretSortIcon className="ml-2 size-4" aria-hidden="true" />
-          )}
-        </Button>
-      )
-    },
+    header: ({ column }) => (
+      <HeaderSortButton column={column} columnName="Cron setting" />
+    ),
   },
   {
     accessorKey: "scheduled",
@@ -146,13 +134,15 @@ export const getTableColumns = (
   },
   {
     accessorKey: "running",
-    header: "Running ?",
     cell: ({ row }) => (
       <div className="text-center">
         <Badge variant={row.getValue("running") ? null : "destructive"}>
           {row.getValue("running") ? "Yes" : "No"}
         </Badge>
       </div>
+    ),
+    header: ({ column }) => (
+      <HeaderSortButton column={column} columnName="Running ?" />
     ),
   },
   {
