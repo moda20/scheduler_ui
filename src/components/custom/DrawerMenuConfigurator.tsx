@@ -13,28 +13,20 @@ import ConfirmationDialogAction, {
 } from "@/components/confirmationDialogAction"
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { jobActions } from "@/features/jobsTable/interfaces"
+import { useHotkeys } from "react-hotkeys-hook"
 
 export default function DrawerMenuConfigurator() {
-  const [keydownEventSet, setKeydownEventSet] = useState(false)
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === "l") {
-        event.preventDefault()
-        if (sideBarTriggerRef?.current) {
-          sideBarTriggerRef.current.click()
-        }
+  useHotkeys(
+    ["ctrl+l", "meta+l"],
+    () => {
+      if (sideBarTriggerRef?.current) {
+        sideBarTriggerRef.current.click()
       }
-    }
-    if (!keydownEventSet) {
-      window.addEventListener("keydown", handleKeyDown)
-      setKeydownEventSet(true)
-    }
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-      setKeydownEventSet(false)
-    }
-  }, [])
+    },
+    {
+      preventDefault: true,
+    },
+  )
 
   const dispatch = useAppDispatch()
   const savedConfig = useAppSelector(config)

@@ -20,10 +20,6 @@ export interface DrawerLokiLogsProps {
 }
 
 export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
-  const [keydownEventSet, setKeydownEventSet] = useState(false)
-  const [logWatcher, setLogWatcher] = useState<ReturnType<
-    typeof setInterval
-  > | null>(null)
   const [logs, setLogs] = useState([])
   const [watch, setWatch] = useState<CheckedState>(true)
   const [period, setPeriod] = useState<DateRange | undefined>({
