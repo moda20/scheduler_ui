@@ -52,17 +52,15 @@ export function AllJobsStats(props: AllJobsStatsProps) {
   const getStats = () => {
     jobsService.jobStats([], dateRange).then(data => {
       setStats(data as Array<any>)
-      console.log(data)
     })
   }
 
   useEffect(() => {
     getStats()
-  }, [])
+  }, [dateRange])
 
   const updatePeriod = (period: DateRange | undefined) => {
     setDateRange(period)
-    getStats()
   }
 
   return (

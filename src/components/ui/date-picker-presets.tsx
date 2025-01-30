@@ -72,10 +72,10 @@ export function DatePickerWithPresets(props: DatePickerWithPresetsProps) {
   const mappedPresetDates = React.useMemo(() => {
     return selectRangeList.reduce(
       (acc, cur) => {
-        acc[cur.days] = cur
+        acc[cur.days ?? ""] = cur
         return acc
       },
-      {} as Record<string, DateRange>,
+      {} as Record<string, DateRangeExtended>,
     )
   }, [selectRangeList])
 
@@ -89,12 +89,10 @@ export function DatePickerWithPresets(props: DatePickerWithPresetsProps) {
   }
 
   const setPresetDates = (command: string) => {
-    selectDate(presetDates[command?.toString() ?? "0"])
+    selectDate(mappedPresetDates[Number(command)])
   }
   const parseDateToPreset = () => {
     const currentDateCount = moment(date?.to).diff(moment(date?.from), "days")
-    console.log(currentDateCount)
-    console.log(date)
     return mappedPresetDates[currentDateCount]?.days?.toString()
   }
 
@@ -148,7 +146,7 @@ export function DatePickerWithPresets(props: DatePickerWithPresetsProps) {
           >
             {selectRangeList.map((e, i) => {
               return (
-                <SelectItem key={i} value={e.days.toString()}>
+                <SelectItem key={i} value={e.days?.toString() ?? ""}>
                   {e.label}
                 </SelectItem>
               )

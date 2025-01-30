@@ -10,7 +10,6 @@ export const initializeStore = () => {
   const currentTargetServer =
     localStorage.getItem("targetServer") || appConfig.apBaseUrl
   const savedTargets = localStorage.getItem("savedTargets") || "[]"
-  console.log(currentTargetServer)
   store.dispatch(
     setConfigItem([
       { name: "savedTargets", value: JSON.parse(savedTargets) },

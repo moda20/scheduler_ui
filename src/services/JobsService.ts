@@ -93,7 +93,7 @@ const jobsService = {
     })
   },
 
-  jobStats(jobIds?: Array<string>, dateRange?: DateRange) {
+  jobStats(jobIds?: Array<string>, dateRange?: DateRange): Promise<any> {
     return axios.get(`/jobs/jobStats`, {
       params: {
         jobIds,
@@ -103,7 +103,7 @@ const jobsService = {
     })
   },
 
-  jobMetrics() {
+  jobMetrics(): Promise<any> {
     return axios.get(`/jobs/jobMetrics`, {})
   },
 }
