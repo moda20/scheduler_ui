@@ -29,6 +29,7 @@ import { ComboBox, ComboBoxItem } from "@/components/ui/combo-box"
 import cronstrue from "cronstrue"
 import { parseCron } from "@/lib/utils"
 import useDialogueManager from "@/hooks/useDialogManager"
+import { useHotkeys } from "react-hotkeys-hook"
 
 export interface JobUpdateDialogProps {
   children: React.ReactNode
@@ -63,6 +64,10 @@ export function JobUpdateDialog({
     },
   })
   const { isDialogOpen, setDialogState } = useDialogueManager()
+
+  useHotkeys(["ctrl+alt+n", "meta+alt+n"], () => {
+    setDialogState(true)
+  })
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={v => setDialogState(v)}>

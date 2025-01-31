@@ -92,6 +92,10 @@ export default function JobsPage() {
         await jobsService
           .executeAction(row!.original.id, "START")
           .then(data => {
+            toast({
+              title: `Service ${row!.original.name} Scheduled`,
+              duration: 3000,
+            })
             return fetchTableData()
           })
           .finally(() => {
@@ -102,6 +106,10 @@ export default function JobsPage() {
         await jobsService
           .executeAction(row!.original.id, "STOP")
           .then(data => {
+            toast({
+              title: `Service ${row!.original.name} De-scheduled`,
+              duration: 3000,
+            })
             return fetchTableData()
           })
           .finally(() => {
@@ -115,6 +123,7 @@ export default function JobsPage() {
           .then(() => {
             toast({
               title: `Service ${row!.original.name} Launched`,
+              duration: 3000,
             })
           })
           .catch(err => {
@@ -137,6 +146,12 @@ export default function JobsPage() {
           .then(d => {
             return jobsService.executeAction(row!.original.id, "START")
           })
+          .then(() => {
+            toast({
+              title: `Service ${row!.original.name} Updated`,
+              duration: 3000,
+            })
+          })
           .finally(() => {
             setLoading(true)
           })
@@ -147,6 +162,12 @@ export default function JobsPage() {
             ...data,
             status: "STOPPED",
             exclusive: true,
+          })
+          .then(() => {
+            toast({
+              title: `Service ${row!.original.name} Created`,
+              duration: 3000,
+            })
           })
           .finally(() => {
             setLoading(false)
