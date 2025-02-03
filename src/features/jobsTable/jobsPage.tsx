@@ -110,7 +110,6 @@ export default function JobsPage() {
               title: `Service ${row!.original.name} De-scheduled`,
               duration: 3000,
             })
-            return fetchTableData()
           })
           .finally(() => {
             setLoading(true)
@@ -134,13 +133,6 @@ export default function JobsPage() {
           })
         break
       case jobActions.UPDATE:
-        /*if (!jobId) {
-          return jobsService.executeActionWithUpdate(jobId, 'CREATE', {
-            ...jobUpdateConfig,
-            status: 'STOPPED',
-            exclusive: true
-          }).then(() => this.getAllJobs())
-        }*/
         await jobsService
           .executeActionWithUpdate(row!.original.id, "STOP", data)
           .then(d => {
