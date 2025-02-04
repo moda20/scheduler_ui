@@ -24,10 +24,10 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import Cron from "react-js-cron"
-import { AsteriskIcon } from "lucide-react"
-import { ComboBox, ComboBoxItem } from "@/components/ui/combo-box"
-import cronstrue from "cronstrue"
-import { parseCron } from "@/lib/utils"
+import { PlusIcon, SaveIcon } from "lucide-react"
+import type { ComboBoxItem } from "@/components/ui/combo-box"
+import { ComboBox } from "@/components/ui/combo-box"
+import { cn, parseCron } from "@/lib/utils"
 import useDialogueManager from "@/hooks/useDialogManager"
 import { useHotkeys } from "react-hotkeys-hook"
 
@@ -37,6 +37,7 @@ export interface JobUpdateDialogProps {
   jobDetails?: jobsTableData
   itemList?: ComboBoxItem[] | (() => Promise<ComboBoxItem[]>)
   onChange: (value: z.infer<typeof jobUpdateSchema>) => void
+  triggerClassName?: string
 }
 export type JobUpdateType = z.infer<typeof jobUpdateSchema>
 
@@ -53,6 +54,7 @@ export function JobUpdateDialog({
   jobDetails,
   onChange,
   itemList,
+  triggerClassName,
 }: JobUpdateDialogProps) {
   const form = useForm<z.infer<typeof jobUpdateSchema>>({
     resolver: zodResolver(jobUpdateSchema),
@@ -72,6 +74,7 @@ export function JobUpdateDialog({
   return (
     <Dialog open={isDialogOpen} onOpenChange={v => setDialogState(v)}>
       <DialogTrigger
+        className={cn(triggerClassName)}
         onClick={v => {
           v.preventDefault()
           setDialogState(true)
@@ -183,6 +186,7 @@ export function JobUpdateDialog({
             />
             <DialogFooter>
               <Button variant={"default"} type="submit">
+                {isCreateDialog ? <PlusIcon /> : <SaveIcon />}
                 {isCreateDialog ? "Add a new job" : "Save changes"}
               </Button>
             </DialogFooter>

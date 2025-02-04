@@ -78,7 +78,7 @@ export default function ActionDropdown({
           <ConfirmationDialogAction
             title={
               row.original.status === "STARTED"
-                ? "un-Scheduele the job"
+                ? "Un-schedule the job"
                 : "Schedule the job"
             }
             description={
@@ -93,6 +93,9 @@ export default function ActionDropdown({
                   : jobActions.SCHEDULE,
               )
             }}
+            confirmText={
+              row.original.status === "STARTED" ? "Un-schedule" : "Schedule"
+            }
           >
             <DropdownMenuItem onSelect={e => e.preventDefault()}>
               <Settings />
@@ -109,6 +112,7 @@ export default function ActionDropdown({
             onChange={jobData => {
               columnsProps.takeAction(row, jobActions.UPDATE, jobData)
             }}
+            triggerClassName="w-full"
           >
             <DropdownMenuItem onSelect={e => e.preventDefault()}>
               <Edit2Icon />
