@@ -1,4 +1,4 @@
-import axios, { request } from "axios"
+import axios from "axios"
 import config from "@/configs/appConfig"
 import history from "../history/history"
 import { auth_token as AUTH_TOKEN } from "@/app/reducers/authReducer"
