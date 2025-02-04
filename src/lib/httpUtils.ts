@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios, { request } from "axios"
 import config from "@/configs/appConfig"
 import history from "../history/history"
 import { auth_token as AUTH_TOKEN } from "@/app/reducers/authReducer"
@@ -20,39 +20,27 @@ const TOKEN_PAYLOAD_KEY = "authorization"
 const services = [service, mongoService]
 // API Request interceptor
 services.forEach(s =>
-  s.interceptors.request.use(
-    config => {
-      const jwtToken = localStorage.getItem("AUTH_TOKEN")
-      const targetUrl = store.getState().ui.config.targetServer
-      if (jwtToken) {
-        config.headers[TOKEN_PAYLOAD_KEY] = jwtToken
-      }
-      if (targetUrl) {
-        config.baseURL = `${targetUrl}${config?.baseURL?.includes("mongo") ? "/mongo" : ""}`
-      }
+  s.interceptors.request.use(config => {
+    const jwtToken = localStorage.getItem("AUTH_TOKEN")
+    const targetUrl = store.getState().ui.config.targetServer
+    if (jwtToken) {
+      config.headers[TOKEN_PAYLOAD_KEY] = jwtToken
+    }
+    if (targetUrl) {
+      config.baseURL = `${targetUrl}${config?.baseURL?.includes("mongo") ? "/mongo" : ""}`
+    }
 
-      /*if (!jwtToken && !config.headers[PUBLIC_REQUEST_KEY]) {
-          history.push(ENTRY_ROUTE)
-          window.location.reload();
-    }*/
-
-      return config
-    },
-    error => {
-      toast({
-        title: "Error",
-        description: error.data.message ?? "Error",
-        variant: "destructive",
-      })
-      return Promise.reject(error)
-    },
-  ),
+    return config
+  }),
 )
 
 // API respone interceptor
 services.forEach(s =>
   s.interceptors.response.use(
     response => {
+      if (response.config?.fetchOptions?.fullResponse) {
+        return response
+      }
       return response.data
     },
     error => {

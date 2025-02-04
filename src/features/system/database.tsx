@@ -15,6 +15,7 @@ import {
 import { useEffect, useState } from "react"
 import systemService from "@/services/SystemService"
 import { Button } from "@/components/ui/button"
+import { toast } from "@/hooks/use-toast"
 
 export default function DatabaseDashboard() {
   const [dbInfo, setDbInfo] = useState<any>({})
@@ -22,6 +23,15 @@ export default function DatabaseDashboard() {
   const getDbInfo = async () => {
     const dbInfo = await systemService.getDatabaseInformation()
     setDbInfo(dbInfo)
+  }
+
+  const backUpDb = () => {
+    return systemService.downloadSchedulerDBBackupFile().then(() => {
+      toast({
+        title: "Backup finished successfully",
+        duration: 1500,
+      })
+    })
   }
 
   useEffect(() => {
@@ -64,7 +74,7 @@ export default function DatabaseDashboard() {
             </ul>
           </CardContent>
           <CardFooter className="flex flex-row justify-end gap-2">
-            <Button>
+            <Button onClick={() => backUpDb()}>
               <DatabaseBackup /> Backup
             </Button>
 
