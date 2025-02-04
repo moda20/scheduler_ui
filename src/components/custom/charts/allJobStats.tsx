@@ -16,7 +16,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 import jobsService from "@/services/JobsService"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import {
   DatePickerWithPresets,
   defaultDateRange,
@@ -27,11 +27,11 @@ import { Button } from "@/components/ui/button"
 import { FileWarningIcon, LucideListRestart } from "lucide-react"
 const chartConfig = {
   average_duration: {
-    label: "Average duration",
+    label: "Average duration (min)",
     color: "hsl(var(--chart-1))",
   },
   total_runtime: {
-    label: "Runtime duration",
+    label: "Runtime duration (min)",
     color: "hsl(var(--chart-2))",
   },
   total_runs: {
