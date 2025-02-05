@@ -14,6 +14,7 @@ import ConfirmationDialogAction, {
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { jobActions } from "@/features/jobsTable/interfaces"
 import { useHotkeys } from "react-hotkeys-hook"
+import HotKeyButton from "@/components/custom/HotKeyButton"
 
 export default function DrawerMenuConfigurator() {
   useHotkeys(
@@ -144,14 +145,14 @@ export default function DrawerMenuConfigurator() {
                       <DeleteIcon />
                     </Button>
                   </ConfirmationDialogAction>
-
-                  <Button
+                  <HotKeyButton
+                    hotKey={["ctrl+alt+" + (i + 1), "meta+alt+" + (i + 1)]}
                     variant={"default"}
                     size={"icon"}
                     onClick={() => setNewTargetServer(e)}
                   >
                     <PlayIcon />
-                  </Button>
+                  </HotKeyButton>
                 </div>
               </div>
             ))}

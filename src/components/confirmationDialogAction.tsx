@@ -9,11 +9,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { Button, buttonVariants } from "@/components/ui/button"
+import type { buttonVariants } from "@/components/ui/button"
 import type * as React from "react"
-import { VariantProps } from "class-variance-authority"
-import { useHotkeys } from "react-hotkeys-hook"
-import { useEffect, useId, useState } from "react"
+import type { VariantProps } from "class-variance-authority"
 import useDialogueManager from "@/hooks/useDialogManager"
 
 export enum ConfirmationDialogActionType {
