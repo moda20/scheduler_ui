@@ -14,6 +14,8 @@ import { InputIcon } from "@radix-ui/react-icons"
 import { IconInput } from "@/components/custom/IconInput"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
+import { useAppSelector } from "@/app/hooks"
+import { config } from "@/app/reducers/uiReducer"
 
 export const defaultSortingState = [{ id: "cronSetting", desc: true }]
 
@@ -22,6 +24,7 @@ export default function JobsPage() {
   const [loading, setLoading] = useState(true)
   const [fetchingData, setFetchingStatus] = useState(false)
   const [sorting, setSorting] = useState<SortingState>(defaultSortingState)
+  const savedConfig = useAppSelector(config)
   async function fetchTableData() {
     setFetchingStatus(true)
     return await jobsService
@@ -60,9 +63,10 @@ export default function JobsPage() {
   }
   useEffect(() => {
     if (!fetchingData) {
+      setLoading(true)
       fetchTableData()
     }
-  }, [])
+  }, [savedConfig.targetServer])
 
   async function filterAndPaginationChange({ sorting }: { sorting: any }) {
     setSorting(sorting)
