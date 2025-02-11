@@ -33,6 +33,11 @@ export const routesList = [
         title: "Databases & Backups",
         url: "/db_backups",
       },
+      {
+        id: "proxies",
+        title: "Proxies",
+        url: "/proxies",
+      },
     ],
   },
 ]

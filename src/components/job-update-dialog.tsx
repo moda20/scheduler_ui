@@ -35,7 +35,7 @@ export interface JobUpdateDialogProps {
   children: React.ReactNode
   isCreateDialog?: boolean
   jobDetails?: jobsTableData
-  itemList?: ComboBoxItem[] | (() => Promise<ComboBoxItem[]>)
+  itemList: ComboBoxItem[] | (() => Promise<ComboBoxItem[]>)
   onChange: (value: z.infer<typeof jobUpdateSchema>) => void
   triggerClassName?: string
 }

@@ -19,7 +19,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import useDialogueManager from "@/hooks/useDialogManager"
-import { useId } from "react"
+import { useCallback, useId } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 
 export interface ComboBoxItemInterface {
@@ -27,16 +27,17 @@ export interface ComboBoxItemInterface {
   label: string
 }
 
-export type ComboBoxItem = ComboBoxItemInterface | null
+export type ComboBoxItem = ComboBoxItemInterface
 export interface ComboBoxProps {
-  itemList?: ComboBoxItem[] | (() => Promise<ComboBoxItem[]>)
-  selectedItemValue?: string | null
+  itemList: ComboBoxItem[] | (() => Promise<ComboBoxItem[]>)
+  selectedItemValue?: string | Array<string> | null
   searchFieldPlaceholder?: string
   noFieldsFoundText?: string
   inputFieldsText?: string
   className?: string
   triggerClassName?: string
-  onChange: (value?: string) => void
+  onChange: (value?: string | Array<string>) => void
+  multiSelect?: boolean
 }
 
 const defaultProps: ComboBoxProps = {
@@ -48,6 +49,47 @@ const defaultProps: ComboBoxProps = {
   inputFieldsText: "Select item...",
   className: "",
   triggerClassName: "",
+  multiSelect: false,
+}
+
+export interface ComboButtonBoxRendererProps {
+  selectedValue?: string | Array<string>
+  itemList: ComboBoxItem[]
+  defaultInputText?: string
+  multiSelect?: boolean
+  mappedInputList: Record<string, ComboBoxItem>
+}
+
+const ComboButtonBoxRenderer = ({
+  selectedValue,
+  itemList,
+  defaultInputText,
+  multiSelect,
+  mappedInputList,
+}: ComboButtonBoxRendererProps) => {
+  return multiSelect ? (
+    <div className="flex gap-1 items-center justify-between w-full">
+      <span className="flex gap-0.5">
+        {(selectedValue as Array<string>).slice(0, 3).map(v => (
+          <span
+            key={v}
+            className="w-[80px] p-1 overflow-clip overflow-ellipsis"
+          >
+            {mappedInputList[v]?.label}
+          </span>
+        ))}
+      </span>
+      <span className="items-center gap-1 rounded border border-border bg-gray-100 bg-opacity-20 px-1.5 font-mono text-[15px] font-bold">
+        {selectedValue?.length}
+      </span>
+    </div>
+  ) : (
+    <span>
+      {selectedValue
+        ? itemList.find(item => item?.value === selectedValue)?.label
+        : defaultInputText}
+    </span>
+  )
 }
 
 export function ComboBox({
@@ -59,13 +101,52 @@ export function ComboBox({
   className,
   triggerClassName,
   inputFieldsText = defaultProps.inputFieldsText,
+  multiSelect,
 }: ComboBoxProps = defaultProps) {
-  const [value, setValue] = React.useState(selectedItemValue ?? "")
+  const [value, setValue] = React.useState<string | Array<string>>(
+    selectedItemValue ?? (multiSelect ? [] : ""),
+  )
+
   const [currentItemList, setCurrentItemList] = React.useState<ComboBoxItem[]>(
     [],
   )
-
   const { isDialogOpen, setDialogState } = useDialogueManager()
+
+  const setSelectedValue = useCallback(
+    (currentValue: string) => {
+      if (multiSelect && Array.isArray(value)) {
+        const newValue = value.includes(currentValue)
+          ? value.filter(e => e !== currentValue)
+          : [...value, currentValue]
+        setValue(newValue)
+        onChange(newValue)
+      } else {
+        setValue(currentValue === value ? "" : currentValue)
+        onChange(currentValue === value ? undefined : currentValue)
+        setDialogState(false)
+      }
+    },
+    [multiSelect, onChange, value, setDialogState],
+  )
+  const mappedInputList = React.useMemo(() => {
+    return currentItemList.reduce(
+      (acc, cur) => {
+        acc[cur!.value ?? ""] = cur
+        return acc
+      },
+      {} as Record<string, ComboBoxItem>,
+    )
+  }, [currentItemList])
+
+  const isSelectedValue = useCallback(
+    (currentValue: string) => {
+      if (multiSelect) {
+        return Array.isArray(value) ? value.includes(currentValue) : false
+      }
+      return value === currentValue
+    },
+    [multiSelect, value],
+  )
 
   React.useEffect(() => {
     if (typeof itemList === "function") {
@@ -101,9 +182,13 @@ export function ComboBox({
             }
           }}
         >
-          {value
-            ? currentItemList.find(item => item?.value === value)?.label
-            : inputFieldsText}
+          {ComboButtonBoxRenderer({
+            selectedValue: value,
+            itemList: currentItemList,
+            defaultInputText: inputFieldsText,
+            multiSelect,
+            mappedInputList,
+          })}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -123,18 +208,15 @@ export function ComboBox({
             <CommandGroup>
               {currentItemList.map(item => (
                 <CommandItem
-                  key={item?.value}
+                  key={item.value}
+                  keywords={[item.label, item.value]}
                   value={item?.value}
-                  onSelect={currentValue => {
-                    setValue(currentValue === value ? "" : currentValue)
-                    setDialogState(false)
-                    onChange(currentValue === value ? undefined : currentValue)
-                  }}
+                  onSelect={currentValue => setSelectedValue(currentValue)}
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === item?.value ? "opacity-100" : "opacity-0",
+                      isSelectedValue(item.value) ? "opacity-100" : "opacity-0",
                     )}
                   />
                   {item?.label}

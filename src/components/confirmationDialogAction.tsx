@@ -22,13 +22,14 @@ export enum ConfirmationDialogActionType {
 export interface ConfirmationDialogActionProps {
   children: React.ReactNode
   title: string
-  description: string
+  description: string | React.ReactNode
   cancelText?: string
   confirmText?: string
   confirmVariant?: VariantProps<typeof buttonVariants>["variant"]
   cancelVariant?: VariantProps<typeof buttonVariants>["variant"]
   takeAction: (arg: ConfirmationDialogActionType) => void
   onOpenChange?: (open: boolean) => void
+  disableConfirm?: boolean
 }
 
 export default function ConfirmationDialogAction(
@@ -74,6 +75,7 @@ export default function ConfirmationDialogAction(
               props.takeAction(ConfirmationDialogActionType.CONFIRM)
             }
             variant={props.confirmVariant}
+            disabled={props.disableConfirm}
           >
             {props.confirmText ?? "Confirm"}
           </AlertDialogAction>

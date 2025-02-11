@@ -5,6 +5,7 @@ import App from "@/App"
 import JobsPage from "@/features/jobsTable/jobsPage"
 import Dashboard from "@/features/dashboard/dashboard"
 import DatabaseDashboard from "@/features/system/database"
+import Proxies from "@/features/network/proxies"
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,11 @@ const router = createBrowserRouter([
         path: "/db_backups",
         index: true,
         element: <DatabaseDashboard />,
+      },
+      {
+        path: "/proxies",
+        index: true,
+        element: <Proxies />,
       },
     ],
   },

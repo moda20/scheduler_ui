@@ -1,11 +1,4 @@
-import {
-  useState,
-  useCallback,
-  useId,
-  useContext,
-  useEffect,
-  useRef,
-} from "react"
+import { useState, useCallback, useId, useContext } from "react"
 import { useAppDispatch, useAppSelector } from "@/app/hooks"
 import {
   closeAllGroupedDialogs,
@@ -41,9 +34,14 @@ function useDialogueManager({
 
   const canClose = (dialog: string, canBeDirectClosed: boolean = false) => {
     const stack = store.getState().ui.dialogStack
+    const groupStack = store.getState().ui.dialogGroups
     return (
       stack.length > 0 &&
-      (canBeDirectClosed || stack[stack.length - 1] === dialog)
+      ((canBeDirectClosed &&
+        inputGroup &&
+        (!groupStack[inputGroup] ||
+          !groupStack[inputGroup].includes(dialog))) ||
+        stack[stack.length - 1] === dialog)
     )
   }
 
