@@ -1,5 +1,7 @@
 import axios, { mongoAxiosService } from "@/lib/httpUtils"
-import { DateRange } from "react-day-picker"
+import type { DateRange } from "react-day-picker"
+import { downloadFile } from "@/utils/serviceUtils"
+import { jobLog } from "@/models/cacheFiles"
 //import socketManager from '../utils/socketManager';
 
 const jobsService = {
@@ -105,6 +107,36 @@ const jobsService = {
 
   jobMetrics(): Promise<any> {
     return axios.get(`/jobs/jobMetrics`, {})
+  },
+
+  getJobCacheFiles(jobId: string): Promise<any> {
+    return axios.get("/files/getCachedFiles", {
+      params: {
+        jobId: jobId,
+      },
+    })
+  },
+  downloadCacheFile(id: string, fileName: string): Promise<any> {
+    return axios
+      .get(`/files/downloadCacheFile`, {
+        params: {
+          id,
+          fileName,
+        },
+        responseType: "arraybuffer",
+        fetchOptions: {
+          fullResponse: true,
+        },
+      })
+      .then(downloadFile)
+  },
+  deleteCacheFile(id: string, fileName: string): Promise<any> {
+    return axios.get(`/files/deleteCacheFile`, {
+      params: {
+        id,
+        fileName,
+      },
+    })
   },
 }
 

@@ -51,7 +51,7 @@ import { subDays } from "date-fns"
 import { DateRange } from "react-day-picker"
 import { ComboBoxItem } from "@/components/ui/combo-box"
 import useDialogueManager from "@/hooks/useDialogManager"
-import ActionDropdown from "@/features/jobsTable/actionDropdown"
+import ActionDropdown from "@/components/custom/jobsTable/actionDropdown"
 import HeaderSortButton from "@/components/custom/jobsTable/headerSortButton"
 
 export interface jobsTableData {

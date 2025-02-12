@@ -14,6 +14,7 @@ import {
   DockIcon,
   Edit2Icon,
   EllipsisVertical,
+  FileSliders,
   LogsIcon,
   Settings,
   Trash2Icon,
@@ -30,6 +31,7 @@ import type {
 import { jobActions } from "@/features/jobsTable/interfaces"
 import type { Row } from "@tanstack/react-table"
 import type { DateRange } from "react-day-picker"
+import DrawerJobFiles from "@/components/custom/DrawerJobFiles"
 
 export interface ActionDropdownProps {
   columnsProps: tableColumnsProps
@@ -149,6 +151,17 @@ export default function ActionDropdown({
               <DropdownMenuItem onSelect={e => e.preventDefault()}>
                 <LogsIcon />
                 <span>Latest Logs</span>
+              </DropdownMenuItem>
+            }
+          />
+        </DropdownMenuGroup>
+        <DropdownMenuGroup>
+          <DrawerJobFiles
+            JobDetails={row.original}
+            trigger={
+              <DropdownMenuItem onSelect={e => e.preventDefault()}>
+                <FileSliders />
+                <span>Output Files</span>
               </DropdownMenuItem>
             }
           />
