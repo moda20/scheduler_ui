@@ -48,7 +48,7 @@ const ProxyUpdateSchema = z.object({
   proxy_ip: z.string(),
   proxy_port: z.union([z.number(), z.string()]),
   description: z.string().optional(),
-  status: z.union([z.enum(["active", "inactive"]), z.number()]).optional(),
+  status: z.union([z.nativeEnum(ProxyStatus), z.number()]).optional(),
   username: z.string().optional(),
   password: z.string().optional(),
   protocol: z.string().optional(),
