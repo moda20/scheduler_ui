@@ -131,7 +131,36 @@ const jobsService = {
       .then(downloadFile)
   },
   deleteCacheFile(id: string, fileName: string): Promise<any> {
-    return axios.get(`/files/deleteCacheFile`, {
+    return axios.delete(`/files/deleteCacheFile`, {
+      params: {
+        id,
+        fileName,
+      },
+    })
+  },
+  getJobOutputFiles(jobId: string): Promise<any> {
+    return axios.get("/files/getOutputFiles", {
+      params: {
+        jobId: jobId,
+      },
+    })
+  },
+  downloadOutputFile(id: string, fileName: string): Promise<any> {
+    return axios
+      .get(`/files/downloadOutputFile`, {
+        params: {
+          id,
+          fileName,
+        },
+        responseType: "arraybuffer",
+        fetchOptions: {
+          fullResponse: true,
+        },
+      })
+      .then(downloadFile)
+  },
+  deleteOutputFile(id: string, fileName: string): Promise<any> {
+    return axios.delete(`/files/deleteOutputFile`, {
       params: {
         id,
         fileName,
