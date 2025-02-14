@@ -45,9 +45,7 @@ export default function ProxyListActionDropdown({
     inputGroup: "proxyActions",
   })
 
-  const hasJobsLinked =
-    !row.original?.job?.length || row.original?.job?.length === 0
-
+  const hasJobsLinked = (row.original?.job?.length ?? 0) > 0
   return (
     <DropdownMenu
       modal={false}
@@ -85,7 +83,6 @@ export default function ProxyListActionDropdown({
           <ProxyConfigDialog
             isCreateDialog={false}
             onChange={jobData => {
-              console.log(jobData)
               columnsProps.proxyAction(ProxyActions.UPDATE, row, jobData)
             }}
             proxyDetails={row.original}

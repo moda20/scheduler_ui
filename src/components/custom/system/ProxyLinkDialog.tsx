@@ -33,6 +33,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PasswordInput } from "@/components/ui/password-input"
 import ManagedSelect from "@/components/custom/ManagedSelect"
+import ConfirmationDialogAction from "@/components/confirmationDialogAction"
+import { MinusIcon } from "@radix-ui/react-icons"
 
 export interface ProxyLinkDialogProps {
   children: React.ReactNode
@@ -68,7 +70,6 @@ export function ProxyLinkDialog({
     },
   })
   const { isDialogOpen, setDialogState } = useDialogueManager()
-  console.log(proxyDetails)
   return (
     <Dialog open={isDialogOpen} onOpenChange={v => setDialogState(v)}>
       <DialogTrigger
@@ -136,6 +137,27 @@ export function ProxyLinkDialog({
               <Card className="border-transparent">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 p-0 pb-2 text-foreground bg-background border-transparent rounded-t-xl">
                   <CardTitle className="text-lg font-bold">Jobs</CardTitle>
+                  <ConfirmationDialogAction
+                    title={"Unlink All jobs"}
+                    description={"Unlink all jobs from this proxy"}
+                    takeAction={() =>
+                      form.setValue("jobs", [], {
+                        shouldTouch: true,
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                    }
+                    confirmText={"Unlink all jobs"}
+                  >
+                    <Button
+                      variant={"destructive"}
+                      size="sm"
+                      className="btn-rounded"
+                    >
+                      <MinusIcon />
+                      Unlink all
+                    </Button>
+                  </ConfirmationDialogAction>
                 </CardHeader>
                 <CardContent className="p-0 pt-0 flex flex-col gap-2">
                   <FormField
@@ -150,9 +172,7 @@ export function ProxyLinkDialog({
                           <br />
                           <FormControl ref={field.ref}>
                             <ComboBox
-                              selectedItemValue={proxyDetails?.job?.map(
-                                e => `${e.job_id}`,
-                              )}
+                              selectedItemValue={field.value}
                               itemList={JobsList}
                               {...field}
                               noFieldsFoundText={"No Jobs found"}
@@ -163,6 +183,7 @@ export function ProxyLinkDialog({
                               className="w-[--radix-popover-trigger-width]"
                               triggerClassName={"w-full"}
                               multiSelect={true}
+                              managed={true}
                             />
                           </FormControl>
                           <FormDescription>

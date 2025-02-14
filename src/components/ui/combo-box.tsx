@@ -19,7 +19,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import useDialogueManager from "@/hooks/useDialogManager"
-import { useCallback, useId } from "react"
+import { useCallback, useEffect, useId } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 
 export interface ComboBoxItemInterface {
@@ -38,6 +38,7 @@ export interface ComboBoxProps {
   triggerClassName?: string
   onChange: (value?: string | Array<string>) => void
   multiSelect?: boolean
+  managed?: boolean
 }
 
 const defaultProps: ComboBoxProps = {
@@ -92,6 +93,15 @@ const ComboButtonBoxRenderer = ({
   )
 }
 
+const parseInputSelectedItems = (
+  selectedItemValue?: string | string[] | null,
+) => {
+  if (Array.isArray(selectedItemValue)) {
+    return selectedItemValue.map(e => `${e}`)
+  }
+  return selectedItemValue?.toString()
+}
+
 export function ComboBox({
   selectedItemValue,
   itemList,
@@ -102,15 +112,24 @@ export function ComboBox({
   triggerClassName,
   inputFieldsText = defaultProps.inputFieldsText,
   multiSelect,
+  managed,
 }: ComboBoxProps = defaultProps) {
   const [value, setValue] = React.useState<string | Array<string>>(
-    selectedItemValue ?? (multiSelect ? [] : ""),
+    parseInputSelectedItems(selectedItemValue) ?? (multiSelect ? [] : ""),
   )
 
   const [currentItemList, setCurrentItemList] = React.useState<ComboBoxItem[]>(
     [],
   )
   const { isDialogOpen, setDialogState } = useDialogueManager()
+
+  useEffect(() => {
+    if (managed) {
+      const newValue =
+        parseInputSelectedItems(selectedItemValue) ?? (multiSelect ? [] : "")
+      setValue(newValue)
+    }
+  }, [selectedItemValue])
 
   const setSelectedValue = useCallback(
     (currentValue: string) => {
