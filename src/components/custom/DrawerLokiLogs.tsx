@@ -49,24 +49,26 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
           .unix(),
       )
       .then(res => {
-        const parsedLogs = res.data?.result?.map((stream, si) => {
-          const logValues = stream?.values?.map((log: any) => {
-            const logBits = log?.[1]?.split(" | ")
+        const parsedLogs = res.data?.result
+          ?.sort((a, b) => Number(b.values[0]?.[0]) - Number(a.values[0]?.[0]))
+          .map((stream, si) => {
+            const logValues = stream?.values?.map((log: any) => {
+              const logBits = log?.[1]?.split(" | ")
+              return {
+                timestamp: logBits[0],
+                type: logBits[1],
+                message: logBits[2],
+              }
+            })
             return {
-              timestamp: logBits[0],
-              type: logBits[1],
-              message: logBits[2],
+              values: logValues,
+              uniqueId: `tab_${stream?.stream?.uniqueId?.toString()}`,
+              name: stream?.stream?.job,
+              title: si
+                ? moment(logValues[0]?.timestamp).format("YYYY-MM-DD")
+                : `latest (${moment(logValues[0]?.timestamp).fromNow()})`,
             }
           })
-          return {
-            values: logValues,
-            uniqueId: `tab_${stream?.stream?.uniqueId?.toString()}`,
-            name: stream?.stream?.job,
-            title: si
-              ? moment(logValues[0]?.timestamp).format("YYYY-MM-DD")
-              : `latest (${moment(logValues[0]?.timestamp).fromNow()})`,
-          }
-        })
         setLogs(parsedLogs ?? [])
         setActiveTab(parsedLogs[0]?.uniqueId)
       })
@@ -122,7 +124,7 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
           defaultValue={logs[0]?.uniqueId}
           className="h-[calc(100%-3rem)]"
         >
-          <TabsList>
+          <TabsList className="px-0">
             {logs.map((stream: any, index) => {
               return (
                 <TabsTrigger
@@ -155,7 +157,7 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
                           key={index}
                           className={"flex flex-row items-center gap-2 mb-2"}
                         >
-                          <Label className="min-w-[190px]">
+                          <Label className="min-w-[170px] whitespace-nowrap">
                             {log.timestamp}
                           </Label>
                           <Badge variant={"defaultTeal"}>{log.type}</Badge>
