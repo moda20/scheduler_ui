@@ -11,6 +11,7 @@ import type { DateRange } from "react-day-picker"
 import moment from "moment"
 import type { CheckedState } from "@radix-ui/react-checkbox"
 import useInterval from "@/hooks/useInterval"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export interface DrawerLokiLogsProps {
   start?: Date
@@ -22,16 +23,18 @@ export interface DrawerLokiLogsProps {
 export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
   const [logs, setLogs] = useState([])
   const [watch, setWatch] = useState<CheckedState>(true)
+  const [dialogOpen, setDialogOpen] = useState<CheckedState>(false)
   const [period, setPeriod] = useState<DateRange | undefined>({
     from: props.start,
     to: props.end,
   })
+  const [activeTab, setActiveTab] = useState<string>(null)
 
   useInterval(
     () => {
       getLogs()
     },
-    watch ? 10000 : null,
+    dialogOpen && watch ? 10000 : null,
   )
 
   const getLogs = () => {
@@ -46,19 +49,31 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
           .unix(),
       )
       .then(res => {
-        const parsedLogs = res.data?.result?.[0]?.values?.map((log: any) => {
-          const logBits = log?.[1]?.split(" | ")
+        const parsedLogs = res.data?.result?.map((stream, si) => {
+          const logValues = stream?.values?.map((log: any) => {
+            const logBits = log?.[1]?.split(" | ")
+            return {
+              timestamp: logBits[0],
+              type: logBits[1],
+              message: logBits[2],
+            }
+          })
           return {
-            timestamp: logBits[0],
-            type: logBits[1],
-            message: logBits[2],
+            values: logValues,
+            uniqueId: `tab_${stream?.stream?.uniqueId?.toString()}`,
+            name: stream?.stream?.job,
+            title: si
+              ? moment(logValues[0]?.timestamp).format("YYYY-MM-DD")
+              : `latest (${moment(logValues[0]?.timestamp).fromNow()})`,
           }
         })
         setLogs(parsedLogs ?? [])
+        setActiveTab(parsedLogs[0]?.uniqueId)
       })
   }
 
   const fetchLogs = (open?: boolean) => {
+    setDialogOpen(open)
     if (open) {
       getLogs()
     }
@@ -75,10 +90,12 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
       title={`Logs for ${props.jobName}`}
       description={null}
       trigger={props.trigger}
-      contentClassName={"w-[600px] sm:w-[800px] sm:max-w-[800px] h-full"}
+      contentClassName={
+        "w-[600px] sm:w-[800px] sm:max-w-[800px] h-full flex flex-col"
+      }
       onOpenChange={open => fetchLogs(open)}
     >
-      <div className={"flex flex-row items-center gap-2 my-2"}>
+      <div className={"flex flex-row items-center gap-2 my-2 h-100"}>
         <div className="flex flex-row items-center gap-2 border rounded-md p-2 bg-sidebar">
           <Checkbox
             id={"watchLogs"}
@@ -99,22 +116,60 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
           />
         </div>
       </div>
-      <ScrollArea className="h-full">
-        <div className={"rounded-md h-full p-1  overflow-clip bg-sidebar"}>
-          {logs.map((log: any, index) => {
+      {logs.length > 0 && (
+        <Tabs
+          value={activeTab}
+          defaultValue={logs[0]?.uniqueId}
+          className="h-[calc(100%-3rem)]"
+        >
+          <TabsList>
+            {logs.map((stream: any, index) => {
+              return (
+                <TabsTrigger
+                  className="data-[state=active]:bg-sidebar"
+                  key={stream.uniqueId}
+                  value={stream.uniqueId}
+                  onClick={() => setActiveTab(stream.uniqueId)}
+                  title={stream.uniqueId}
+                >
+                  {stream.title}
+                </TabsTrigger>
+              )
+            })}
+          </TabsList>
+          {logs.map((stream: any, index) => {
             return (
-              <div
-                key={index}
-                className={"flex flex-row items-center gap-2 mb-2"}
+              <TabsContent
+                key={"t" + stream.uniqueId}
+                value={stream.uniqueId}
+                className="h-[inherit]"
+                title={stream.title}
               >
-                <Label className="min-w-[190px]">{log.timestamp}</Label>
-                <Badge variant={"defaultTeal"}>{log.type}</Badge>
-                <Label className="leading-5">{log.message}</Label>
-              </div>
+                <ScrollArea className="pb-2 flex flex-col gap-0.5 h-full">
+                  <div
+                    className={"rounded-md h-full p-1 overflow-clip bg-sidebar"}
+                  >
+                    {stream.values.map((log: any, index) => {
+                      return (
+                        <div
+                          key={index}
+                          className={"flex flex-row items-center gap-2 mb-2"}
+                        >
+                          <Label className="min-w-[190px]">
+                            {log.timestamp}
+                          </Label>
+                          <Badge variant={"defaultTeal"}>{log.type}</Badge>
+                          <Label className="leading-5">{log.message}</Label>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </ScrollArea>
+              </TabsContent>
             )
           })}
-        </div>
-      </ScrollArea>
+        </Tabs>
+      )}
     </SheetActionDialog>
   )
 }
