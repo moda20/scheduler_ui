@@ -28,7 +28,7 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
     from: props.start,
     to: props.end,
   })
-  const [activeTab, setActiveTab] = useState<string>(null)
+  const [activeTab, setActiveTab] = useState<string>("")
 
   useInterval(
     () => {
@@ -50,8 +50,11 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
       )
       .then(res => {
         const parsedLogs = res.data?.result
-          ?.sort((a, b) => Number(b.values[0]?.[0]) - Number(a.values[0]?.[0]))
-          .map((stream, si) => {
+          ?.sort(
+            (a: any, b: any) =>
+              Number(b.values[0]?.[0]) - Number(a.values[0]?.[0]),
+          )
+          .map((stream: any, si: number) => {
             const logValues = stream?.values?.map((log: any) => {
               const logBits = log?.[1]?.split(" | ")
               return {
@@ -75,7 +78,7 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
   }
 
   const fetchLogs = (open?: boolean) => {
-    setDialogOpen(open)
+    setDialogOpen(!!open)
     if (open) {
       getLogs()
     }
@@ -119,11 +122,7 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
         </div>
       </div>
       {logs.length > 0 && (
-        <Tabs
-          value={activeTab}
-          defaultValue={logs[0]?.uniqueId}
-          className="h-[calc(100%-3rem)]"
-        >
+        <Tabs value={activeTab} className="h-[calc(100%-3rem)]">
           <TabsList className="px-0">
             {logs.map((stream: any, index) => {
               return (
@@ -151,7 +150,7 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
                   <div
                     className={"rounded-md h-full p-1 overflow-clip bg-sidebar"}
                   >
-                    {stream.values.map((log: any, index) => {
+                    {stream.values.map((log: any, index: number) => {
                       return (
                         <div
                           key={index}
