@@ -12,6 +12,7 @@ import moment from "moment"
 import type { CheckedState } from "@radix-ui/react-checkbox"
 import useInterval from "@/hooks/useInterval"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { FileX2, LogsIcon } from "lucide-react"
 
 export interface DrawerLokiLogsProps {
   start?: Date
@@ -121,6 +122,14 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
           />
         </div>
       </div>
+      {logs.length === 0 && (
+        <div className="flex flex-col gap-2 items-center justify-center p-2 border-border border rounded-md">
+          <LogsIcon />
+          <div className="text-muted-foreground text-sm">
+            No Logs for {props.jobName} found
+          </div>
+        </div>
+      )}
       {logs.length > 0 && (
         <Tabs value={activeTab} className="h-[calc(100%-3rem)]">
           <TabsList className="px-0">
