@@ -69,12 +69,14 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
               uniqueId: `tab_${stream?.stream?.uniqueId?.toString()}`,
               name: stream?.stream?.job,
               title: si
-                ? moment(logValues[0]?.timestamp).format("YYYY-MM-DD")
-                : `latest (${moment(logValues[0]?.timestamp).fromNow()})`,
+                ? moment(logValues[logValues.length - 1]?.timestamp).format(
+                    "YYYY-MM-DD",
+                  )
+                : `latest (${moment(logValues[logValues.length - 1]?.timestamp).fromNow()})`,
             }
           })
         setLogs(parsedLogs ?? [])
-        setActiveTab(parsedLogs[0]?.uniqueId)
+        if (!activeTab) setActiveTab(parsedLogs[0]?.uniqueId)
       })
   }
 
