@@ -26,3 +26,8 @@ export interface jobLog {
   cacheFiles?: CacheFile[]
   outputFiles?: OutputFile[]
 }
+
+export enum jobFileTypes {
+  json = "application/json",
+  csv = "text/csv",
+}

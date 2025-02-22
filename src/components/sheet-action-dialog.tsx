@@ -25,6 +25,7 @@ export interface SheetActionDialogProps
   trigger: ReactNode
   children?: ReactNode
   contentClassName?: string
+  innerContainerClassName?: string
   onOpenChange?: (open: boolean) => void
 }
 
@@ -64,7 +65,14 @@ export default function SheetActionDialog(
           <SheetTitle>{props.title}</SheetTitle>
           <SheetDescription>{props.description}</SheetDescription>
         </SheetHeader>
-        <div className="h-full pb-8 flex flex-col">{props.children}</div>
+        <div
+          className={cn(
+            "h-full pb-8 flex flex-col",
+            props.innerContainerClassName,
+          )}
+        >
+          {props.children}
+        </div>
         <SheetFooter></SheetFooter>
       </SheetContent>
     </Sheet>

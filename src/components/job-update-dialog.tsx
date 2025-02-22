@@ -79,6 +79,7 @@ export function JobUpdateDialog({
           v.preventDefault()
           setDialogState(true)
         }}
+        asChild
       >
         {children}
       </DialogTrigger>

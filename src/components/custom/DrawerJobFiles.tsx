@@ -19,6 +19,8 @@ import { ButtonGroup } from "@/components/ui/buttonGroup"
 import ConfirmationDialogAction from "@/components/confirmationDialogAction"
 import { toast } from "@/hooks/use-toast"
 import type { CacheFile, jobLog, OutputFile } from "@/models/cacheFiles"
+import { Badge } from "@/components/ui/badge"
+import DrawerFilePreview from "@/components/custom/DrawerFilePreview"
 
 export interface DrawerJobFilesProps {
   JobDetails: jobsTableData
@@ -147,11 +149,31 @@ export default function DrawerJobFiles({
                     key={log.created_at}
                     className="flex flex-row gap-3 items-center border border-border rounded-md p-2 bg-sidebar"
                   >
-                    <span title={log.file_type}>
+                    <span
+                      title={log.file_type}
+                      className="flex flex-col gap-1 justify-center items-center"
+                    >
                       {log.file_type === "json" ? <FileJson2 /> : <Files />}
+                      <DrawerFilePreview
+                        trigger={
+                          <Button
+                            className="italic text-[11px] p-0.5 px-1 h-[unset]"
+                            size="sm"
+                            variant={"outline"}
+                          >
+                            Preview
+                          </Button>
+                        }
+                        id={log.id}
+                        fileName={log.file_name}
+                        fileType={log.file_type}
+                        fileNature={"cache"}
+                      />
                     </span>
                     <div className="flex flex-col gap-1">
-                      <div className="text-sm font-bold">{log.file_name}</div>
+                      <div className="text-sm font-bold text-ellipsis">
+                        {log.file_name}
+                      </div>
                       <div className="text-xs text-[--muted-foreground]">
                         <span className="font-semibold">Created at: </span>
                         <span title={log.created_at}>
@@ -219,8 +241,26 @@ export default function DrawerJobFiles({
                     key={log.created_at}
                     className="flex flex-row gap-3 items-center border border-border rounded-md p-2 bg-sidebar"
                   >
-                    <span title={log.file_type}>
+                    <span
+                      title={log.file_type}
+                      className="flex flex-col gap-1 justify-center items-center"
+                    >
                       {log.file_type === "json" ? <FileJson2 /> : <Files />}
+                      <DrawerFilePreview
+                        trigger={
+                          <Button
+                            className="italic text-[11px] p-0.5 px-1 h-[unset]"
+                            size="sm"
+                            variant={"outline"}
+                          >
+                            Preview
+                          </Button>
+                        }
+                        id={log.id}
+                        fileName={log.file_name}
+                        fileType={log.file_type}
+                        fileNature={"output"}
+                      />
                     </span>
                     <div className="flex flex-col gap-1">
                       <div className="text-sm font-bold">{log.file_name}</div>

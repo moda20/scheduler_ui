@@ -167,6 +167,30 @@ const jobsService = {
       },
     })
   },
+
+  readOutputFile(id: string, fileName: string): Promise<any> {
+    return axios.get(`/files/downloadOutputFile`, {
+      params: {
+        id,
+        fileName,
+      },
+      fetchOptions: {
+        fullResponse: true,
+      },
+    })
+  },
+
+  readCacheFile(id: string, fileName: string): Promise<any> {
+    return axios.get(`/files/downloadCacheFile`, {
+      params: {
+        id,
+        fileName,
+      },
+      fetchOptions: {
+        fullResponse: true,
+      },
+    })
+  },
 }
 
 export default jobsService
