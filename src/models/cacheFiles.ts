@@ -27,7 +27,7 @@ export interface jobLog {
   outputFiles?: OutputFile[]
 }
 
-export enum jobFileTypes {
-  json = "application/json",
-  csv = "text/csv",
+export const jobFileTypes: Record<string, string> = {
+  json: "application/json",
+  csv: "text/csv",
 }
