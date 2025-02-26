@@ -98,7 +98,10 @@ export const getTableColumns = (
 ): ColumnDef<jobsTableData>[] => [
   {
     accessorKey: "id",
-    header: "Id",
+    header: ({ column }) => (
+      <HeaderSortButton column={column} columnName="Id" className="" />
+    ),
+    cell: ({ row }) => <div className="px-2">{row.original.id}</div>,
   },
   {
     accessorKey: "name",
@@ -121,7 +124,6 @@ export const getTableColumns = (
   },
   {
     accessorKey: "scheduled",
-    header: "Scheduled",
     cell: ({ row }) => (
       <div className="text-center">
         <Badge
@@ -130,6 +132,9 @@ export const getTableColumns = (
           {row.original.status === "STARTED" ? "Started" : "Stopped"}
         </Badge>
       </div>
+    ),
+    header: ({ column }) => (
+      <HeaderSortButton column={column} columnName="Scheduled" />
     ),
   },
   {
@@ -147,9 +152,11 @@ export const getTableColumns = (
   },
   {
     accessorKey: "averageTime",
-    header: "Average time",
     cell: ({ row }) => (
       <div>{Math.ceil((row.original?.averageTime ?? 0) / 60)} minutes</div>
+    ),
+    header: ({ column }) => (
+      <HeaderSortButton column={column} columnName="Average time" />
     ),
   },
   {

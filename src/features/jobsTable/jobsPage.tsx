@@ -25,10 +25,10 @@ export default function JobsPage() {
   const [fetchingData, setFetchingStatus] = useState(false)
   const [sorting, setSorting] = useState<SortingState>(defaultSortingState)
   const savedConfig = useAppSelector(config)
-  async function fetchTableData() {
+  async function fetchTableData(inputSorting?: SortingState) {
     setFetchingStatus(true)
     return await jobsService
-      .getAllJobs(null, sorting)
+      .getAllJobs(null, inputSorting ?? sorting)
       .then(data => {
         let logsPerJob = data.logs.result.reduce((p: any, c: any) => {
           p[c.job_id] = c
@@ -71,7 +71,7 @@ export default function JobsPage() {
   async function filterAndPaginationChange({ sorting }: { sorting: any }) {
     setSorting(sorting)
     setLoading(true)
-    await fetchTableData()
+    await fetchTableData(sorting)
   }
 
   async function getAvailableConsumers(): Promise<ComboBoxItem[]> {
