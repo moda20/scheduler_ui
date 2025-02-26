@@ -161,7 +161,7 @@ export default function JobsPage() {
           })
           .then(() => {
             toast({
-              title: `Service ${row!.original.name} Created`,
+              title: `Service ${data.name} Created`,
               duration: 3000,
             })
           })
