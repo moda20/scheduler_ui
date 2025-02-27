@@ -6,13 +6,11 @@ import { useEffect, useState } from "react"
 import { Spinner } from "@/components/ui/spinner"
 import type { Row, SortingState } from "@tanstack/react-table"
 import { toast } from "@/hooks/use-toast"
-import { JobUpdateDialog, JobUpdateType } from "@/components/job-update-dialog"
+import type { JobUpdateType } from "@/components/job-update-dialog"
+import { JobUpdateDialog } from "@/components/job-update-dialog"
 import { Button } from "@/components/ui/button"
 import { PlusIcon } from "lucide-react"
-import { ComboBoxItem } from "@/components/ui/combo-box"
-import { InputIcon } from "@radix-ui/react-icons"
-import { IconInput } from "@/components/custom/IconInput"
-import { cn } from "@/lib/utils"
+import type { ComboBoxItem } from "@/components/ui/combo-box"
 import { Badge } from "@/components/ui/badge"
 import { useAppSelector } from "@/app/hooks"
 import { config } from "@/app/reducers/uiReducer"
@@ -30,23 +28,11 @@ export default function JobsPage() {
     return await jobsService
       .getAllJobs(null, inputSorting ?? sorting)
       .then(data => {
-        let logsPerJob = data.logs.result.reduce((p: any, c: any) => {
-          p[c.job_id] = c
-          return p
-        }, {})
-        let errorPerJob = data.errors.result.reduce((p: any, c: any) => {
-          p[c.job_id] = c
-          return p
-        }, {})
-
         data?.registeredJobs?.jobs.map((e: any) => {
           if (Object.values(e.isCurrentlyRunning).length > 0) {
             e.hasJobsRunning = true
           }
-          e.logs = logsPerJob[e.id]
-          e.latestError = errorPerJob[e.job_id]?.error
           e.running = e.hasJobsRunning
-          e.lastRun = e.hasJobsRunning
           return e
         })
         return data
