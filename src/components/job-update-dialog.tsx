@@ -30,6 +30,7 @@ import { ComboBox } from "@/components/ui/combo-box"
 import { cn, parseCron } from "@/lib/utils"
 import useDialogueManager from "@/hooks/useDialogManager"
 import { useHotkeys } from "react-hotkeys-hook"
+import { useCallback } from "react"
 
 export interface JobUpdateDialogProps {
   children: React.ReactNode
@@ -71,8 +72,22 @@ export function JobUpdateDialog({
     setDialogState(true)
   })
 
+  const resetState = useCallback(
+    (finalState: boolean) => {
+      if (!finalState) {
+        form.reset()
+      }
+    },
+    [form],
+  )
+
   return (
-    <Dialog open={isDialogOpen} onOpenChange={v => setDialogState(v)}>
+    <Dialog
+      open={isDialogOpen}
+      onOpenChange={v => {
+        setDialogState(v, resetState)
+      }}
+    >
       <DialogTrigger
         className={cn(triggerClassName)}
         onClick={v => {
@@ -87,7 +102,7 @@ export function JobUpdateDialog({
         className="sm:max-w-[425px] text-foreground bg-background"
         onEscapeKeyDown={e => {
           e.preventDefault()
-          setDialogState(false)
+          setDialogState(false, resetState)
         }}
       >
         <DialogHeader>
@@ -104,7 +119,7 @@ export function JobUpdateDialog({
               v => {
                 onChange(v)
                 if (isCreateDialog) {
-                  setDialogState(false)
+                  setDialogState(false, resetState)
                 }
               },
               err => {
