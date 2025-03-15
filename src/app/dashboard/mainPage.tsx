@@ -33,6 +33,7 @@ import { Input } from "@/components/ui/input"
 import { PlayIcon } from "@radix-ui/react-icons"
 import { toast } from "@/hooks/use-toast"
 import DrawerMenuConfigurator from "@/components/custom/DrawerMenuConfigurator"
+import SearchBar from "@/components/custom/SearchBar"
 
 export default function MainPage() {
   const navigate = useNavigate()
@@ -85,8 +86,11 @@ export default function MainPage() {
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
-          <ThemeToggle className={"ml-auto border-border"} />
-          <DrawerMenuConfigurator />
+          <div className="ml-auto flex gap-2">
+            <SearchBar />
+            <ThemeToggle className={"border-border"} />
+            <DrawerMenuConfigurator />
+          </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 text-foreground">
           <Outlet />

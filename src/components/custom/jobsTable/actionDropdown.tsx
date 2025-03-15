@@ -32,40 +32,51 @@ import { jobActions } from "@/features/jobsTable/interfaces"
 import type { Row } from "@tanstack/react-table"
 import type { DateRange } from "react-day-picker"
 import DrawerJobFiles from "@/components/custom/DrawerJobFiles"
+import React, { ReactNode, useCallback } from "react"
 
 export interface ActionDropdownProps {
   columnsProps: tableColumnsProps
-  row: Row<jobsTableData>
+  row: jobsTableData
   defaultLogPeriod: DateRange
+  inputGroup?: string
+  children?: ReactNode
+  modal?: boolean
 }
 export default function ActionDropdown({
   columnsProps,
   row,
   defaultLogPeriod,
+  inputGroup,
+  children,
+  modal,
 }: ActionDropdownProps) {
   const { isDialogOpen, setDialogState } = useDialogueManager({
-    inputGroup: "JobActions",
+    inputGroup: inputGroup ?? "JobActions",
   })
 
   return (
     <DropdownMenu
-      modal={false}
+      modal={modal ?? false}
       open={isDialogOpen}
-      onOpenChange={v => setDialogState(v)}
+      onOpenChange={v => {
+        setDialogState(v)
+      }}
     >
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size={"icon"}
-          onKeyDown={v => {
-            if (v.key === "Escape") {
-              v.preventDefault()
-              setDialogState(false)
-            }
-          }}
-        >
-          <EllipsisVertical />
-        </Button>
+      <DropdownMenuTrigger asChild onSelect={() => setDialogState(true)}>
+        {children ?? (
+          <Button
+            variant="ghost"
+            size={"icon"}
+            onKeyDown={v => {
+              if (v.key === "Escape") {
+                v.preventDefault()
+                setDialogState(false)
+              }
+            }}
+          >
+            <EllipsisVertical />
+          </Button>
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className="w-56 bg-background"
@@ -74,12 +85,12 @@ export default function ActionDropdown({
           setDialogState(false)
         }}
       >
-        <DropdownMenuLabel>Config {row.original?.name}</DropdownMenuLabel>
+        <DropdownMenuLabel>Config {row.name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <ConfirmationDialogAction
             title={
-              row.original.status === "STARTED"
+              row.status === "STARTED"
                 ? "Un-schedule the job"
                 : "Schedule the job"
             }
@@ -90,25 +101,23 @@ export default function ActionDropdown({
               if (action === ConfirmationDialogActionType.CANCEL) return
               columnsProps.takeAction(
                 row,
-                row.original.status === "STARTED"
+                row.status === "STARTED"
                   ? jobActions.UNSCHEDULE
                   : jobActions.SCHEDULE,
               )
             }}
-            confirmText={
-              row.original.status === "STARTED" ? "Un-schedule" : "Schedule"
-            }
+            confirmText={row.status === "STARTED" ? "Un-schedule" : "Schedule"}
           >
             <DropdownMenuItem onSelect={e => e.preventDefault()}>
               <Settings />
               <span>
-                {row.original.status === "STARTED" ? "deSchedule" : "Schedule"}
+                {row.status === "STARTED" ? "deSchedule" : "Schedule"}
               </span>
               <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </DropdownMenuItem>
           </ConfirmationDialogAction>
           <JobUpdateDialog
-            jobDetails={row.original}
+            jobDetails={row}
             isCreateDialog={false}
             itemList={columnsProps.getAvailableConsumers}
             onChange={jobData => {
@@ -144,7 +153,7 @@ export default function ActionDropdown({
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DrawerLokiLogs
-            jobName={row.original.name}
+            jobName={row.name}
             start={defaultLogPeriod.from}
             end={defaultLogPeriod.to}
             trigger={
@@ -157,7 +166,7 @@ export default function ActionDropdown({
         </DropdownMenuGroup>
         <DropdownMenuGroup>
           <DrawerJobFiles
-            JobDetails={row.original}
+            JobDetails={row}
             trigger={
               <DropdownMenuItem onSelect={e => e.preventDefault()}>
                 <FileSliders />
@@ -169,7 +178,7 @@ export default function ActionDropdown({
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <ConfirmationDialogAction
-            title={`Delete Job : ${row.original.name}`}
+            title={`Delete Job : ${row.name}`}
             description={
               "This action will un-schedule and set to inactive the job but will NOT stop it if it's running"
             }

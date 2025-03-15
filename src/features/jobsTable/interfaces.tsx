@@ -34,18 +34,14 @@ export enum jobActions {
   STOP,
 }
 
-const defaultLogPeriod: DateRange = {
+export const defaultLogPeriod: DateRange = {
   from: subDays(new Date(), 1),
   to: new Date(),
 }
 
 export interface tableColumnsProps {
   getAvailableConsumers: () => Promise<ComboBoxItem[]>
-  takeAction: (
-    row: Row<jobsTableData>,
-    action: jobActions,
-    jobData?: any,
-  ) => void
+  takeAction: (row: jobsTableData, action: jobActions, jobData?: any) => void
 }
 
 export const getTableColumns = (
@@ -152,7 +148,7 @@ export const getTableColumns = (
     header: "Actions",
     cell: ({ row }) => (
       <ActionDropdown
-        row={row}
+        row={row.original}
         defaultLogPeriod={defaultLogPeriod}
         columnsProps={props}
       />

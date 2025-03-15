@@ -14,6 +14,7 @@ import type { ComboBoxItem } from "@/components/ui/combo-box"
 import { Badge } from "@/components/ui/badge"
 import { useAppSelector } from "@/app/hooks"
 import { config } from "@/app/reducers/uiReducer"
+import { getConsumersCBox, takeAction } from "@/features/jobsTable/jobsUtils"
 
 export const defaultSortingState = [{ id: "cronSetting", desc: true }]
 
@@ -60,132 +61,21 @@ export default function JobsPage() {
     await fetchTableData(sorting)
   }
 
-  async function getAvailableConsumers(): Promise<ComboBoxItem[]> {
-    return jobsService.getAvailableConsumers().then((data: Array<Object>) => {
-      return data.map((item: any) => {
-        return {
-          value: item,
-          label: item,
-        }
-      })
-    })
-  }
-
-  async function takeAction(
-    row: Row<jobsTableData> | null,
+  async function takeJobsAction(
+    row: jobsTableData | null,
     action: jobActions,
     data?: JobUpdateType | any,
   ) {
     setLoading(true)
-    switch (action) {
-      case jobActions.SCHEDULE:
-        await jobsService
-          .executeAction(row!.original.id, "START")
-          .then(data => {
-            toast({
-              title: `Service ${row!.original.name} Scheduled`,
-              duration: 3000,
-            })
-            return fetchTableData()
-          })
-          .finally(() => {
-            setLoading(true)
-          })
-        break
-      case jobActions.UNSCHEDULE:
-        await jobsService
-          .executeAction(row!.original.id, "STOP")
-          .then(data => {
-            toast({
-              title: `Service ${row!.original.name} De-scheduled`,
-              duration: 3000,
-            })
-          })
-          .finally(() => {
-            setLoading(true)
-          })
-        break
-      case jobActions.EXECUTE:
-      case jobActions.EXECUTE_IN_THE_BACKGROUND:
-        await jobsService
-          .executeAction(row!.original.id, "EXECUTE")
-          .then(() => {
-            toast({
-              title: `Service ${row!.original.name} Launched`,
-              duration: 3000,
-            })
-          })
-          .catch(err => {
-            toast({
-              title: err.message,
-              variant: "destructive",
-            })
-          })
-        break
-      case jobActions.UPDATE:
-        await jobsService
-          .executeActionWithUpdate(row!.original.id, "STOP", data)
-          .then(d => {
-            return jobsService.executeAction(row!.original.id, "START")
-          })
-          .then(() => {
-            toast({
-              title: `Service ${row!.original.name} Updated`,
-              duration: 3000,
-            })
-          })
-          .finally(() => {
-            setLoading(true)
-          })
-        break
-      case jobActions.CREATE:
-        await jobsService
-          .executeActionWithUpdate(null, "CREATE", {
-            ...data,
-            status: "STOPPED",
-            exclusive: true,
-          })
-          .then(() => {
-            toast({
-              title: `Service ${data.name} Created`,
-              duration: 3000,
-            })
-          })
-          .finally(() => {
-            setLoading(false)
-          })
-        break
-
-      case jobActions.SOFT_DELETE:
-        await jobsService.isJobRunning(row!.original.id).then((data: any) => {
-          if (data) {
-            toast({
-              title: `Service ${row!.original.name} is running and cannot be deleted`,
-              variant: "destructive",
-            })
-          } else {
-            return jobsService
-              .executeAction(row!.original.id, "SOFT_DELETE")
-              .then(() => {
-                toast({
-                  title: `Service ${row!.original.name} deleted`,
-                })
-              })
-              .catch(err => {
-                toast({
-                  title: err.message,
-                  variant: "destructive",
-                })
-              })
-          }
-        })
-        break
-    }
+    await takeAction(row, action, data)
     setLoading(true)
     await fetchTableData()
   }
 
-  const columns = getTableColumns({ takeAction, getAvailableConsumers })
+  const columns = getTableColumns({
+    takeAction: takeJobsAction,
+    getAvailableConsumers: getConsumersCBox,
+  })
   const runningJobsCount = Number(
     data?.registeredJobs?.runningJobsCount?.runningJobsCount ?? 0,
   )
@@ -195,8 +85,8 @@ export default function JobsPage() {
         <JobUpdateDialog
           jobDetails={undefined}
           isCreateDialog={true}
-          itemList={getAvailableConsumers}
-          onChange={jobData => takeAction(null, jobActions.CREATE, jobData)}
+          itemList={getConsumersCBox}
+          onChange={jobData => takeJobsAction(null, jobActions.CREATE, jobData)}
         >
           <Button variant="outline" className={"border-border"}>
             <PlusIcon /> New job

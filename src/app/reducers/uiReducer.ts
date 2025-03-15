@@ -118,7 +118,9 @@ export const UiReducerSlice = createAppSlice({
       (state: UISliceState, action: PayloadAction<string>) => {
         const dialogs = state.dialogGroups[action.payload]
         dialogs?.forEach(e => {
-          state.dialogStack.splice(state.dialogStack.indexOf(e), 1)
+          if (state.dialogStack.indexOf(e) !== -1) {
+            state.dialogStack.splice(state.dialogStack.indexOf(e), 1)
+          }
         })
         delete state.dialogGroups[action.payload]
       },

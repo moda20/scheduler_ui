@@ -191,6 +191,16 @@ const jobsService = {
       },
     })
   },
+
+  searchJobs(search: string, limit: number, offset: number): Promise<any> {
+    return axios.get(`/jobs/searchJobs`, {
+      params: {
+        search: search,
+        limit: limit,
+        offset: offset,
+      },
+    })
+  },
 }
 
 export default jobsService
