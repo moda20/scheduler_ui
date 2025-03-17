@@ -33,6 +33,8 @@ import type { Row } from "@tanstack/react-table"
 import type { DateRange } from "react-day-picker"
 import DrawerJobFiles from "@/components/custom/DrawerJobFiles"
 import React, { ReactNode, useCallback } from "react"
+import { useHotkeys } from "react-hotkeys-hook"
+import DropdownMenuItemExtended from "@/components/custom/general/DropdownItemExtended"
 
 export interface ActionDropdownProps {
   columnsProps: tableColumnsProps
@@ -108,13 +110,13 @@ export default function ActionDropdown({
             }}
             confirmText={row.status === "STARTED" ? "Un-schedule" : "Schedule"}
           >
-            <DropdownMenuItem onSelect={e => e.preventDefault()}>
+            <DropdownMenuItemExtended keyBinding="S">
               <Settings />
               <span>
                 {row.status === "STARTED" ? "deSchedule" : "Schedule"}
               </span>
-              <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-            </DropdownMenuItem>
+              <DropdownMenuShortcut>S</DropdownMenuShortcut>
+            </DropdownMenuItemExtended>
           </ConfirmationDialogAction>
           <JobUpdateDialog
             jobDetails={row}
@@ -135,12 +137,14 @@ export default function ActionDropdown({
         <DropdownMenuLabel>Execution</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem
-            onClick={() => columnsProps.takeAction(row, jobActions.EXECUTE)}
+          <DropdownMenuItemExtended
+            keyBinding="meta+e"
+            onAction={() => columnsProps.takeAction(row, jobActions.EXECUTE)}
           >
             <DockIcon />
             <span>Run now</span>
-          </DropdownMenuItem>
+            <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
+          </DropdownMenuItemExtended>
           <DropdownMenuItem
             onClick={() =>
               columnsProps.takeAction(row, jobActions.EXECUTE_IN_THE_BACKGROUND)
@@ -157,10 +161,14 @@ export default function ActionDropdown({
             start={defaultLogPeriod.from}
             end={defaultLogPeriod.to}
             trigger={
-              <DropdownMenuItem onSelect={e => e.preventDefault()}>
+              <DropdownMenuItemExtended
+                keyBinding="L"
+                onSelect={e => e.preventDefault()}
+              >
                 <LogsIcon />
                 <span>Latest Logs</span>
-              </DropdownMenuItem>
+                <DropdownMenuShortcut>L</DropdownMenuShortcut>
+              </DropdownMenuItemExtended>
             }
           />
         </DropdownMenuGroup>
@@ -168,10 +176,14 @@ export default function ActionDropdown({
           <DrawerJobFiles
             JobDetails={row}
             trigger={
-              <DropdownMenuItem onSelect={e => e.preventDefault()}>
+              <DropdownMenuItemExtended
+                keyBinding="O"
+                onSelect={e => e.preventDefault()}
+              >
                 <FileSliders />
                 <span>Output Files</span>
-              </DropdownMenuItem>
+                <DropdownMenuShortcut>O</DropdownMenuShortcut>
+              </DropdownMenuItemExtended>
             }
           />
         </DropdownMenuGroup>
