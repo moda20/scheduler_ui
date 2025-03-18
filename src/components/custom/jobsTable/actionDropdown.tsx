@@ -139,7 +139,7 @@ export default function ActionDropdown({
         <DropdownMenuGroup>
           <DropdownMenuItemExtended
             keyBinding="meta+e"
-            onAction={() => columnsProps.takeAction(row, jobActions.EXECUTE)}
+            onClick={() => columnsProps.takeAction(row, jobActions.EXECUTE)}
           >
             <DockIcon />
             <span>Run now</span>
