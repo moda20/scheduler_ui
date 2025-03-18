@@ -172,7 +172,10 @@ export default function DrawerJobFiles({
                       />
                     </span>
                     <div className="flex flex-col gap-1">
-                      <div className="text-sm font-bold text-ellipsis">
+                      <div
+                        title={log.file_name}
+                        className="text-sm font-bold text-ellipsis overflow-hidden max-w-[200px]"
+                      >
                         {log.file_name}
                       </div>
                       <div className="text-xs text-[--muted-foreground]">
@@ -264,7 +267,12 @@ export default function DrawerJobFiles({
                       />
                     </span>
                     <div className="flex flex-col gap-1">
-                      <div className="text-sm font-bold">{log.file_name}</div>
+                      <div
+                        title={log.file_name}
+                        className="text-sm font-bold text-ellipsis overflow-hidden max-w-[200px]"
+                      >
+                        {log.file_name}
+                      </div>
                       <div className="text-xs text-[--muted-foreground]">
                         <span className="font-semibold">Created at: </span>
                         <span title={log.created_at}>
