@@ -131,6 +131,7 @@ export default function DrawerJobFiles({
           getCacheFiles()
         }
       }}
+      modal={true}
     >
       <div className={"flex flex-col gap-2 py-4"}>
         <div className="text-lg font-bold">Cache Files:</div>

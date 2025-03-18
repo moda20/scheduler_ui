@@ -27,6 +27,7 @@ export interface SheetActionDialogProps
   contentClassName?: string
   innerContainerClassName?: string
   onOpenChange?: (open: boolean) => void
+  modal?: boolean
 }
 
 const defaultSheetActionDialogProps: SheetActionDialogProps = {
@@ -37,6 +38,7 @@ const defaultSheetActionDialogProps: SheetActionDialogProps = {
   children: null,
   contentClassName: "",
   onOpenChange: () => {},
+  modal: false,
 }
 
 export default function SheetActionDialog(
@@ -49,6 +51,7 @@ export default function SheetActionDialog(
       key={props.side}
       open={isDialogOpen}
       onOpenChange={v => setDialogState(v, props.onOpenChange)}
+      modal={props.modal}
     >
       <SheetTrigger
         asChild

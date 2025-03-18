@@ -102,6 +102,7 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
         "w-[600px] sm:w-[800px] sm:max-w-[800px] h-full flex flex-col"
       }
       onOpenChange={open => fetchLogs(open)}
+      modal={true}
     >
       <div className={"flex flex-row items-center gap-2 my-2 h-100"}>
         <div className="flex flex-row items-center gap-2 border rounded-md p-2 bg-sidebar">
