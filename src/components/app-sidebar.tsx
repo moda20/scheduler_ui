@@ -1,6 +1,4 @@
 import type * as React from "react"
-
-import { SearchForm } from "@/components/search-form"
 import { VersionSwitcher } from "@/components/version-switcher"
 import {
   Sidebar,
@@ -32,11 +30,7 @@ export function AppSidebar({
   return (
     <Sidebar {...props} className={"border-border"}>
       <SidebarHeader>
-        <VersionSwitcher
-          versions={data.versions}
-          defaultVersion={data.versions[0]}
-        />
-        <SearchForm />
+        <VersionSwitcher />
       </SidebarHeader>
       <SidebarContent>
         {/* We create a SidebarGroup for each parent. */}
