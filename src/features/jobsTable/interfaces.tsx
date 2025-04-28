@@ -8,19 +8,21 @@ import type { DateRange } from "react-day-picker"
 import type { ComboBoxItem } from "@/components/ui/combo-box"
 import ActionDropdown from "@/components/custom/jobsTable/actionDropdown"
 import HeaderSortButton from "@/components/custom/jobsTable/headerSortButton"
+import { FileArchive, LucideFileWarning } from "lucide-react"
 
 export interface jobsTableData {
   id: string
   name: string
   status: string
   cronSetting: string
-  running: boolean
+  isCurrentlyRunning: boolean
   latestRun: any
   latestError?: any
   logs?: any
   consumer?: string
   averageTime?: number
   param: string
+  initialized?: boolean
 }
 
 export enum jobActions {
@@ -57,6 +59,23 @@ export const getTableColumns = (
   {
     accessorKey: "name",
     header: "Name",
+    cell: ({ row }) => (
+      <div className="px-2 flex flex-col gap-2">
+        <span className="font-extrabold">{row.original.name}</span>
+        {!row.original.initialized && row.original.status === "STARTED" && (
+          <div className="flex gap-2 text-[12px] items-center text-yellow-500 font-bold">
+            <LucideFileWarning size="14" className="" />
+            Initializing Error
+          </div>
+        )}
+        {
+          <div className="flex gap-2 text-[13px] items-center font-light">
+            <FileArchive size="14" className="" />
+            {row.original.consumer}
+          </div>
+        }
+      </div>
+    ),
   },
   {
     accessorKey: "cronSetting",
@@ -89,11 +108,13 @@ export const getTableColumns = (
     ),
   },
   {
-    accessorKey: "running",
+    accessorKey: "isCurrentlyRunning",
     cell: ({ row }) => (
       <div className="text-center">
-        <Badge variant={row.getValue("running") ? null : "destructive"}>
-          {row.getValue("running") ? "Yes" : "No"}
+        <Badge
+          variant={row.getValue("isCurrentlyRunning") ? null : "destructive"}
+        >
+          {row.getValue("isCurrentlyRunning") ? "Yes" : "No"}
         </Badge>
       </div>
     ),
@@ -111,8 +132,10 @@ export const getTableColumns = (
     ),
   },
   {
-    accessorKey: "lastRun",
-    header: "Latest run",
+    accessorKey: "latestRun",
+    header: ({ column }) => (
+      <HeaderSortButton column={column} columnName="Latest run" />
+    ),
     cell: ({ row }) => {
       return (
         <div className="text-left">

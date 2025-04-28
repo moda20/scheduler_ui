@@ -5,12 +5,10 @@ import { getTableColumns, jobActions } from "@/features/jobsTable/interfaces"
 import { useEffect, useState } from "react"
 import { Spinner } from "@/components/ui/spinner"
 import type { Row, SortingState } from "@tanstack/react-table"
-import { toast } from "@/hooks/use-toast"
 import type { JobUpdateType } from "@/components/job-update-dialog"
 import { JobUpdateDialog } from "@/components/job-update-dialog"
 import { Button } from "@/components/ui/button"
 import { PlusIcon } from "lucide-react"
-import type { ComboBoxItem } from "@/components/ui/combo-box"
 import { Badge } from "@/components/ui/badge"
 import { useAppSelector } from "@/app/hooks"
 import { config } from "@/app/reducers/uiReducer"
@@ -20,6 +18,7 @@ export const defaultSortingState = [{ id: "cronSetting", desc: true }]
 
 export default function JobsPage() {
   const [data, setData] = useState<any>({})
+  const [runningJobsData, setRunningJobsData] = useState<any>({})
   const [loading, setLoading] = useState(true)
   const [fetchingData, setFetchingStatus] = useState(false)
   const [sorting, setSorting] = useState<SortingState>(defaultSortingState)
@@ -28,16 +27,6 @@ export default function JobsPage() {
     setFetchingStatus(true)
     return await jobsService
       .getAllJobs(null, inputSorting ?? sorting)
-      .then(data => {
-        data?.registeredJobs?.jobs.map((e: any) => {
-          if (Object.values(e.isCurrentlyRunning).length > 0) {
-            e.hasJobsRunning = true
-          }
-          e.running = e.hasJobsRunning
-          return e
-        })
-        return data
-      })
       .then(data => {
         setData(data)
         setLoading(false)
@@ -48,17 +37,28 @@ export default function JobsPage() {
       })
       .finally(() => setFetchingStatus(false))
   }
+
+  function updateTableData(sorting?: any) {
+    return Promise.all([getRunningJobs(), fetchTableData(sorting)])
+  }
+
+  async function getRunningJobs() {
+    return await jobsService.getRunningJobs().then(data => {
+      setRunningJobsData(data)
+    })
+  }
   useEffect(() => {
     if (!fetchingData) {
       setLoading(true)
-      fetchTableData()
+      updateTableData()
     }
   }, [savedConfig.targetServer])
 
   async function filterAndPaginationChange({ sorting }: { sorting: any }) {
-    setSorting(sorting)
+    const targetSorting = sorting?.length ? sorting : defaultSortingState
+    setSorting(targetSorting)
     setLoading(true)
-    await fetchTableData(sorting)
+    await updateTableData(targetSorting)
   }
 
   async function takeJobsAction(
@@ -69,16 +69,14 @@ export default function JobsPage() {
     setLoading(true)
     await takeAction(row, action, data)
     setLoading(true)
-    await fetchTableData()
+    await updateTableData()
   }
 
   const columns = getTableColumns({
     takeAction: takeJobsAction,
     getAvailableConsumers: getConsumersCBox,
   })
-  const runningJobsCount = Number(
-    data?.registeredJobs?.runningJobsCount?.runningJobsCount ?? 0,
-  )
+  const runningJobsCount = Number(runningJobsData.count ?? 0)
   return (
     <div className="">
       <div className={"table-header flex items-center py-4 justify-between"}>
@@ -101,11 +99,11 @@ export default function JobsPage() {
       <Spinner show={loading}>
         <DataTable
           columns={columns}
-          data={data?.registeredJobs?.jobs ?? []}
+          data={data ?? []}
           filters={{ sorting }}
           events={{
             onPageChange: filterAndPaginationChange,
-            actionConfirmed: fetchTableData,
+            actionConfirmed: updateTableData,
           }}
         />
       </Spinner>

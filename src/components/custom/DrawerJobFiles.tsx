@@ -35,23 +35,23 @@ export default function DrawerJobFiles({
   const [outputFiles, setOutputFiles] = useState<jobLog[]>([])
   const getCacheFiles = () => {
     jobsService.getJobCacheFiles(JobDetails.id.toString()).then(data => {
-      data.logs.forEach((log: jobLog) => {
-        log.cacheFiles?.forEach((cacheFile: CacheFile) => {
+      data.forEach((log: jobLog) => {
+        log.cache_files?.forEach((cacheFile: CacheFile) => {
           cacheFile["parsed_file_size"] = humanFileSize(cacheFile.file_size)
         })
       })
-      setCacheFiles(data.logs)
+      setCacheFiles(data)
     })
   }
 
   const getOutputFiles = () => {
     jobsService.getJobOutputFiles(JobDetails.id.toString()).then(data => {
-      data.logs.forEach((log: jobLog) => {
-        log.outputFiles?.forEach((outputFile: OutputFile) => {
+      data.forEach((log: jobLog) => {
+        log.output_files?.forEach((outputFile: OutputFile) => {
           outputFile["parsed_file_size"] = humanFileSize(outputFile.file_size)
         })
       })
-      setOutputFiles(data.logs)
+      setOutputFiles(data)
     })
   }
 
@@ -145,7 +145,7 @@ export default function DrawerJobFiles({
                     {logParent.job_log_id}
                   </div>
                 </div>
-                {logParent.cacheFiles.map((log: any, index: number) => (
+                {logParent.cache_files.map((log: any, index: number) => (
                   <div
                     key={log.created_at}
                     className="flex flex-row gap-3 items-center border border-border rounded-md p-2 bg-sidebar"
@@ -240,7 +240,7 @@ export default function DrawerJobFiles({
                     {logParent.job_log_id}
                   </div>
                 </div>
-                {logParent.outputFiles.map((log: any, index: number) => (
+                {logParent.output_files.map((log: any, index: number) => (
                   <div
                     key={log.created_at}
                     className="flex flex-row gap-3 items-center border border-border rounded-md p-2 bg-sidebar"

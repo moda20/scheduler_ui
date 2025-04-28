@@ -50,7 +50,7 @@ services.forEach(s =>
       }
 
       // Remove token and redirect
-      if (error.response.status === 400 || error.response.status === 403) {
+      if (error.response?.status === 403) {
         notificationParam.description = "Authentication Fail"
         notificationParam.description = "Please login again"
         localStorage.removeItem("AUTH_TOKEN")
@@ -58,20 +58,22 @@ services.forEach(s =>
         window.location.reload()
       }
 
-      if (error.response.status === 404) {
+      if (error.response?.status === 404) {
         notificationParam.description = "Not Found"
       }
 
-      if (error.response.status === 500) {
+      if (error.response?.status === 500) {
         notificationParam.description = "Internal Server Error"
       }
 
-      if (error.response.status === 508) {
+      if (error.response?.status === 508) {
         notificationParam.description = "Time Out"
       }
 
       notificationParam.description =
-        error.response?.data?.error ?? notificationParam.description
+        error.response?.data?.error ??
+        error.response?.data ??
+        notificationParam.description
       toast({
         ...notificationParam,
         variant: "destructive",

@@ -42,7 +42,7 @@ export default function Proxies(props: ProxiesPageProps) {
 
   async function getAllJobs(): Promise<ComboBoxItem[]> {
     return jobsService.getAllJobs(null, null).then((data: any) => {
-      return data.registeredJobs.jobs.map((item: any) => {
+      return data.map((item: any) => {
         return {
           value: item.id?.toString(),
           label: item.name,
@@ -98,7 +98,10 @@ export default function Proxies(props: ProxiesPageProps) {
         break
       case ProxyActions.LINK:
         await systemService
-          .addProxyToJob(proxyData!.id!, proxyData!.jobs!)
+          .addProxyToJob(
+            proxyData!.id!,
+            proxyData!.jobs!.map(e => Number(e)),
+          )
           .then(data => {
             toast({
               title: `Proxy ${proxyData?.proxy_ip}:${proxyData?.proxy_port} link updated`,

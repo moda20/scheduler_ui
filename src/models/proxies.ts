@@ -9,7 +9,7 @@ export interface ProxyTableData {
   status: ProxyStatus
   created_at?: string
   updated_at?: string
-  job?: any[]
+  jobs?: any[]
 }
 
 export enum ProxyActions {

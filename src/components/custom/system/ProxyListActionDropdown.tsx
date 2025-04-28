@@ -45,7 +45,7 @@ export default function ProxyListActionDropdown({
     inputGroup: "proxyActions",
   })
 
-  const hasJobsLinked = (row.original?.job?.length ?? 0) > 0
+  const hasJobsLinked = (row.original?.jobs?.length ?? 0) > 0
   return (
     <DropdownMenu
       modal={false}

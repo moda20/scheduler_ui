@@ -34,22 +34,18 @@ export function DataTable<TData, TValue>({
   events,
   filters,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = React.useState<SortingState>(
-    filters.sorting ?? [],
-  )
-
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    manualSorting: true,
     onSortingChange: v => {
-      setSorting(v)
       events.onPageChange({
-        sorting: typeof v === "function" ? v([]) : v,
+        sorting: typeof v === "function" ? v(filters.sorting) : v,
       })
     },
     state: {
-      sorting,
+      sorting: filters.sorting,
     },
   })
 

@@ -5,7 +5,7 @@ import ProxyListActionDropdown from "@/components/custom/system/ProxyListActionD
 import type { ProxyActions } from "@/models/proxies"
 import type { ProxyConfigUpdateType } from "@/components/custom/system/ProxyConfigDialog"
 import { ProxyStatus } from "@/models/proxies"
-import { ComboBoxItem } from "@/components/ui/combo-box"
+import type { ComboBoxItem } from "@/components/ui/combo-box"
 
 export interface ProxyTableInterfaceProps {
   proxyAction: (
@@ -64,7 +64,9 @@ export default function proxyTableInterfaces(
       accessorKey: "JobsLinkedTo",
       header: "N. of Jobs Using",
       cell: ({ row }) => {
-        return <div className="text-left">{row.original?.job?.length ?? 0}</div>
+        return (
+          <div className="text-left">{row.original?.jobs?.length ?? 0}</div>
+        )
       },
     },
     {

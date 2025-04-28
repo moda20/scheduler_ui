@@ -139,7 +139,11 @@ export default function ActionDropdown({
         <DropdownMenuGroup>
           <DropdownMenuItemExtended
             keyBinding="meta+e"
-            onClick={() => columnsProps.takeAction(row, jobActions.EXECUTE)}
+            onClick={() =>
+              !(!row.initialized && row.status === "STARTED") &&
+              columnsProps.takeAction(row, jobActions.EXECUTE)
+            }
+            disabled={!row.initialized && row.status === "STARTED"}
           >
             <DockIcon />
             <span>Run now</span>
@@ -147,8 +151,10 @@ export default function ActionDropdown({
           </DropdownMenuItemExtended>
           <DropdownMenuItem
             onClick={() =>
+              !(!row.initialized && row.status === "STARTED") &&
               columnsProps.takeAction(row, jobActions.EXECUTE_IN_THE_BACKGROUND)
             }
+            disabled={!row.initialized && row.status === "STARTED"}
           >
             <DockIcon />
             <span>Run in background</span>

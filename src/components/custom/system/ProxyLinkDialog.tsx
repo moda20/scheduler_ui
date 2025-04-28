@@ -64,7 +64,7 @@ export function ProxyLinkDialog({
     resolver: zodResolver(ProxyUpdateSchema),
     defaultValues: {
       id: proxyDetails?.id ?? "",
-      jobs: proxyDetails?.job?.map(e => e.job_id) ?? [],
+      jobs: proxyDetails?.jobs?.map(e => e.job_id) ?? [],
       proxy_ip: proxyDetails?.proxy_ip ?? "",
       proxy_port: proxyDetails?.proxy_port ?? "",
     },

@@ -13,8 +13,12 @@ const jobsService = {
       params: {
         status: status ?? ["STOPPED", "STARTED"],
         sorting,
+        limit: 9999999,
       },
     })
+  },
+  getRunningJobs() {
+    return axios.get("/jobs/getRunningJobs")
   },
   executeAction(jobId: string, action: string) {
     return axios.post("/jobs/executeAction", {
@@ -22,61 +26,17 @@ const jobsService = {
       action: action,
     })
   },
-  executeActionWithUpdate(jobId: string | null, action: string, config: any) {
+  executeActionWithUpdate(action: string, config: any, jobId?: string | null) {
     return axios.post("/jobs/executeAction", {
       jobId: jobId,
       action: action,
-      jobConfig: config,
+      config: config,
     })
   },
   getAvailableConsumers() {
-    return axios.get("/jobs/availableConsumers") as Promise<Array<any>>
+    return axios.get("/jobs/getAvailableConsumers") as Promise<Array<any>>
   },
 
-  getAvailableSubCategories(search: string) {
-    return axios.get("/items/categories", {
-      params: {
-        limit: 999999,
-        search,
-      },
-    })
-  },
-
-  getAllMadeCategories({
-    limit,
-    offset,
-    search,
-  }: {
-    limit: number | string
-    offset: number | string
-    search: any
-  }) {
-    return mongoAxiosService.get("/category/allMadeCategories", {
-      params: {
-        limit,
-        search,
-        offset,
-      },
-    })
-  },
-
-  createCategory(values: any, id: string) {
-    return mongoAxiosService.post("/category/createCategory", {
-      name: values.name,
-      subCategories: values.subCategories.join(","),
-      id: id,
-    })
-  },
-
-  subscribeToLogs(socketId: string, uniqueId: string) {
-    return axios.post("/jobs/subscribeToLogs", {
-      uniqueId: uniqueId,
-    })
-  },
-
-  connectToLogWebsocket() {
-    //return socketManager.connectToSocket()
-  },
   isJobRunning(jobId: string) {
     return axios.get("/jobs/isJobRunning", {
       params: {
@@ -96,7 +56,7 @@ const jobsService = {
   },
 
   jobStats(jobIds?: Array<string>, dateRange?: DateRange): Promise<any> {
-    return axios.get(`/jobs/jobStats`, {
+    return axios.get(`/jobs/getJobStats`, {
       params: {
         jobIds,
         startDate: dateRange?.from,
@@ -193,9 +153,9 @@ const jobsService = {
   },
 
   searchJobs(search: string, limit: number, offset: number): Promise<any> {
-    return axios.get(`/jobs/searchJobs`, {
+    return axios.get(`/jobs/allJobs`, {
       params: {
-        search: search,
+        name: search,
         limit: limit,
         offset: offset,
       },

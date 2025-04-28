@@ -19,7 +19,7 @@ export default function HeaderSortButton(props: HeaderSortButtonProps) {
     <Button
       variant="ghost"
       className={cn("px-2 flex flex-row gap-1", className)}
-      onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      onClick={() => column.toggleSorting()}
     >
       {columnName}
       {column.getCanSort() && column.getIsSorted() === "desc" ? (

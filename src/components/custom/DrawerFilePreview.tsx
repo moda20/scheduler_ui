@@ -3,6 +3,7 @@ import { ReactNode, useCallback, useState } from "react"
 import jobsService from "@/services/JobsService"
 import MonacoFileViewer from "@/components/custom/MonacoFileViewer"
 import { jobFileTypes } from "@/models/cacheFiles"
+import { getMimeTypeFromExtension } from "@/utils/generalUtils"
 
 export interface DrawerFilePreviewProps {
   trigger: ReactNode
@@ -26,14 +27,15 @@ export default function DrawerFilePreview({
       case "cache":
         return jobsService.readCacheFile(id, fileName).then(res => {
           const sentFileType = res.headers["content-type"]
-          if (jobFileTypes[fileType] === sentFileType) {
+
+          if (sentFileType?.includes(getMimeTypeFromExtension(fileType))) {
             setFileContent(res.data)
           }
         })
       case "output":
         return jobsService.readOutputFile(id, fileName).then(res => {
           const sentFileType = res.headers["content-type"]
-          if (jobFileTypes[fileType] === sentFileType) {
+          if (sentFileType?.includes(getMimeTypeFromExtension(fileType))) {
             setFileContent(res.data)
           }
         })

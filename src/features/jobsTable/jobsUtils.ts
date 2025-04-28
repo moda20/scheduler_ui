@@ -42,7 +42,7 @@ export const takeAction = (
         })
     case jobActions.UPDATE:
       return jobsService
-        .executeActionWithUpdate(row!.id, "STOP", data)
+        .executeActionWithUpdate("UPDATE", data, row!.id)
         .then(d => {
           return jobsService.executeAction(row!.id, "START")
         })
@@ -54,11 +54,15 @@ export const takeAction = (
         })
     case jobActions.CREATE:
       return jobsService
-        .executeActionWithUpdate(null, "CREATE", {
-          ...data,
-          status: "STOPPED",
-          exclusive: true,
-        })
+        .executeActionWithUpdate(
+          "CREATE",
+          {
+            ...data,
+            status: "STOPPED",
+            exclusive: true,
+          },
+          undefined,
+        )
         .then(() => {
           toast({
             title: `Service ${data.name} Created`,

@@ -30,7 +30,7 @@ const systemService = {
       })
   },
   getAllProxies(): Promise<Array<ProxyTableData>> {
-    return axios.get("/system/getProxies")
+    return axios.get("/proxies/getAllProxies")
   },
   updateProxy(id: number, proxyData: ProxyConfigUpdateType): Promise<any> {
     return axios.put("/proxies/updateProxy", {
@@ -41,10 +41,7 @@ const systemService = {
   addProxy(proxyData: ProxyConfigUpdateType): Promise<any> {
     return axios.post("/proxies/addProxy", proxyData)
   },
-  addProxyToJob(
-    id: number | string,
-    jobIds: Array<number | string>,
-  ): Promise<any> {
+  addProxyToJob(id: number | string, jobIds: Array<number>): Promise<any> {
     return axios.post("/proxies/addProxyToJob", {
       id,
       job_ids: jobIds,

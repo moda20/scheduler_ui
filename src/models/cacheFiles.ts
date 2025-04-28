@@ -23,8 +23,8 @@ export interface jobLog {
   end_time: string
   result: string | null
   error: string | null
-  cacheFiles?: CacheFile[]
-  outputFiles?: OutputFile[]
+  cache_files?: CacheFile[]
+  output_files?: OutputFile[]
 }
 
 export const jobFileTypes: Record<string, string> = {
