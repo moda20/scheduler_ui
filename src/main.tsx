@@ -12,6 +12,7 @@ import { RouterProvider } from "react-router"
 import router from "./router"
 import { ThemeProvider } from "@/components/theme-provider"
 import { initializeStore } from "@/utils/initializer"
+import Authentication from "@/features/auth/authentication"
 
 const container = document.getElementById("root")
 
@@ -23,6 +24,7 @@ if (container) {
     <React.StrictMode>
       <Provider store={store}>
         <Toaster />
+        <Authentication />
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
           <RouterProvider router={router} />
         </ThemeProvider>

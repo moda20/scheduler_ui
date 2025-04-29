@@ -1,8 +1,10 @@
 import type { PayloadAction } from "@reduxjs/toolkit"
 import { createAppSlice } from "@/app/createAppSlice"
+import type { LoginFormData } from "@/models/auth"
 
 export interface AuthenticationSliceState {
   authToken?: string
+  user?: any
 }
 
 const initialState: AuthenticationSliceState = {
@@ -16,13 +18,17 @@ export const AuthenticationSlice = createAppSlice({
   initialState,
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: create => ({
-    setAuthToken: create.reducer(
-      (state: AuthenticationSliceState, action: PayloadAction<string>) => {
-        state.authToken = action.payload
+    setUser: create.reducer(
+      (
+        state: AuthenticationSliceState,
+        action: PayloadAction<LoginFormData>,
+      ) => {
+        state.user = action.payload
       },
     ),
     disconnect: create.reducer((state: AuthenticationSliceState) => {
       state.authToken = undefined
+      state.user = undefined
     }),
     // The function below is called a thunk and allows us to perform async logic. It
     // can be dispatched like a regular action: `dispatch(incrementAsync(10))`. This
@@ -53,11 +59,12 @@ export const AuthenticationSlice = createAppSlice({
   // state as their first argument.
   selectors: {
     auth_token: state => state.authToken,
+    user: state => state.user,
   },
 })
 
 // Action creators are generated for each case reducer function.
-export const { setAuthToken, disconnect } = AuthenticationSlice.actions
+export const { setUser, disconnect } = AuthenticationSlice.actions
 
 // Selectors returned by `slice.selectors` take the root state as their first argument.
-export const { auth_token } = AuthenticationSlice.selectors
+export const { auth_token, user } = AuthenticationSlice.selectors

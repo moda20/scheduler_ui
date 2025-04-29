@@ -1,14 +1,20 @@
 import axios from "axios"
 import config from "@/configs/appConfig"
 import history from "../history/history"
-import { auth_token as AUTH_TOKEN } from "@/app/reducers/authReducer"
+import {
+  auth_token as AUTH_TOKEN,
+  disconnect,
+} from "@/app/reducers/authReducer"
 import { store } from "@/app/store"
 import { toast } from "@/hooks/use-toast"
+import { useAppDispatch } from "@/app/hooks"
 
 const service = axios.create({
   baseURL: config.apBaseUrl,
   timeout: 60000,
 })
+service.defaults.withCredentials = true
+
 const mongoService = axios.create({
   baseURL: config.apBaseUrl + "/mongo",
   timeout: 60000,
@@ -47,6 +53,13 @@ services.forEach(s =>
       console.log(error)
       let notificationParam = {
         description: "",
+      }
+
+      if (error.response?.status === 401) {
+        notificationParam.description = "Authentication Fail"
+        notificationParam.description = "Please login again"
+        const dispatch = useAppDispatch()
+        dispatch(disconnect())
       }
 
       // Remove token and redirect
