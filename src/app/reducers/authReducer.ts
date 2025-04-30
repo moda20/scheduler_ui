@@ -2,13 +2,21 @@ import type { PayloadAction } from "@reduxjs/toolkit"
 import { createAppSlice } from "@/app/createAppSlice"
 import type { LoginFormData } from "@/models/auth"
 
+export enum ConnectionStatus {
+  CONNECTED = "CONNECTED",
+  INPROGRESS = "INPROGRESS",
+  DISCONNECTED = "DISCONNECTED",
+}
+
 export interface AuthenticationSliceState {
   authToken?: string
   user?: any
+  connectionStatus: ConnectionStatus
 }
 
 const initialState: AuthenticationSliceState = {
   authToken: undefined,
+  connectionStatus: ConnectionStatus.INPROGRESS,
 }
 
 // If you are not using async thunks you can use the standalone `createSlice`.
@@ -18,6 +26,14 @@ export const AuthenticationSlice = createAppSlice({
   initialState,
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: create => ({
+    setConnectionStatus: create.reducer(
+      (
+        state: AuthenticationSliceState,
+        action: PayloadAction<ConnectionStatus>,
+      ) => {
+        state.connectionStatus = action.payload
+      },
+    ),
     setUser: create.reducer(
       (
         state: AuthenticationSliceState,
@@ -60,11 +76,14 @@ export const AuthenticationSlice = createAppSlice({
   selectors: {
     auth_token: state => state.authToken,
     user: state => state.user,
+    connectionStatus: state => state.connectionStatus,
   },
 })
 
 // Action creators are generated for each case reducer function.
-export const { setUser, disconnect } = AuthenticationSlice.actions
+export const { setUser, disconnect, setConnectionStatus } =
+  AuthenticationSlice.actions
 
 // Selectors returned by `slice.selectors` take the root state as their first argument.
-export const { auth_token, user } = AuthenticationSlice.selectors
+export const { auth_token, user, connectionStatus } =
+  AuthenticationSlice.selectors

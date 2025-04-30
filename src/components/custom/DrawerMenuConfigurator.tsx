@@ -15,6 +15,7 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { jobActions } from "@/features/jobsTable/interfaces"
 import { useHotkeys } from "react-hotkeys-hook"
 import HotKeyButton from "@/components/custom/HotKeyButton"
+import { verifyUserConnection } from "@/utils/authUtils"
 
 export default function DrawerMenuConfigurator() {
   useHotkeys(
@@ -56,6 +57,7 @@ export default function DrawerMenuConfigurator() {
 
   const setNewTargetServer = (newTarget?: string) => {
     dispatch(setConfigItem({ name: "targetServer", value: newTarget }))
+    verifyUserConnection()
     toast({
       title: `Target server updated`,
     })

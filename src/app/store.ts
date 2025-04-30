@@ -5,6 +5,7 @@ import { counterSlice } from "../features/counter/counterSlice"
 import { quotesApiSlice } from "../features/quotes/quotesApiSlice"
 import { AuthenticationSlice } from "../app/reducers/authReducer"
 import { UiReducerSlice } from "../app/reducers/uiReducer"
+import { JobsReducerSlice } from "@/app/reducers/jobsReducer"
 
 // `combineSlices` automatically combines the reducers using
 // their `reducerPath`s, therefore we no longer need to call `combineReducers`.
@@ -13,6 +14,7 @@ const rootReducer = combineSlices(
   quotesApiSlice,
   AuthenticationSlice,
   UiReducerSlice,
+  JobsReducerSlice,
 )
 // Infer the `RootState` type from the root reducer
 export type RootState = ReturnType<typeof rootReducer>

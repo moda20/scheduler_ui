@@ -10,9 +10,10 @@ import { JobUpdateDialog } from "@/components/job-update-dialog"
 import { Button } from "@/components/ui/button"
 import { PlusIcon } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { useAppSelector } from "@/app/hooks"
+import { useAppDispatch, useAppSelector } from "@/app/hooks"
 import { config } from "@/app/reducers/uiReducer"
 import { getConsumersCBox, takeAction } from "@/features/jobsTable/jobsUtils"
+import { runningJobs, setRunningJobsCount } from "@/app/reducers/jobsReducer"
 
 export const defaultSortingState = [{ id: "cronSetting", desc: true }]
 
@@ -23,6 +24,8 @@ export default function JobsPage() {
   const [fetchingData, setFetchingStatus] = useState(false)
   const [sorting, setSorting] = useState<SortingState>(defaultSortingState)
   const savedConfig = useAppSelector(config)
+  const runnnigJobsData = useAppSelector(runningJobs)
+  const dispatch = useAppDispatch()
   async function fetchTableData(inputSorting?: SortingState) {
     setFetchingStatus(true)
     return await jobsService
@@ -43,8 +46,9 @@ export default function JobsPage() {
   }
 
   async function getRunningJobs() {
-    return await jobsService.getRunningJobs().then(data => {
+    return await jobsService.getRunningJobs().then((data: any) => {
       setRunningJobsData(data)
+      dispatch(setRunningJobsCount(data.count))
     })
   }
   useEffect(() => {
@@ -76,7 +80,7 @@ export default function JobsPage() {
     takeAction: takeJobsAction,
     getAvailableConsumers: getConsumersCBox,
   })
-  const runningJobsCount = Number(runningJobsData.count ?? 0)
+  const runningJobsCount = Number(runnnigJobsData.runningJobsCount ?? 0)
   return (
     <div className="">
       <div className={"table-header flex items-center py-4 justify-between"}>

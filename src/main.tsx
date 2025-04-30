@@ -13,12 +13,14 @@ import router from "./router"
 import { ThemeProvider } from "@/components/theme-provider"
 import { initializeStore } from "@/utils/initializer"
 import Authentication from "@/features/auth/authentication"
+import { verifyUserConnection } from "@/utils/authUtils"
 
 const container = document.getElementById("root")
 
 if (container) {
   const root = createRoot(container)
   initializeStore()
+  verifyUserConnection()
 
   root.render(
     <React.StrictMode>

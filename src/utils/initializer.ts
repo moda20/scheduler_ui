@@ -1,6 +1,7 @@
 import { store } from "@/app/store"
 import { setConfigItem } from "@/app/reducers/uiReducer"
 import appConfig from "@/configs/appConfig"
+import SocketManager from "@/lib/socketUtils"
 
 export interface SavedConfigInterface {
   targetServer?: string
