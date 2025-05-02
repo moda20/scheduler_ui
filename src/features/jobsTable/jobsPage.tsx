@@ -13,29 +13,33 @@ import { Badge } from "@/components/ui/badge"
 import { useAppDispatch, useAppSelector } from "@/app/hooks"
 import { config } from "@/app/reducers/uiReducer"
 import { getConsumersCBox, takeAction } from "@/features/jobsTable/jobsUtils"
-import { runningJobs, setRunningJobsCount } from "@/app/reducers/jobsReducer"
+import {
+  jobsList,
+  runningJobs,
+  setJobsList,
+  setRunningJobsCount,
+} from "@/app/reducers/jobsReducer"
 
 export const defaultSortingState = [{ id: "cronSetting", desc: true }]
 
 export default function JobsPage() {
-  const [data, setData] = useState<any>({})
-  const [runningJobsData, setRunningJobsData] = useState<any>({})
   const [loading, setLoading] = useState(true)
   const [fetchingData, setFetchingStatus] = useState(false)
   const [sorting, setSorting] = useState<SortingState>(defaultSortingState)
   const savedConfig = useAppSelector(config)
   const runnnigJobsData = useAppSelector(runningJobs)
+  const JobsList = useAppSelector(jobsList)
   const dispatch = useAppDispatch()
   async function fetchTableData(inputSorting?: SortingState) {
     setFetchingStatus(true)
     return await jobsService
       .getAllJobs(null, inputSorting ?? sorting)
       .then(data => {
-        setData(data)
+        dispatch(setJobsList(data))
         setLoading(false)
       })
       .catch(err => {
-        setData([])
+        dispatch(setJobsList([]))
         setLoading(false)
       })
       .finally(() => setFetchingStatus(false))
@@ -47,7 +51,6 @@ export default function JobsPage() {
 
   async function getRunningJobs() {
     return await jobsService.getRunningJobs().then((data: any) => {
-      setRunningJobsData(data)
       dispatch(setRunningJobsCount(data.count))
     })
   }
@@ -103,7 +106,7 @@ export default function JobsPage() {
       <Spinner show={loading}>
         <DataTable
           columns={columns}
-          data={data ?? []}
+          data={JobsList ?? []}
           filters={{ sorting }}
           events={{
             onPageChange: filterAndPaginationChange,
