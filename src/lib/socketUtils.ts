@@ -22,7 +22,10 @@ export default class SocketManager {
 
   createSocket() {
     const targetUrl = store.getState().ui.config.targetServer
-    this.socket = new WebSocket(`${targetUrl}/ws`)
+    this.socket = new WebSocket(new URL("/ws", targetUrl).toString())
+    this.socket.onerror = error => {
+      console.log("socket error", error)
+    }
     this.socket.onopen = (data: Event) => {
       console.log("socket opened")
     }

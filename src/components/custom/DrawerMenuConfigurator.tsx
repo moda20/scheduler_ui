@@ -119,12 +119,23 @@ export default function DrawerMenuConfigurator() {
         <div className="grid gap-2 py-2">
           {savedConfig.savedTargets &&
             savedConfig.savedTargets.map((e, i) => (
-              <div className="flex items-center gap-4 justify-between" key={i}>
-                <div className={"flex items-center gap-4"}>
+              <div
+                className="flex items-center gap-4 justify-between w-full min-w-0 flex-1 overflow-hidden"
+                key={i}
+              >
+                <div
+                  className={
+                    "flex items-center gap-4 w-full flex-shrink flex-grow-0 min-w-0"
+                  }
+                >
                   <Label htmlFor="target" className="text-left">
                     Target
                   </Label>
-                  <Label htmlFor="target" className="text-left">
+                  <Label
+                    htmlFor="target"
+                    className="text-left overflow-ellipsis overflow-hidden flex-1 min-w-0"
+                    title={e}
+                  >
                     {e}
                   </Label>
                 </div>
