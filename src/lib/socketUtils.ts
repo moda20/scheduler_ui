@@ -27,7 +27,7 @@ export default class SocketManager {
       console.log("socket error", error)
     }
     this.socket.onopen = (data: Event) => {
-      console.log("socket opened")
+      console.log("socket initiated")
     }
     this.setUpEvents()
   }
@@ -38,12 +38,16 @@ export default class SocketManager {
         id: string
         data: string
       } = JSON.parse(data.data)
-      this.actionEvent(parsedData.id, JSON.parse(parsedData.data))
+      this.actionEvent(parsedData.id, JSON.parse(parsedData.data || "{}"))
     }
   }
 
   actionEvent(action: string, data: JobStartedNotification) {
     switch (action) {
+      case JobNotificationTopics.NOOP: {
+        console.log("socket connection established")
+        break
+      }
       case JobNotificationTopics.JobStarted: {
         store.dispatch(setRunningJobsCount(data.runningJobCount))
         store.dispatch(

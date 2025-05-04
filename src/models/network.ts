@@ -2,6 +2,7 @@ export enum JobNotificationTopics {
   JobStarted = "JobStarted",
   JobFinished = "JobFinished",
   JobFailed = "JobFailed",
+  NOOP = "NOOP",
 }
 
 export interface JobNotification {
