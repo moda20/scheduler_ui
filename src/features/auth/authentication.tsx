@@ -20,7 +20,6 @@ export default function Authentication({
 }: AuthenticationProps) {
   const dispatch = useAppDispatch()
   const { isDialogOpen, setDialogState } = useDialogueManager()
-  const [authChecking, setAuthChecking] = useState(false)
   const targetConnectionStatus = useAppSelector(connectionStatus)
 
   const isConnected = targetConnectionStatus === ConnectionStatus.CONNECTED
