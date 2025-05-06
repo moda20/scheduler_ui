@@ -5,12 +5,11 @@ import {
   CommandList,
   CommandGroup,
   CommandItem,
-  CommandSeparator,
-  CommandShortcut,
 } from "@/components/ui/command"
 import useDialogueManager from "@/hooks/useDialogManager"
 import { useHotkeys } from "react-hotkeys-hook"
 import type { ReactNode } from "react"
+import { useRef } from "react"
 import { useCallback, useState } from "react"
 import { Button } from "@/components/ui/button"
 import jobsService from "@/services/JobsService"
@@ -20,29 +19,23 @@ import ActionDropdown from "@/components/custom/jobsTable/actionDropdown"
 import type { jobsTableData } from "@/features/jobsTable/interfaces"
 import { defaultLogPeriod } from "@/features/jobsTable/interfaces"
 import { getConsumersCBox, takeAction } from "@/features/jobsTable/jobsUtils"
-import {
-  Clock,
-  FileArchive,
-  ListChecks,
-  ListIcon,
-  ListStart,
-  ListXIcon,
-  Loader2Icon,
-  LoaderIcon,
-} from "lucide-react"
+import { Clock, FileArchive, LoaderIcon } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { ListBulletIcon } from "@radix-ui/react-icons"
-import { ListCheck } from "lucide"
 
 export interface SearchBarProps {
   trigger?: ReactNode
 }
 
 export default function SearchBar({ trigger }: SearchBarProps) {
+  const inputRef = useRef<HTMLInputElement>(null)
   const { isDialogOpen, setDialogState } = useDialogueManager()
 
   useHotkeys(["ctrl+k", "meta+k"], () => {
-    setDialogState(true)
+    if (isDialogOpen) {
+      inputRef.current?.focus()
+    } else {
+      setDialogState(true)
+    }
   })
 
   const [searchKey, setSearchKey] = useState("")
@@ -99,6 +92,7 @@ export default function SearchBar({ trigger }: SearchBarProps) {
         }}
       >
         <CommandInput
+          ref={inputRef}
           className="text-foreground"
           placeholder="Type a command or search..."
           onValueChange={e => searchForJobs(e)}
