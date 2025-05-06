@@ -38,7 +38,7 @@ export default class SocketManager {
         id: string
         data: string
       } = JSON.parse(data.data)
-      this.actionEvent(parsedData.id, JSON.parse(parsedData.data || "{}"))
+      this.actionEvent(parsedData.id, JSON.parse(parsedData?.data || "{}"))
     }
   }
 
