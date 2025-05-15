@@ -4,18 +4,16 @@ import type { jobsTableData } from "@/features/jobsTable/interfaces"
 import { getTableColumns, jobActions } from "@/features/jobsTable/interfaces"
 import { useEffect, useState } from "react"
 import { Spinner } from "@/components/ui/spinner"
-import type { Row, SortingState } from "@tanstack/react-table"
+import type { SortingState } from "@tanstack/react-table"
 import type { JobUpdateType } from "@/components/job-update-dialog"
 import { JobUpdateDialog } from "@/components/job-update-dialog"
 import { Button } from "@/components/ui/button"
 import { PlusIcon } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
 import { useAppDispatch, useAppSelector } from "@/app/hooks"
 import { config } from "@/app/reducers/uiReducer"
 import { getConsumersCBox, takeAction } from "@/features/jobsTable/jobsUtils"
 import {
   jobsList,
-  runningJobs,
   setJobsList,
   setRunningJobsCount,
 } from "@/app/reducers/jobsReducer"
@@ -27,7 +25,6 @@ export default function JobsPage() {
   const [fetchingData, setFetchingStatus] = useState(false)
   const [sorting, setSorting] = useState<SortingState>(defaultSortingState)
   const savedConfig = useAppSelector(config)
-  const runnnigJobsData = useAppSelector(runningJobs)
   const JobsList = useAppSelector(jobsList)
   const dispatch = useAppDispatch()
   async function fetchTableData(inputSorting?: SortingState) {
@@ -91,7 +88,6 @@ export default function JobsPage() {
     takeAction: takeJobsAction,
     getAvailableConsumers: getConsumersCBox,
   })
-  const runningJobsCount = Number(runnnigJobsData.runningJobsCount ?? 0)
   return (
     <div className="">
       <div className={"table-header flex items-center py-4 justify-between"}>
@@ -105,11 +101,6 @@ export default function JobsPage() {
             <PlusIcon /> New job
           </Button>
         </JobUpdateDialog>
-        <div className="">
-          <Badge variant={runningJobsCount > 0 ? "outline" : "default"}>
-            {runningJobsCount} jobs running
-          </Badge>
-        </div>
       </div>
       <Spinner show={loading}>
         <DataTable

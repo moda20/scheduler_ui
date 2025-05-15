@@ -36,6 +36,8 @@ export default {
         border: "hsl(var(--border))",
         ring: "hsl(var(--ring))",
         teal: "var(--teal)",
+        success: "hsl(var(--success))",
+        "success-foreground": "hsl(var(--success-foreground))",
       },
     },
   },

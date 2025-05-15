@@ -34,6 +34,7 @@ import { PlayIcon } from "@radix-ui/react-icons"
 import { toast } from "@/hooks/use-toast"
 import DrawerMenuConfigurator from "@/components/custom/DrawerMenuConfigurator"
 import SearchBar from "@/components/custom/SearchBar"
+import JobsStatusCount from "@/components/custom/dashboard/JobsStatusCount"
 
 export default function MainPage() {
   const navigate = useNavigate()
@@ -87,6 +88,7 @@ export default function MainPage() {
             </BreadcrumbList>
           </Breadcrumb>
           <div className="ml-auto flex gap-2">
+            <JobsStatusCount />
             <SearchBar />
             <ThemeToggle className={"border-border"} />
             <DrawerMenuConfigurator />
