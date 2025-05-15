@@ -61,8 +61,16 @@ export default function JobsPage() {
     }
   }, [savedConfig.targetServer])
 
-  async function filterAndPaginationChange({ sorting }: { sorting: any }) {
-    const targetSorting = sorting?.length ? sorting : defaultSortingState
+  async function filterAndPaginationChange({
+    sorting: newSorting,
+  }: {
+    sorting: any
+  }) {
+    const targetSorting =
+      newSorting?.length ||
+      (sorting === defaultSortingState && !newSorting?.length)
+        ? newSorting
+        : defaultSortingState
     setSorting(targetSorting)
     setLoading(true)
     await updateTableData(targetSorting)
