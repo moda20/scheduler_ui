@@ -12,31 +12,46 @@ import {
   LucideDatabase,
   LucideDatabaseZap,
 } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import systemService from "@/services/SystemService"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/hooks/use-toast"
 
 export default function DatabaseDashboard() {
   const [dbInfo, setDbInfo] = useState<any>({})
+  const [baseDbInfo, setBaseDbInfo] = useState<any>({})
 
-  const getDbInfo = async () => {
+  const getDbInfo = useCallback(async () => {
     const dbInfo = await systemService.getDatabaseInformation()
     setDbInfo(dbInfo)
-  }
+  }, [setDbInfo])
 
-  const backUpDb = () => {
+  const getBaseDbInfo = useCallback(async () => {
+    const dbInfo = await systemService.getBaseDatabaseInformation()
+    setBaseDbInfo(dbInfo)
+  }, [setBaseDbInfo])
+
+  const backUpDb = useCallback(() => {
     return systemService.downloadSchedulerDBBackupFile().then(() => {
       toast({
         title: "Backup finished successfully",
         duration: 1500,
       })
     })
-  }
+  }, [])
+  const backUpBaseDb = useCallback(() => {
+    return systemService.downloadBaseDBBackupFile().then(() => {
+      toast({
+        title: "Backup finished successfully",
+        duration: 1500,
+      })
+    })
+  }, [])
 
   useEffect(() => {
     getDbInfo()
-  }, [])
+    getBaseDbInfo()
+  }, [getBaseDbInfo, getDbInfo])
 
   return (
     <div className="flex flex-col gap-4">
@@ -53,10 +68,7 @@ export default function DatabaseDashboard() {
         <Card className="border-border ">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2 text-foreground bg-background border-border rounded-t-xl">
             <CardTitle className="text-md font-medium">
-              Database <b>{dbInfo?.databaseName}</b>
-              <p className="text-sm font-mono italic">
-                Managing the scheduler database
-              </p>
+              Scheduler database : <b>{dbInfo?.databaseName}</b>
             </CardTitle>
             <LucideDatabase />
           </CardHeader>
@@ -78,7 +90,37 @@ export default function DatabaseDashboard() {
               <DatabaseBackup /> Backup
             </Button>
 
-            <Button variant="outline">
+            <Button variant="outline" disabled>
+              <LucideDatabaseZap /> Restore
+            </Button>
+          </CardFooter>
+        </Card>
+        <Card className="border-border ">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2 text-foreground bg-background border-border rounded-t-xl">
+            <CardTitle className="text-md font-medium">
+              Base database : <b>{baseDbInfo?.databaseName}</b>
+            </CardTitle>
+            <LucideDatabase />
+          </CardHeader>
+          <CardContent className="p-4 pt-0">
+            <ul>
+              <li className="my-2">
+                <b>Host</b> : {baseDbInfo?.host}
+              </li>
+              <li className="my-2">
+                <b>Database name</b> : {baseDbInfo?.databaseName}
+              </li>
+              <li className="my-2">
+                <b>Size</b> : {baseDbInfo?.dbSize} MB
+              </li>
+            </ul>
+          </CardContent>
+          <CardFooter className="flex flex-row justify-end gap-2">
+            <Button onClick={() => backUpBaseDb()}>
+              <DatabaseBackup /> Backup
+            </Button>
+
+            <Button variant="outline" disabled>
               <LucideDatabaseZap /> Restore
             </Button>
           </CardFooter>
