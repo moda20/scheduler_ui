@@ -167,6 +167,16 @@ export function ComboBox({
     [multiSelect, value],
   )
 
+  const sortItemForCommandList = useCallback(
+    (itemList: ComboBoxItem[]) => {
+      return itemList.sort((a, b) => {
+        if (isSelectedValue(a.value)) return -1
+        return 1
+      })
+    },
+    [isSelectedValue],
+  )
+
   React.useEffect(() => {
     if (typeof itemList === "function") {
       setCurrentItemList([])
@@ -225,7 +235,7 @@ export function ComboBox({
           <CommandList>
             <CommandEmpty>{noFieldsFoundText}</CommandEmpty>
             <CommandGroup>
-              {currentItemList.map(item => (
+              {sortItemForCommandList(currentItemList).map(item => (
                 <CommandItem
                   key={item.value}
                   keywords={[item.label, item.value]}
