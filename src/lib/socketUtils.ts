@@ -7,7 +7,7 @@ import {
 } from "@/app/reducers/jobsReducer"
 
 export default class SocketManager {
-  socket: WebSocket | undefined
+  socket?: WebSocket
   targetUrl?: string
   static instance: SocketManager
 
@@ -33,6 +33,9 @@ export default class SocketManager {
   }
 
   setUpEvents() {
+    if (this.socket) {
+      console.log("socket not created, not setting up event")
+    }
     this.socket!.onmessage = (data: MessageEvent<string>) => {
       const parsedData: {
         id: string
@@ -46,6 +49,11 @@ export default class SocketManager {
     switch (action) {
       case JobNotificationTopics.NOOP: {
         console.log("socket connection established")
+        this.socket!.send(
+          JSON.stringify({
+            id: JobNotificationTopics.Status,
+          }),
+        )
         break
       }
       case JobNotificationTopics.JobStarted: {
@@ -66,6 +74,10 @@ export default class SocketManager {
             isRunning: false,
           }),
         )
+        break
+      }
+      case JobNotificationTopics.Status: {
+        store.dispatch(setRunningJobsCount(data.runningJobCount))
         break
       }
     }
