@@ -4,9 +4,9 @@ services:
       context: .
       dockerfile: DOCKERFILE
       args:
-        SERVER_ENDPOINT: ${SERVER_ENDPOINT}
+        SERVER_ENDPOINT: ${SERVER_ENDPOINT-http://localhost:3000} # is used when building the app, the server endpoint can be changed during runtime
     container_name: scheduler_ui
     env_file: .env
     restart: always
     ports:
-      - "8096:80"
+      - "80:80"
