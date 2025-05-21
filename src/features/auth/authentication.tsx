@@ -11,6 +11,7 @@ import {
   setUser,
 } from "@/app/reducers/authReducer"
 import type { LoginFormData, RegisterFormData } from "@/models/auth"
+import { verifyUserConnection } from "@/utils/authUtils"
 
 export interface AuthenticationProps extends React.ComponentProps<"div"> {}
 
@@ -43,18 +44,18 @@ export default function Authentication({
 
   const loginAction = useCallback(
     async (data: LoginFormData) => {
-      console.log(data)
       await authService.login(data)
       dispatch(setUser(data))
+      verifyUserConnection()
     },
     [dispatch],
   )
 
   const registerAction = useCallback(
     async (data: RegisterFormData) => {
-      console.log(data)
       await authService.register(data)
       dispatch(setUser(data))
+      verifyUserConnection()
     },
     [dispatch],
   )

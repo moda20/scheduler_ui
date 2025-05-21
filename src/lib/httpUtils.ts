@@ -44,7 +44,6 @@ services.forEach(s =>
         if (response.headers["content-type"] !== "application/json") {
           throw new AxiosError("Invalid response type")
         }
-        return response
       }
 
       if (response.config?.fetchOptions?.fullResponse) {

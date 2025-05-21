@@ -77,7 +77,6 @@ export function AllJobsStats(props: AllJobsStatsProps) {
     jobsService
       .jobStats([], dateRange)
       .then(data => {
-        console.log(data)
         setStats(data as Array<any>)
       })
       .catch(err => {
