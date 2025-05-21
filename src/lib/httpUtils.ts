@@ -1,10 +1,7 @@
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 import config from "@/configs/appConfig"
 import history from "../history/history"
-import {
-  auth_token as AUTH_TOKEN,
-  disconnect,
-} from "@/app/reducers/authReducer"
+import { disconnect } from "@/app/reducers/authReducer"
 import { store } from "@/app/store"
 import { toast } from "@/hooks/use-toast"
 import { useAppDispatch } from "@/app/hooks"
@@ -12,18 +9,17 @@ import { useAppDispatch } from "@/app/hooks"
 const service = axios.create({
   baseURL: config.apBaseUrl,
   timeout: 60000,
+  responseType: "json",
+  fetchOptions: {
+    onlyJSON: true,
+  },
 })
 service.defaults.withCredentials = true
-
-const mongoService = axios.create({
-  baseURL: config.apBaseUrl + "/mongo",
-  timeout: 60000,
-})
 
 // Config
 const ENTRY_ROUTE = "/auth/login"
 const TOKEN_PAYLOAD_KEY = "authorization"
-const services = [service, mongoService]
+const services = [service]
 // API Request interceptor
 services.forEach(s =>
   s.interceptors.request.use(config => {
@@ -33,17 +29,24 @@ services.forEach(s =>
       config.headers[TOKEN_PAYLOAD_KEY] = jwtToken
     }
     if (targetUrl) {
-      config.baseURL = `${targetUrl}${config?.baseURL?.includes("mongo") ? "/mongo" : ""}`
+      config.baseURL = targetUrl
     }
 
     return config
   }),
 )
 
-// API respone interceptor
+// API response interceptor
 services.forEach(s =>
   s.interceptors.response.use(
     response => {
+      if (response.config?.fetchOptions?.onlyJSON) {
+        if (response.headers["content-type"] !== "application/json") {
+          throw new AxiosError("Invalid response type")
+        }
+        return response
+      }
+
       if (response.config?.fetchOptions?.fullResponse) {
         return response
       }
@@ -98,4 +101,3 @@ services.forEach(s =>
 )
 
 export default service
-export const mongoAxiosService = mongoService
