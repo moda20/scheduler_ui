@@ -41,7 +41,7 @@ services.forEach(s =>
   s.interceptors.response.use(
     response => {
       if (response.config?.fetchOptions?.onlyJSON) {
-        if (response.headers["content-type"] !== "application/json") {
+        if (response.headers["content-type"]?.includes("application/json")) {
           throw new AxiosError("Invalid response type")
         }
       }
