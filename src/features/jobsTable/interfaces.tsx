@@ -30,6 +30,7 @@ export enum jobActions {
   UNSCHEDULE,
   EXECUTE,
   EXECUTE_IN_THE_BACKGROUND,
+  REFRESH,
   UPDATE,
   CREATE,
   SOFT_DELETE,

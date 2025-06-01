@@ -91,3 +91,32 @@ export const getMimeTypeFromExtension = (extension = "txt") => {
     }[extension] || "application/octet-stream"
   )
 }
+
+// will compare two objects recursively to determine if they are equal or not
+// from : https://stackoverflow.com/a/52645018/6641693
+export const isEqual = (a: any, b: any): Boolean => {
+  if (a === b) return true
+  if (a instanceof Date && b instanceof Date) return a.getTime() === b.getTime()
+  if (!a || !b || (typeof a !== "object" && typeof b !== "object"))
+    return a === b
+  if (a === null || a === undefined || b === null || b === undefined)
+    return false
+  if (a.prototype !== b.prototype) return false
+  let keys = Object.keys(a)
+
+  if (keys.length !== Object.keys(b).length) return false
+  if (
+    typeof a === "object" &&
+    typeof b === "object" &&
+    JSON.stringify(a) === JSON.stringify(b)
+  )
+    return true
+  return keys.every(k => isEqual(a[k], b[k]))
+}
+
+export const genUID = () => {
+  return (
+    Math.random().toString(24).substring(2, 10) +
+    Math.random().toString(24).substring(2, 10)
+  )
+}

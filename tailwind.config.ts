@@ -25,6 +25,7 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
         primary: "hsl(var(--primary))",
+        input: "hsl(var(--input))",
         "primary-foreground": "hsl(var(--primary-foreground))",
         transparent: "transparent",
         background: "hsl(var(--background))",

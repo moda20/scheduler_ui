@@ -38,6 +38,11 @@ export const routesList = [
         title: "Proxies",
         url: "/proxies",
       },
+      {
+        id: "configs",
+        title: "Configs",
+        url: "/configs",
+      },
     ],
   },
 ]

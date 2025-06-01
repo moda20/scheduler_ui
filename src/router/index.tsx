@@ -6,6 +6,7 @@ import JobsPage from "@/features/jobsTable/jobsPage"
 import Dashboard from "@/features/dashboard/dashboard"
 import DatabaseDashboard from "@/features/system/database"
 import Proxies from "@/features/network/proxies"
+import ConfigsDashboard from "@/features/system/configs"
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,11 @@ const router = createBrowserRouter([
         path: "/proxies",
         index: true,
         element: <Proxies />,
+      },
+      {
+        path: "/configs",
+        index: true,
+        element: <ConfigsDashboard />,
       },
     ],
   },

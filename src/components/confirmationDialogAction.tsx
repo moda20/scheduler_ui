@@ -76,6 +76,7 @@ export default function ConfirmationDialogAction(
             }
             variant={props.confirmVariant}
             disabled={props.disableConfirm}
+            autoFocus={true}
           >
             {props.confirmText ?? "Confirm"}
           </AlertDialogAction>

@@ -40,6 +40,13 @@ export const takeAction = (
             variant: "destructive",
           })
         })
+    case jobActions.REFRESH:
+      return jobsService.executeAction(row!.id, "REFRESH").then(() => {
+        toast({
+          title: `Service ${row!.name} Refreshed`,
+          duration: 3000,
+        })
+      })
     case jobActions.UPDATE:
       return jobsService
         .executeActionWithUpdate("UPDATE", data, row!.id)

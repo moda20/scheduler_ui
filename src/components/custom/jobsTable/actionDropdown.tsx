@@ -149,16 +149,18 @@ export default function ActionDropdown({
             <span>Run now</span>
             <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
           </DropdownMenuItemExtended>
-          <DropdownMenuItem
+          <DropdownMenuItemExtended
+            keyBinding="R"
             onClick={() =>
               !(!row.initialized && row.status === "STARTED") &&
-              columnsProps.takeAction(row, jobActions.EXECUTE_IN_THE_BACKGROUND)
+              columnsProps.takeAction(row, jobActions.REFRESH)
             }
             disabled={!row.initialized && row.status === "STARTED"}
           >
             <DockIcon />
-            <span>Run in background</span>
-          </DropdownMenuItem>
+            <span>Refresh Task File</span>
+            <DropdownMenuShortcut>R</DropdownMenuShortcut>
+          </DropdownMenuItemExtended>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
