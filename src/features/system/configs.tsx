@@ -118,7 +118,7 @@ export default function ConfigsDashboard() {
 
   const removeConfigItem = useCallback(
     (itemId: string, parentId?: string, setValue: boolean = true) => {
-      const newConfig = JSON.parse(JSON.stringify(config))
+      const newConfig: Array<ConfigItem> = JSON.parse(JSON.stringify(config))
       let targetConfig
       let targetConfigList
       if (!parentId) {
@@ -285,17 +285,17 @@ export default function ConfigsDashboard() {
       {editMode && (
         <div className="flex gap-4 items-center">
           <Button
-            variant="dashed"
+            variant="ghost"
             onClick={() => addConfigItem(undefined, "item")}
-            className="w-full gap-2 border-dashed border-2 border-border hover:border-solid"
+            className="w-full gap-2 border-dashed border-2 border-border hover:border-solid hover:bg-transparent"
           >
             <Plus className="h-4 w-4" />
             Add single config Item
           </Button>
           <Button
-            variant="dashed"
+            variant="ghost"
             onClick={() => addConfigItem(undefined, "block")}
-            className="w-full gap-2 border-dashed border-2 border-border hover:border-solid"
+            className="w-full gap-2 border-dashed border-2 border-border hover:border-solid hover:bg-transparent"
           >
             <Plus className="h-4 w-4" />
             Add a config block

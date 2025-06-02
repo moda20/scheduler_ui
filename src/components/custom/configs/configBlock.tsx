@@ -133,9 +133,9 @@ export default function ConfigBlock({
 
             {group.subGroups && editMode && (
               <Button
-                variant="dashed"
+                variant="ghost"
                 onClick={() => addConfigItem(group.id)}
-                className="w-full gap-2 border-dashed border border-border hover:border-solid"
+                className="w-full gap-2 border-dashed border-2 border-border hover:border-solid hover:bg-transparent"
               >
                 <Plus className="h-4 w-4" />
                 Add Configuration Item
