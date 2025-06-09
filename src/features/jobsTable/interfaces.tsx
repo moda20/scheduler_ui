@@ -9,6 +9,7 @@ import type { ComboBoxItem } from "@/components/ui/combo-box"
 import ActionDropdown from "@/components/custom/jobsTable/actionDropdown"
 import HeaderSortButton from "@/components/custom/jobsTable/headerSortButton"
 import { FileArchive, LucideFileWarning } from "lucide-react"
+import React from "react"
 
 export interface jobsTableData {
   id: string
@@ -81,11 +82,8 @@ export const getTableColumns = (
   {
     accessorKey: "cronSetting",
     cell: ({ row }) => (
-      <div
-        className="text-left flex flex-col gap-2 max-w-[200px]"
-        style={{ maxWidth: "200px" }}
-      >
-        <div>{getStringFromCronExpression(row.getValue("cronSetting"))}</div>
+      <div className="text-left flex flex-col gap-2 w-max-[200px]">
+        <div>{getStringFromCronExpression(row.original.cronSetting)}</div>
         <small>{row.getValue("cronSetting")}</small>
       </div>
     ),
@@ -110,15 +108,17 @@ export const getTableColumns = (
   },
   {
     accessorKey: "isCurrentlyRunning",
-    cell: ({ row }) => (
-      <div className="text-center">
-        <Badge
-          variant={row.getValue("isCurrentlyRunning") ? null : "destructive"}
-        >
-          {row.getValue("isCurrentlyRunning") ? "Yes" : "No"}
-        </Badge>
-      </div>
-    ),
+    cell: ({ row }) => {
+      return (
+        <div className="text-center">
+          <Badge
+            variant={row.original.isCurrentlyRunning ? null : "destructive"}
+          >
+            {row.original.isCurrentlyRunning ? "Yes" : "No"}
+          </Badge>
+        </div>
+      )
+    },
     header: ({ column }) => (
       <HeaderSortButton column={column} columnName="Running ?" />
     ),
@@ -154,11 +154,7 @@ export const getTableColumns = (
           {row.original?.latestRun?.error && (
             <>
               <br />
-              <Badge
-                className={"m-auto"}
-                variant={"destructive"}
-                onClick={() => {}}
-              >
+              <Badge className={"m-auto"} variant={"destructive"}>
                 Has error
               </Badge>
             </>

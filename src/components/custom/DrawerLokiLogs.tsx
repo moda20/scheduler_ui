@@ -1,18 +1,17 @@
 import { Label } from "@/components/ui/label"
 import SheetActionDialog from "@/components/sheet-action-dialog"
 import type { ReactNode } from "react"
-import { useEffect, useRef, useState } from "react"
-import jobsService from "@/services/JobsService"
+import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Checkbox } from "@/components/ui/checkbox"
 import { DatePickerWithPresets } from "@/components/ui/date-picker-presets"
 import type { DateRange } from "react-day-picker"
-import moment from "moment"
 import type { CheckedState } from "@radix-ui/react-checkbox"
 import useInterval from "@/hooks/useInterval"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileX2, LogsIcon } from "lucide-react"
+import { LogsIcon } from "lucide-react"
+import { getLokiLogs } from "@/services/components/logsService"
 
 export interface DrawerLokiLogsProps {
   start?: Date
@@ -39,45 +38,12 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
   )
 
   const getLogs = () => {
-    jobsService
-      .jobLogs(
-        `{job="${props.jobName}"}`,
-        moment(period?.from).unix(),
-        moment(period?.to)
-          .set("hours", 23)
-          .set("minutes", 59)
-          .set("seconds", 59)
-          .unix(),
-      )
-      .then(res => {
-        const parsedLogs = res.data?.result
-          ?.sort(
-            (a: any, b: any) =>
-              Number(b.values[0]?.[0]) - Number(a.values[0]?.[0]),
-          )
-          .map((stream: any, si: number) => {
-            const logValues = stream?.values?.map((log: any) => {
-              const logBits = log?.[1]?.split(" | ")
-              return {
-                timestamp: logBits[0],
-                type: logBits[1],
-                message: logBits[2],
-              }
-            })
-            return {
-              values: logValues,
-              uniqueId: `tab_${stream?.stream?.uniqueId?.toString()}`,
-              name: stream?.stream?.job,
-              title: si
-                ? moment(logValues[logValues.length - 1]?.timestamp).format(
-                    "YYYY-MM-DD",
-                  )
-                : `latest (${moment(logValues[logValues.length - 1]?.timestamp).fromNow()})`,
-            }
-          })
-        setLogs(parsedLogs ?? [])
-        if (!activeTab) setActiveTab(parsedLogs[0]?.uniqueId)
-      })
+    return getLokiLogs(`{job="${props.jobName}"}`, period?.from, period?.to, {
+      setEndToMidnight: true,
+    }).then(parsedLogs => {
+      setLogs(parsedLogs ?? [])
+      if (!activeTab) setActiveTab(parsedLogs[0]?.uniqueId)
+    })
   }
 
   const fetchLogs = (open?: boolean) => {

@@ -3,7 +3,6 @@ import { createRoot } from "react-dom/client"
 import { Provider } from "react-redux"
 import { Toaster } from "@/components/ui/toaster"
 
-import App from "./App"
 import { store } from "./app/store"
 import "./index.css"
 import "./styles/global.css"
