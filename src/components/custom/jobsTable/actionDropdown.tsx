@@ -29,12 +29,13 @@ import type {
   tableColumnsProps,
 } from "@/features/jobsTable/interfaces"
 import { jobActions } from "@/features/jobsTable/interfaces"
-import type { Row } from "@tanstack/react-table"
 import type { DateRange } from "react-day-picker"
 import DrawerJobFiles from "@/components/custom/DrawerJobFiles"
-import React, { ReactNode, useCallback } from "react"
-import { useHotkeys } from "react-hotkeys-hook"
+import type { ReactNode } from "react"
+import React, { useCallback, useEffect } from "react"
 import DropdownMenuItemExtended from "@/components/custom/general/DropdownItemExtended"
+import DrawerLatestRuns from "@/components/custom/DrawerLatestRuns"
+import { CardStackIcon } from "@radix-ui/react-icons"
 
 export interface ActionDropdownProps {
   columnsProps: tableColumnsProps
@@ -56,25 +57,74 @@ export default function ActionDropdown({
     inputGroup: inputGroup ?? "JobActions",
   })
 
+  const handleMenuTriggerClick = useCallback(() => {
+    setDialogState(true)
+  }, [])
+
+  const handleEscapeKeyTrigger = useCallback((v: any) => {
+    if (v.key === "Escape") {
+      v.preventDefault()
+      setDialogState(false)
+    }
+  }, [])
+
+  const handleEscapeDirectTrigger = useCallback((e: any) => {
+    e.preventDefault()
+    setDialogState(false)
+  }, [])
+
+  const handleEventPrevention = useCallback((e: any) => {
+    e.preventDefault()
+  }, [])
+
+  const handleConfirmationDialogAction = useCallback(
+    (action: ConfirmationDialogActionType) => {
+      if (action === ConfirmationDialogActionType.CANCEL) return
+      columnsProps.takeAction(
+        row,
+        row.status === "STARTED" ? jobActions.UNSCHEDULE : jobActions.SCHEDULE,
+      )
+    },
+    [columnsProps, row, setDialogState],
+  )
+
+  const handleConfirmationDeleteAction = useCallback(
+    (action: ConfirmationDialogActionType) => {
+      if (action === ConfirmationDialogActionType.CANCEL) return
+      columnsProps.takeAction(row, jobActions.SOFT_DELETE)
+    },
+    [columnsProps, row, setDialogState],
+  )
+
+  const handleJobUpdateAction = useCallback(
+    (jobData: any) => {
+      return columnsProps.takeAction(row, jobActions.UPDATE, jobData)
+    },
+    [row],
+  )
+
+  const handleJobExecutionAction = useCallback(() => {
+    if (!row.initialized && row.status === "STARTED") return
+    return columnsProps.takeAction(row, jobActions.EXECUTE)
+  }, [row])
+
+  const handleJobRefresh = useCallback(() => {
+    if (!row.initialized && row.status === "STARTED") return
+    return columnsProps.takeAction(row, jobActions.REFRESH)
+  }, [row])
+
   return (
     <DropdownMenu
       modal={modal ?? false}
       open={isDialogOpen}
-      onOpenChange={v => {
-        setDialogState(v)
-      }}
+      onOpenChange={setDialogState}
     >
-      <DropdownMenuTrigger asChild onSelect={() => setDialogState(true)}>
+      <DropdownMenuTrigger asChild onSelect={handleMenuTriggerClick}>
         {children ?? (
           <Button
             variant="ghost"
             size={"icon"}
-            onKeyDown={v => {
-              if (v.key === "Escape") {
-                v.preventDefault()
-                setDialogState(false)
-              }
-            }}
+            onKeyDown={handleEscapeKeyTrigger}
           >
             <EllipsisVertical />
           </Button>
@@ -82,10 +132,7 @@ export default function ActionDropdown({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className="w-56 bg-background"
-        onEscapeKeyDown={e => {
-          e.preventDefault()
-          setDialogState(false)
-        }}
+        onEscapeKeyDown={handleEscapeDirectTrigger}
       >
         <DropdownMenuLabel>Config {row.name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -99,15 +146,7 @@ export default function ActionDropdown({
             description={
               "this action will schedule the execution of the job based on it's cron setting"
             }
-            takeAction={action => {
-              if (action === ConfirmationDialogActionType.CANCEL) return
-              columnsProps.takeAction(
-                row,
-                row.status === "STARTED"
-                  ? jobActions.UNSCHEDULE
-                  : jobActions.SCHEDULE,
-              )
-            }}
+            takeAction={handleConfirmationDialogAction}
             confirmText={row.status === "STARTED" ? "Un-schedule" : "Schedule"}
           >
             <DropdownMenuItemExtended keyBinding="S">
@@ -122,12 +161,10 @@ export default function ActionDropdown({
             jobDetails={row}
             isCreateDialog={false}
             itemList={columnsProps.getAvailableConsumers}
-            onChange={jobData => {
-              columnsProps.takeAction(row, jobActions.UPDATE, jobData)
-            }}
+            onChange={handleJobUpdateAction}
             triggerClassName="w-full"
           >
-            <DropdownMenuItem onSelect={e => e.preventDefault()}>
+            <DropdownMenuItem onSelect={handleEventPrevention}>
               <Edit2Icon />
               <span>Update config</span>
             </DropdownMenuItem>
@@ -139,10 +176,7 @@ export default function ActionDropdown({
         <DropdownMenuGroup>
           <DropdownMenuItemExtended
             keyBinding="meta+e"
-            onClick={() =>
-              !(!row.initialized && row.status === "STARTED") &&
-              columnsProps.takeAction(row, jobActions.EXECUTE)
-            }
+            onClick={handleJobExecutionAction}
             disabled={!row.initialized && row.status === "STARTED"}
           >
             <DockIcon />
@@ -151,10 +185,7 @@ export default function ActionDropdown({
           </DropdownMenuItemExtended>
           <DropdownMenuItemExtended
             keyBinding="R"
-            onClick={() =>
-              !(!row.initialized && row.status === "STARTED") &&
-              columnsProps.takeAction(row, jobActions.REFRESH)
-            }
+            onClick={handleJobRefresh}
             disabled={!row.initialized && row.status === "STARTED"}
           >
             <DockIcon />
@@ -171,7 +202,7 @@ export default function ActionDropdown({
             trigger={
               <DropdownMenuItemExtended
                 keyBinding="L"
-                onSelect={e => e.preventDefault()}
+                onSelect={handleEventPrevention}
               >
                 <LogsIcon />
                 <span>Latest Logs</span>
@@ -186,11 +217,26 @@ export default function ActionDropdown({
             trigger={
               <DropdownMenuItemExtended
                 keyBinding="O"
-                onSelect={e => e.preventDefault()}
+                onSelect={handleEventPrevention}
               >
                 <FileSliders />
                 <span>Output Files</span>
                 <DropdownMenuShortcut>O</DropdownMenuShortcut>
+              </DropdownMenuItemExtended>
+            }
+          />
+        </DropdownMenuGroup>
+        <DropdownMenuGroup>
+          <DrawerLatestRuns
+            JobDetails={row}
+            trigger={
+              <DropdownMenuItemExtended
+                keyBinding="P"
+                onSelect={handleEventPrevention}
+              >
+                <CardStackIcon />
+                <span>Previous Runs</span>
+                <DropdownMenuShortcut>P</DropdownMenuShortcut>
               </DropdownMenuItemExtended>
             }
           />
@@ -202,14 +248,11 @@ export default function ActionDropdown({
             description={
               "This action will un-schedule and set to inactive the job but will NOT stop it if it's running"
             }
-            takeAction={action => {
-              if (action === ConfirmationDialogActionType.CANCEL) return
-              columnsProps.takeAction(row, jobActions.SOFT_DELETE)
-            }}
+            takeAction={handleConfirmationDeleteAction}
           >
             <DropdownMenuItem
               className={"bg-destructive"}
-              onSelect={e => e.preventDefault()}
+              onSelect={handleEventPrevention}
             >
               <Trash2Icon />
               <span>Delete job</span>

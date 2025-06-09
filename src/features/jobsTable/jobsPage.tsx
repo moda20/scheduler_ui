@@ -2,9 +2,9 @@ import jobsService from "@/services/JobsService"
 import { DataTable } from "@/features/jobsTable/jobsTable"
 import type { jobsTableData } from "@/features/jobsTable/interfaces"
 import { getTableColumns, jobActions } from "@/features/jobsTable/interfaces"
-import { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { Spinner } from "@/components/ui/spinner"
-import type { SortingState } from "@tanstack/react-table"
+import type { ColumnDef, SortingState } from "@tanstack/react-table"
 import type { JobUpdateType } from "@/components/job-update-dialog"
 import { JobUpdateDialog } from "@/components/job-update-dialog"
 import { Button } from "@/components/ui/button"
@@ -42,9 +42,9 @@ export default function JobsPage() {
       .finally(() => setFetchingStatus(false))
   }
 
-  function updateTableData(sorting?: any) {
+  const updateTableData = useCallback((sorting?: any) => {
     return Promise.all([getRunningJobs(), fetchTableData(sorting)])
-  }
+  }, [])
 
   async function getRunningJobs() {
     return await jobsService.getRunningJobs().then((data: any) => {
@@ -58,36 +58,56 @@ export default function JobsPage() {
     }
   }, [savedConfig.targetServer])
 
-  async function filterAndPaginationChange({
-    sorting: newSorting,
-  }: {
-    sorting: any
-  }) {
-    const targetSorting =
-      newSorting?.length ||
-      (sorting === defaultSortingState && !newSorting?.length)
-        ? newSorting
-        : defaultSortingState
-    setSorting(targetSorting)
-    setLoading(true)
-    await updateTableData(targetSorting)
-  }
+  const filterAndPaginationChange = useCallback(
+    async ({ sorting: newSorting }: { sorting: any }) => {
+      const targetSorting =
+        newSorting?.length ||
+        (sorting === defaultSortingState && !newSorting?.length)
+          ? newSorting
+          : defaultSortingState
+      setSorting(targetSorting)
+      setLoading(true)
+      await updateTableData(targetSorting)
+    },
+    [],
+  )
 
-  async function takeJobsAction(
-    row: jobsTableData | null,
-    action: jobActions,
-    data?: JobUpdateType | any,
-  ) {
-    setLoading(true)
-    await takeAction(row, action, data)
-    setLoading(true)
-    await updateTableData()
-  }
+  const tableEventsMemoized = useMemo(
+    () => ({
+      onPageChange: filterAndPaginationChange,
+      actionConfirmed: updateTableData,
+    }),
+    [filterAndPaginationChange, updateTableData],
+  )
 
-  const columns = getTableColumns({
-    takeAction: takeJobsAction,
-    getAvailableConsumers: getConsumersCBox,
-  })
+  const takeJobsAction = useCallback(
+    async (
+      row: jobsTableData | null,
+      action: jobActions,
+      data?: JobUpdateType | any,
+    ) => {
+      setLoading(true)
+      await takeAction(row, action, data)
+      setLoading(true)
+      await updateTableData()
+    },
+    [],
+  )
+
+  const columns: ColumnDef<jobsTableData, any>[] = useMemo(() => {
+    console.log("columns again")
+    return getTableColumns({
+      takeAction: takeJobsAction,
+      getAvailableConsumers: getConsumersCBox,
+    })
+  }, [])
+
+  const filterMemo = useMemo(() => {
+    return {
+      sorting: sorting,
+    }
+  }, [sorting])
+
   return (
     <div className="">
       <div className={"table-header flex items-center py-4 justify-between"}>
@@ -105,12 +125,9 @@ export default function JobsPage() {
       <Spinner show={loading}>
         <DataTable
           columns={columns}
-          data={JobsList ?? []}
-          filters={{ sorting }}
-          events={{
-            onPageChange: filterAndPaginationChange,
-            actionConfirmed: updateTableData,
-          }}
+          data={JobsList}
+          filters={filterMemo}
+          events={tableEventsMemoized}
         />
       </Spinner>
     </div>

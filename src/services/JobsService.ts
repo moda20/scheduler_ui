@@ -1,8 +1,7 @@
 import axios from "@/lib/httpUtils"
 import type { DateRange } from "react-day-picker"
 import { downloadFile } from "@/utils/serviceUtils"
-import { jobLog } from "@/models/cacheFiles"
-//import socketManager from '../utils/socketManager';
+import type { JobRunsQuerySchema } from "@/models/jobs"
 
 const jobsService = {
   getAllJobs(
@@ -159,6 +158,11 @@ const jobsService = {
         limit: limit,
         offset: offset,
       },
+    })
+  },
+  getJobRuns(query: JobRunsQuerySchema): Promise<any> {
+    return axios.get("/jobs/getJobRuns", {
+      params: query,
     })
   },
 }

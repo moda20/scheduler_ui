@@ -32,48 +32,52 @@ function useDialogueManager({
     }
   })
 
-  const canClose = (dialog: string, canBeDirectClosed: boolean = false) => {
-    const stack = store.getState().ui.dialogStack
-    const groupStack = store.getState().ui.dialogGroups
-    return (
-      stack.length > 0 &&
-      ((canBeDirectClosed &&
-        inputGroup &&
-        (!groupStack[inputGroup] ||
-          !groupStack[inputGroup].includes(dialog))) ||
-        stack[stack.length - 1] === dialog)
-    )
-  }
+  const canClose = useCallback(
+    (dialog: string, canBeDirectClosed: boolean = false) => {
+      const stack = store.getState().ui.dialogStack
+      const groupStack = store.getState().ui.dialogGroups
+      return (
+        stack.length > 0 &&
+        ((canBeDirectClosed &&
+          inputGroup &&
+          (!groupStack[inputGroup] ||
+            !groupStack[inputGroup].includes(dialog))) ||
+          stack[stack.length - 1] === dialog)
+      )
+    },
+    [inputGroup],
+  )
 
-  const updateDialogState = (
-    open: boolean,
-    callback?: (open: boolean) => void,
-  ) => {
-    if (open) {
-      if (inputGroup) {
-        dispatch(closeAllGroupedDialogs(inputGroup))
-      }
-      dispatch(openDialog({ cptId, group: inputGroup }))
-      setIsDialogOpen(open)
-      if (callback) {
-        callback(open)
-      }
-    } else {
-      if (canClose(cptId, !!inputGroup)) {
+  const updateDialogState = useCallback(
+    (open: boolean, callback?: (open: boolean) => void) => {
+      if (open) {
+        if (inputGroup) {
+          dispatch(closeAllGroupedDialogs(inputGroup))
+        }
+        dispatch(openDialog({ cptId, group: inputGroup }))
         setIsDialogOpen(open)
-        isDialogOpen && dispatch(closeTopDialog(inputGroup ? cptId : undefined))
         if (callback) {
           callback(open)
         }
+      } else {
+        if (canClose(cptId, !!inputGroup)) {
+          setIsDialogOpen(open)
+          isDialogOpen &&
+            dispatch(closeTopDialog(inputGroup ? cptId : undefined))
+          if (callback) {
+            callback(open)
+          }
+        }
       }
-    }
-  }
+    },
+    [canClose, cptId, inputGroup, isDialogOpen],
+  )
 
   const setDialogState = useCallback(
     (open: boolean, callback?: (open: boolean) => void) => {
       updateDialogState(open, callback)
     },
-    [updateDialogState, isDialogOpen, currentStack],
+    [updateDialogState, isDialogOpen],
   )
 
   return {
