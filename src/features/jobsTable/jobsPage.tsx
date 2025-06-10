@@ -42,9 +42,12 @@ export default function JobsPage() {
       .finally(() => setFetchingStatus(false))
   }
 
-  const updateTableData = useCallback((sorting?: any) => {
-    return Promise.all([getRunningJobs(), fetchTableData(sorting)])
-  }, [])
+  const updateTableData = useCallback(
+    (sorting?: any) => {
+      return Promise.all([getRunningJobs(), fetchTableData(sorting)])
+    },
+    [sorting],
+  )
 
   async function getRunningJobs() {
     return await jobsService.getRunningJobs().then((data: any) => {
@@ -91,16 +94,15 @@ export default function JobsPage() {
       setLoading(true)
       await updateTableData()
     },
-    [],
+    [sorting],
   )
 
   const columns: ColumnDef<jobsTableData, any>[] = useMemo(() => {
-    console.log("columns again")
     return getTableColumns({
       takeAction: takeJobsAction,
       getAvailableConsumers: getConsumersCBox,
     })
-  }, [])
+  }, [sorting])
 
   const filterMemo = useMemo(() => {
     return {

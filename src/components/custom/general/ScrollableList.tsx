@@ -60,7 +60,7 @@ export default function ScrollableList<T>({
           loadMoreItems(items.length)
         }
       },
-      { threshold: 0.2 },
+      { threshold: 0.1 },
     )
 
     if (loaderRef.current) {
