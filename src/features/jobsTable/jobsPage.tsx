@@ -3,12 +3,12 @@ import { DataTable } from "@/features/jobsTable/jobsTable"
 import type { jobsTableData } from "@/features/jobsTable/interfaces"
 import { getTableColumns, jobActions } from "@/features/jobsTable/interfaces"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { Spinner } from "@/components/ui/spinner"
+import Spinner from "@/components/ui/spinner"
 import type { ColumnDef, SortingState } from "@tanstack/react-table"
 import type { JobUpdateType } from "@/components/job-update-dialog"
 import { JobUpdateDialog } from "@/components/job-update-dialog"
 import { Button } from "@/components/ui/button"
-import { PlusIcon } from "lucide-react"
+import { PlusIcon, LoaderPinwheelIcon } from "lucide-react"
 import { useAppDispatch, useAppSelector } from "@/app/hooks"
 import { config } from "@/app/reducers/uiReducer"
 import { getConsumersCBox, takeAction } from "@/features/jobsTable/jobsUtils"
@@ -124,7 +124,7 @@ export default function JobsPage() {
           </Button>
         </JobUpdateDialog>
       </div>
-      <Spinner show={loading}>
+      <Spinner isLoading={loading} icon={LoaderPinwheelIcon}>
         <DataTable
           columns={columns}
           data={JobsList}

@@ -1,34 +1,21 @@
-import { Button } from "@/components/ui/button"
 import {
-  ArrowDownFromLine,
-  Calendar1Icon,
   CalendarDays,
-  CalendarX2,
   CheckCircle,
   Clock2,
-  CogIcon,
-  FileJson2,
-  Files,
   FileWarning,
-  FileX2,
+  LoaderPinwheelIcon,
   LogsIcon,
-  Trash2,
 } from "lucide-react"
 import SheetActionDialog from "@/components/sheet-action-dialog"
 import type { jobsTableData } from "@/features/jobsTable/interfaces"
 import type { ReactNode } from "react"
 import jobsService from "@/services/JobsService"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useState } from "react"
 import moment from "moment"
-import { humanFileSize } from "@/utils/numberUtils"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { ButtonGroup } from "@/components/ui/buttonGroup"
-import ConfirmationDialogAction from "@/components/confirmationDialogAction"
-import { toast } from "@/hooks/use-toast"
-import type { CacheFile, jobLog, OutputFile } from "@/models/cacheFiles"
 import { Badge } from "@/components/ui/badge"
-import DrawerFilePreview from "@/components/custom/DrawerFilePreview"
-import { JobRunLog, JobRunsQuerySchema } from "@/models/jobs"
+import Spinner from "@/components/ui/spinner"
+import type { JobRunLog, JobRunsQuerySchema } from "@/models/jobs"
 import { cn } from "@/lib/utils"
 import { CardStackIcon } from "@radix-ui/react-icons"
 import ScrollableList from "@/components/custom/general/ScrollableList"
@@ -84,7 +71,7 @@ export default function DrawerLatestRuns({
         return []
       })
       .finally(() => setLoading(false))
-  }, [inputSchema])
+  }, [inputSchema, loading])
 
   const getMoreRuns = useCallback(
     (offset?: number) => {
@@ -99,21 +86,14 @@ export default function DrawerLatestRuns({
 
   const openAndFetchLogs = useCallback((LogItem: JobRunLog) => {
     if (LogItem && LogItem.end_time) {
-      const offsetStartTime = new Date(
-        LogItem.start_time.getTime() +
-          LogItem.start_time.getTimezoneOffset() * 60000,
-      )
-      const offsetEndTime = new Date(
-        LogItem.end_time.getTime() +
-          LogItem.end_time.getTimezoneOffset() * 60000,
-      )
+      const offsetStartTime = new Date(LogItem.start_time.getTime())
+      const offsetEndTime = new Date(LogItem.end_time.getTime())
       setShowLogs(true)
       return getLokiLogs(
         `{logId="${LogItem.log_id}"}`,
         offsetStartTime,
         offsetEndTime,
       ).then(data => {
-        console.log(data)
         setLogLines(data)
       })
     }
@@ -147,7 +127,7 @@ export default function DrawerLatestRuns({
             originalList={LogItems}
             loadMore={(inputSchema.offset ?? 0) <= itemsTotal}
             loadMoreAction={getMoreRuns}
-            className="px-[1px] py-[2px]"
+            className="px-[1px] py-[2px] "
             onItemClick={(item: JobRunLog, index: number) => {
               openAndFetchLogs(item)
             }}
@@ -157,11 +137,11 @@ export default function DrawerLatestRuns({
                 item.error ? "ring-destructive ring-2 rounded-xl" : "",
               )
             }}
-            renderItem={(logParent: any, index: number) => {
+            renderItem={(logParent: any) => {
               return (
                 <div
                   className={cn(
-                    "px-4 py-2 rounded-lg border border-border transition-all duration-200 cursor-pointer focus:ring-offset-2",
+                    "px-4 py-2 rounded-lg border border-border transition-all duration-200 cursor-pointer focus:ring-offset-2 w-[275px]",
                   )}
                   role="option"
                 >
@@ -230,32 +210,34 @@ export default function DrawerLatestRuns({
             showLogs ? "" : "hidden w-0 p-0",
           )}
         >
-          {logLines?.[0] && (
-            <ScrollArea className="pb-2 flex flex-col gap-0.5 h-full">
-              {logLines[0]?.values.map((log: any, index: number) => {
-                return (
-                  <div
-                    key={index}
-                    className={"flex flex-row items-center gap-2 mb-2"}
-                  >
-                    <Label className="min-w-[170px] whitespace-nowrap">
-                      {log.timestamp}
-                    </Label>
-                    <Badge variant={"defaultTeal"}>{log.type}</Badge>
-                    <Label className="leading-5">{log.message}</Label>
-                  </div>
-                )
-              })}
-            </ScrollArea>
-          )}
-          {!logLines?.[0] && (
-            <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
-              <LogsIcon className="w-16 h-16 text-destructive" />
-              <div className="text-muted-foreground text-md">
-                No logs found for this run
+          <Spinner isLoading={loading} icon={LoaderPinwheelIcon}>
+            {logLines?.[0] && (
+              <ScrollArea className="pb-2 flex flex-col gap-0.5 h-full">
+                {logLines[0]?.values.map((log: any, index: number) => {
+                  return (
+                    <div
+                      key={index}
+                      className={"flex flex-row items-center gap-2 mb-2"}
+                    >
+                      <Label className="min-w-[170px] whitespace-nowrap">
+                        {log.timestamp}
+                      </Label>
+                      <Badge variant={"defaultTeal"}>{log.type}</Badge>
+                      <Label className="leading-5">{log.message}</Label>
+                    </div>
+                  )
+                })}
+              </ScrollArea>
+            )}
+            {!logLines?.[0] && !loading && (
+              <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
+                <LogsIcon className="w-16 h-16 text-destructive" />
+                <div className="text-muted-foreground text-md">
+                  No logs found for this run
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </Spinner>
         </div>
       </div>
     </SheetActionDialog>
