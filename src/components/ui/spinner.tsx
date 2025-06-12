@@ -3,6 +3,7 @@ import type { ReactNode } from "react"
 import { useEffect, useMemo, useState, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Loader2, type LucideIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface LoadingOverlayProps {
   children: ReactNode
@@ -10,6 +11,7 @@ interface LoadingOverlayProps {
   icon?: LucideIcon
   iconSize?: number
   backdropOpacity?: number
+  className?: string
 }
 
 export default function LoadingOverlay({
@@ -18,6 +20,7 @@ export default function LoadingOverlay({
   icon: Icon = Loader2,
   iconSize = 32,
   backdropOpacity = 0.5,
+  className,
 }: LoadingOverlayProps) {
   const [useViewportPosition, setUseViewportPosition] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -100,7 +103,7 @@ export default function LoadingOverlay({
   return (
     <div
       ref={containerRef}
-      className="relative overflow-hidden inline-flex w-full"
+      className={cn("relative overflow-hidden inline-flex w-full", className)}
     >
       {children}
 
