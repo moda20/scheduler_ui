@@ -59,19 +59,25 @@ export default function ActionDropdown({
 
   const handleMenuTriggerClick = useCallback(() => {
     setDialogState(true)
-  }, [])
+  }, [setDialogState])
 
-  const handleEscapeKeyTrigger = useCallback((v: any) => {
-    if (v.key === "Escape") {
-      v.preventDefault()
+  const handleEscapeKeyTrigger = useCallback(
+    (v: any) => {
+      if (v.key === "Escape") {
+        v.preventDefault()
+        setDialogState(false)
+      }
+    },
+    [setDialogState],
+  )
+
+  const handleEscapeDirectTrigger = useCallback(
+    (e: any) => {
+      e.preventDefault()
       setDialogState(false)
-    }
-  }, [])
-
-  const handleEscapeDirectTrigger = useCallback((e: any) => {
-    e.preventDefault()
-    setDialogState(false)
-  }, [])
+    },
+    [setDialogState],
+  )
 
   const handleEventPrevention = useCallback((e: any) => {
     e.preventDefault()
