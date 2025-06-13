@@ -40,6 +40,10 @@ export default {
         success: "hsl(var(--success))",
         "success-foreground": "hsl(var(--success-foreground))",
       },
+      animationDuration: {
+        "2000": "2000ms",
+        "5s": "5s",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

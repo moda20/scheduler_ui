@@ -46,6 +46,7 @@
     "cmdk": "^1.1.1",
     "cronstrue": "^2.50.0",
     "date-fns": "^3.6.0",
+    "framer-motion": "^12.16.0",
     "history": "^5.3.0",
     "lucide": "^0.474.0",
     "lucide-react": "^0.453.0",

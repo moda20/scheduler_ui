@@ -16,11 +16,6 @@ export const routesList = [
         url: "/jobs",
         active: false,
       },
-      {
-        id: "jobs-scheduler",
-        title: "Jobs scheduler",
-        url: "#",
-      },
     ],
   },
   {
