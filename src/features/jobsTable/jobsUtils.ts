@@ -48,6 +48,9 @@ export const takeAction = (
         })
       })
     case jobActions.UPDATE:
+      if (data.param) {
+        data.param = JSON.stringify(JSON.parse(data.param))
+      }
       return jobsService
         .executeActionWithUpdate("UPDATE", data, row!.id)
         .then(d => {
@@ -60,6 +63,9 @@ export const takeAction = (
           })
         })
     case jobActions.CREATE:
+      if (data.param) {
+        data.param = JSON.stringify(JSON.parse(data.param))
+      }
       return jobsService
         .executeActionWithUpdate(
           "CREATE",

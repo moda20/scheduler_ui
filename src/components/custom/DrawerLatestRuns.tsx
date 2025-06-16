@@ -136,7 +136,7 @@ export default function DrawerLatestRuns({
             originalList={LogItems}
             loadMore={(inputSchema.offset ?? 0) <= itemsTotal}
             loadMoreAction={getMoreRuns}
-            className="px-[1px] py-[2px] "
+            className="px-[1px] py-[2px] min-w-[280px]"
             onItemClick={(item: JobRunLog, index: number) => {
               openAndFetchLogs(item)
             }}
@@ -220,7 +220,7 @@ export default function DrawerLatestRuns({
         </ScrollArea>
         <div
           className={cn(
-            "flex flex-col gap-2 border border-border rounded-xl p-2 flex-grow",
+            "flex flex-col gap-2 border border-border rounded-xl p-2 flex-grow min-w-0",
             showLogs ? "" : "hidden w-0 p-0",
           )}
         >
