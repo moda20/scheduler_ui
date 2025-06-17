@@ -1,6 +1,6 @@
 import axios from "@/lib/httpUtils"
-import { ProxyTableData } from "@/models/proxies"
-import { ProxyConfigUpdateType } from "@/components/custom/system/ProxyConfigDialog"
+import type { ProxyTableData } from "@/models/proxies"
+import type { ProxyConfigUpdateType } from "@/components/custom/system/ProxyConfigDialog"
 
 const systemService = {
   getDatabaseInformation(): Promise<any> {
@@ -12,6 +12,7 @@ const systemService = {
         responseType: "arraybuffer",
         fetchOptions: {
           fullResponse: true,
+          onlyJSON: false,
         },
       })
       .then(response => {
@@ -38,6 +39,7 @@ const systemService = {
         responseType: "arraybuffer",
         fetchOptions: {
           fullResponse: true,
+          onlyJSON: false,
         },
       })
       .then(response => {
