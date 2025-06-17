@@ -5,6 +5,7 @@ import { disconnect } from "@/app/reducers/authReducer"
 import { store } from "@/app/store"
 import { toast } from "@/hooks/use-toast"
 import { useAppDispatch } from "@/app/hooks"
+import type { CustomAxiosConfig } from "@/models/network"
 
 const service = axios.create({
   baseURL: config.apBaseUrl,
@@ -13,7 +14,7 @@ const service = axios.create({
   fetchOptions: {
     onlyJSON: true,
   },
-})
+} as CustomAxiosConfig)
 service.defaults.withCredentials = true
 
 // Config
@@ -40,13 +41,13 @@ services.forEach(s =>
 services.forEach(s =>
   s.interceptors.response.use(
     response => {
-      if (response.config?.fetchOptions?.["onlyJSON"]) {
+      if ((response.config as CustomAxiosConfig)?.fetchOptions?.onlyJSON) {
         if (!response.headers["content-type"]?.includes("application/json")) {
           throw new AxiosError("Invalid response type")
         }
       }
 
-      if (response.config?.fetchOptions?.["fullResponse"]) {
+      if ((response.config as CustomAxiosConfig)?.fetchOptions?.fullResponse) {
         return response
       }
       return response.data

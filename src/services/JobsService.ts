@@ -85,6 +85,7 @@ const jobsService = {
         responseType: "arraybuffer",
         fetchOptions: {
           fullResponse: true,
+          onlyJSON: false,
         },
       })
       .then(downloadFile)
@@ -114,6 +115,7 @@ const jobsService = {
         responseType: "arraybuffer",
         fetchOptions: {
           fullResponse: true,
+          onlyJSON: false,
         },
       })
       .then(downloadFile)
@@ -135,6 +137,7 @@ const jobsService = {
       },
       fetchOptions: {
         fullResponse: true,
+        onlyJSON: false,
       },
     })
   },
@@ -147,6 +150,7 @@ const jobsService = {
       },
       fetchOptions: {
         fullResponse: true,
+        onlyJSON: false,
       },
     })
   },
