@@ -30,7 +30,9 @@ import { ComboBox } from "@/components/ui/combo-box"
 import { cn, parseCron } from "@/lib/utils"
 import useDialogueManager from "@/hooks/useDialogManager"
 import { useHotkeys } from "react-hotkeys-hook"
-import { useCallback } from "react"
+import { useCallback, useMemo, useState } from "react"
+import MonacoFileViewer from "@/components/custom/MonacoFileViewer"
+import ExpandableCard from "@/components/custom/general/ExpandableCard"
 
 export interface JobUpdateDialogProps {
   children: React.ReactNode
@@ -57,6 +59,7 @@ export function JobUpdateDialog({
   itemList,
   triggerClassName,
 }: JobUpdateDialogProps) {
+  const [paramsShown, setParamsShown] = useState(false)
   const form = useForm<z.infer<typeof jobUpdateSchema>>({
     resolver: zodResolver(jobUpdateSchema),
     defaultValues: {
@@ -81,6 +84,10 @@ export function JobUpdateDialog({
     [form],
   )
 
+  const paramsValue = useMemo(() => {
+    return isCreateDialog ? {} : JSON.parse(jobDetails?.param ?? "{}")
+  }, [jobDetails?.param, isCreateDialog])
+
   return (
     <Dialog
       open={isDialogOpen}
@@ -99,7 +106,10 @@ export function JobUpdateDialog({
         {children}
       </DialogTrigger>
       <DialogContent
-        className="sm:max-w-[425px] text-foreground bg-background"
+        className={cn(
+          "sm:max-w-[425px] text-foreground bg-background",
+          paramsShown ? "sm:w-[900px] sm:max-w-[80vw]" : "",
+        )}
         onEscapeKeyDown={e => {
           e.preventDefault()
           setDialogState(false, resetState)
@@ -113,101 +123,137 @@ export function JobUpdateDialog({
               : `Edit the ${jobDetails?.name} job`}
           </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(
-              v => {
-                onChange(v)
-                if (isCreateDialog) {
-                  setDialogState(false, resetState)
+        <div className={cn("flex transition-all duration-200")}>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(
+                v => {
+                  onChange(v)
+                  if (isCreateDialog) {
+                    setDialogState(false, resetState)
+                  }
+                },
+                err => {},
+              )}
+              className="space-y-8"
+            >
+              <ExpandableCard
+                className="gap-2"
+                mainContentClassName="gap-4"
+                onExpandedChange={expanded => setParamsShown(expanded)}
+                expandedContent={
+                  <div className="max-w-[400px] flex-grow w-full">
+                    <FormField
+                      control={form.control}
+                      name="param"
+                      render={({ field }) => (
+                        <div className="">
+                          <FormItem className="flex-grow h-[400px] flex flex-col gap-2">
+                            <FormLabel>JSON Params</FormLabel>
+                            <MonacoFileViewer
+                              fileName={
+                                isCreateDialog
+                                  ? "Params"
+                                  : `Params for ${jobDetails?.name}`
+                              }
+                              fileType="json"
+                              fileContent={paramsValue}
+                              onChange={field.onChange}
+                            />
+                          </FormItem>
+                        </div>
+                      )}
+                    />
+                  </div>
                 }
-              },
-              err => {
-                console.log(err)
-              },
-            )}
-            className="space-y-8"
-          >
-            <FormField
-              control={form.control}
-              name="cronSetting"
-              render={({ field }) => (
-                <div>
-                  <FormItem>
-                    <FormLabel>Cron setting</FormLabel>
-                    <FormControl>
-                      <Input placeholder="0 7 * * *" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      This is the cron settings for the job :{" "}
-                      {parseCron(field.value)}.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                  <Cron
-                    value={field.value ?? ""}
-                    setValue={(newValue: string) => {
-                      field.onChange(newValue)
-                    }}
+              >
+                <div className="flex flex-col gap-1">
+                  <FormField
+                    control={form.control}
+                    name="cronSetting"
+                    render={({ field }) => (
+                      <div>
+                        <FormItem>
+                          <FormLabel>Cron setting</FormLabel>
+                          <FormControl>
+                            <Input placeholder="0 7 * * *" {...field} />
+                          </FormControl>
+                          <FormDescription>
+                            This is the cron settings for the job :{" "}
+                            {parseCron(field.value)}.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                        <Cron
+                          value={field.value ?? ""}
+                          setValue={(newValue: string) => {
+                            field.onChange(newValue)
+                          }}
+                        />
+                      </div>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <div>
+                        <FormItem>
+                          <FormLabel>job name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="a unique name" {...field} />
+                          </FormControl>
+                          <FormDescription>
+                            This is the job name, it should be a unique name.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      </div>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="consumer"
+                    render={({ field }) => (
+                      <div>
+                        <FormItem>
+                          <FormLabel>Consumer script</FormLabel>
+                          <br />
+                          <FormControl ref={field.ref}>
+                            <ComboBox
+                              selectedItemValue={jobDetails?.consumer}
+                              itemList={itemList}
+                              {...field}
+                              noFieldsFoundText={"No consumer scripts found"}
+                              searchFieldPlaceholder={
+                                "Search consumer scripts..."
+                              }
+                              inputFieldsText={"Select consumer script..."}
+                              className="w-[--radix-popover-trigger-width]"
+                              triggerClassName={"w-full"}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            This is the consumer script that will be run when
+                            the job is triggered
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      </div>
+                    )}
                   />
                 </div>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <div>
-                  <FormItem>
-                    <FormLabel>job name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="a unique name" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      This is the job name, it should be a unique name.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                </div>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="consumer"
-              render={({ field }) => (
-                <div>
-                  <FormItem>
-                    <FormLabel>Consumer script</FormLabel>
-                    <br />
-                    <FormControl ref={field.ref}>
-                      <ComboBox
-                        selectedItemValue={jobDetails?.consumer}
-                        itemList={itemList}
-                        {...field}
-                        noFieldsFoundText={"No consumer scripts found"}
-                        searchFieldPlaceholder={"Search consumer scripts..."}
-                        inputFieldsText={"Select consumer script..."}
-                        className="w-[--radix-popover-trigger-width]"
-                        triggerClassName={"w-full"}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      This is the consumer script that will be run when the job
-                      is triggered
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                </div>
-              )}
-            />
-            <DialogFooter>
-              <Button variant={"default"} type="submit">
-                {isCreateDialog ? <PlusIcon /> : <SaveIcon />}
-                {isCreateDialog ? "Add a new job" : "Save changes"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+              </ExpandableCard>
+
+              <DialogFooter>
+                <Button variant={"default"} type="submit">
+                  {isCreateDialog ? <PlusIcon /> : <SaveIcon />}
+                  {isCreateDialog ? "Add a new job" : "Save changes"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </div>
       </DialogContent>
     </Dialog>
   )

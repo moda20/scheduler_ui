@@ -40,6 +40,24 @@ export const takeAction = (
             variant: "destructive",
           })
         })
+    case jobActions.EXECUTE_WITH_PARAMS:
+      if (data.param) {
+        data.param = JSON.stringify(JSON.parse(data.param))
+      }
+      return jobsService
+        .executeActionWithUpdate("EXECUTE_WITH_PARAMS", data, row!.id)
+        .then(() => {
+          toast({
+            title: `Custom service ${row!.name} Launched`,
+            duration: 3000,
+          })
+        })
+        .catch(err => {
+          toast({
+            title: err.message,
+            variant: "destructive",
+          })
+        })
     case jobActions.REFRESH:
       return jobsService.executeAction(row!.id, "REFRESH").then(() => {
         toast({
@@ -48,6 +66,9 @@ export const takeAction = (
         })
       })
     case jobActions.UPDATE:
+      if (data.param) {
+        data.param = JSON.stringify(JSON.parse(data.param))
+      }
       return jobsService
         .executeActionWithUpdate("UPDATE", data, row!.id)
         .then(d => {
@@ -60,6 +81,9 @@ export const takeAction = (
           })
         })
     case jobActions.CREATE:
+      if (data.param) {
+        data.param = JSON.stringify(JSON.parse(data.param))
+      }
       return jobsService
         .executeActionWithUpdate(
           "CREATE",

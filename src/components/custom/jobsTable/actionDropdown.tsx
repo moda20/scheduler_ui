@@ -36,6 +36,7 @@ import React, { useCallback, useEffect } from "react"
 import DropdownMenuItemExtended from "@/components/custom/general/DropdownItemExtended"
 import DrawerLatestRuns from "@/components/custom/DrawerLatestRuns"
 import { CardStackIcon } from "@radix-ui/react-icons"
+import { JobExecutionDialog } from "@/components/job-execution-dialog"
 
 export interface ActionDropdownProps {
   columnsProps: tableColumnsProps
@@ -109,6 +110,17 @@ export default function ActionDropdown({
     [row],
   )
 
+  const handleCustomJobExecution = useCallback(
+    (jobParams: any) => {
+      return columnsProps.takeAction(
+        row,
+        jobActions.EXECUTE_WITH_PARAMS,
+        jobParams,
+      )
+    },
+    [row],
+  )
+
   const handleJobExecutionAction = useCallback(() => {
     if (!row.initialized && row.status === "STARTED") return
     return columnsProps.takeAction(row, jobActions.EXECUTE)
@@ -170,10 +182,13 @@ export default function ActionDropdown({
             onChange={handleJobUpdateAction}
             triggerClassName="w-full"
           >
-            <DropdownMenuItem onSelect={handleEventPrevention}>
+            <DropdownMenuItemExtended
+              keyBinding="u"
+              onSelect={handleEventPrevention}
+            >
               <Edit2Icon />
               <span>Update config</span>
-            </DropdownMenuItem>
+            </DropdownMenuItemExtended>
           </JobUpdateDialog>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
@@ -189,6 +204,20 @@ export default function ActionDropdown({
             <span>Run now</span>
             <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
           </DropdownMenuItemExtended>
+          <JobExecutionDialog
+            jobDetails={row}
+            onChange={handleCustomJobExecution}
+            triggerClassName="w-full"
+          >
+            <DropdownMenuItemExtended
+              keyBinding="meta+shift+e"
+              onSelect={handleEventPrevention}
+            >
+              <DockIcon />
+              <span>Custom run</span>
+              <DropdownMenuShortcut>⌘+⇧+R</DropdownMenuShortcut>
+            </DropdownMenuItemExtended>
+          </JobExecutionDialog>
           <DropdownMenuItemExtended
             keyBinding="R"
             onClick={handleJobRefresh}

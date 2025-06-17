@@ -36,6 +36,7 @@ export enum jobActions {
   CREATE,
   SOFT_DELETE,
   STOP,
+  EXECUTE_WITH_PARAMS,
 }
 
 export const defaultLogPeriod: DateRange = {
@@ -82,7 +83,7 @@ export const getTableColumns = (
   {
     accessorKey: "cronSetting",
     cell: ({ row }) => (
-      <div className="text-left flex flex-col gap-2 w-max-[200px]">
+      <div className="text-left flex flex-col gap-2 max-w-[200px]">
         <div>{getStringFromCronExpression(row.original.cronSetting)}</div>
         <small>{row.getValue("cronSetting")}</small>
       </div>
