@@ -36,6 +36,7 @@ export enum jobActions {
   CREATE,
   SOFT_DELETE,
   STOP,
+  EXECUTE_WITH_PARAMS,
 }
 
 export const defaultLogPeriod: DateRange = {
