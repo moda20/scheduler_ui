@@ -131,7 +131,12 @@ export default function DrawerLatestRuns({
       modal={true}
     >
       <div className={"flex gap-2 py-4 h-full"}>
-        <ScrollArea className={cn("max-h-[100%]", showLogs ? "" : "flex-grow")}>
+        <ScrollArea
+          className={cn(
+            "max-h-[100%] min-w-[280px]",
+            showLogs ? "" : "flex-grow",
+          )}
+        >
           <ScrollableList
             originalList={LogItems}
             loadMore={(inputSchema.offset ?? 0) <= itemsTotal}
@@ -220,7 +225,7 @@ export default function DrawerLatestRuns({
         </ScrollArea>
         <div
           className={cn(
-            "flex flex-col gap-2 border border-border rounded-xl p-2 flex-grow min-w-0",
+            "flex flex-col gap-2 border border-border rounded-xl p-2 w-full min-w-0",
             showLogs ? "" : "hidden w-0 p-0",
           )}
         >
