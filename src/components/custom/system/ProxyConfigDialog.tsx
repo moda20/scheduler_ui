@@ -85,6 +85,7 @@ export function ProxyConfigDialog({
   return (
     <Dialog open={isDialogOpen} onOpenChange={v => setDialogState(v)}>
       <DialogTrigger
+        asChild
         className={cn(triggerClassName)}
         onClick={v => {
           v.preventDefault()
