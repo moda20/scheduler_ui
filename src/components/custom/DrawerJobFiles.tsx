@@ -8,9 +8,10 @@ import {
 } from "lucide-react"
 import SheetActionDialog from "@/components/sheet-action-dialog"
 import type { jobsTableData } from "@/features/jobsTable/interfaces"
-import { ReactNode, useMemo } from "react"
+import type { ReactNode } from "react"
+import { useRef } from "react"
 import jobsService from "@/services/JobsService"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState, useMemo } from "react"
 import moment from "moment"
 import { humanFileSize } from "@/utils/numberUtils"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -18,10 +19,9 @@ import { ButtonGroup } from "@/components/ui/buttonGroup"
 import ConfirmationDialogAction from "@/components/confirmationDialogAction"
 import { toast } from "@/hooks/use-toast"
 import type { CacheFile, jobLog, OutputFile } from "@/models/cacheFiles"
-import { Badge } from "@/components/ui/badge"
 import DrawerFilePreview from "@/components/custom/DrawerFilePreview"
-import ScrollableList from "@/components/custom/general/ScrollableList"
 import { cn } from "@/lib/utils"
+import ScrollableList from "@/components/custom/general/ScrollableList"
 
 export interface DrawerJobFilesProps {
   JobDetails: jobsTableData
@@ -42,7 +42,8 @@ export default function DrawerJobFiles({
     data: jobLog[]
     offset?: number
   }>({ total: 0, data: [] })
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  const cacheFilesListRef = useRef<any>()
+  const outputFilesListRef = useRef<any>()
   const getCacheFiles = (offset?: number) => {
     return jobsService
       .getJobCacheFiles(JobDetails.id.toString(), offset, 10)
@@ -100,7 +101,7 @@ export default function DrawerJobFiles({
   )
 
   const deleteFile = useCallback(
-    (file: CacheFile, nature: string) => {
+    (file: CacheFile, nature: string, index: number) => {
       switch (nature) {
         case "cache":
           return jobsService
@@ -110,7 +111,7 @@ export default function DrawerJobFiles({
                 title: `Cache file ${file.file_name} deleted`,
                 duration: 2000,
               })
-              return getCacheFiles()
+              return cacheFilesListRef.current?.removeItem(index)
             })
         case "output":
           return jobsService
@@ -120,13 +121,13 @@ export default function DrawerJobFiles({
                 title: `Output file ${file.file_name} deleted`,
                 duration: 2000,
               })
-              return getOutputFiles()
+              return outputFilesListRef.current?.removeItem(index)
             })
         default:
           break
       }
     },
-    [JobDetails],
+    [JobDetails, cacheFilesListRef.current],
   )
 
   useEffect(() => {
@@ -206,13 +207,13 @@ export default function DrawerJobFiles({
       description={"Manage your exported files"}
       trigger={trigger}
       modal={true}
-      onOpenChange={v => setDrawerOpen(v)}
     >
       <div className={"flex flex-col gap-2 py-4"}>
         <div className="text-lg font-bold">Cache Files:</div>
         <ScrollArea className="max-h-96">
           <div className="flex flex-col gap-4">
             <ScrollableList
+              ref={cacheFilesListRef}
               autoFocus={true}
               originalList={getFullInitialCacheList}
               loadMore={(cacheFiles.offset ?? 0) < cacheFiles.total}
@@ -296,7 +297,7 @@ export default function DrawerJobFiles({
                           <ConfirmationDialogAction
                             title={"Delete cache file"}
                             description={`This will delete the ${item.file_name} cache file permanently`}
-                            takeAction={() => deleteFile(item, "cache")}
+                            takeAction={() => deleteFile(item, "cache", index)}
                             confirmText={"Delete cache file"}
                             confirmVariant={"destructive"}
                           >
@@ -322,6 +323,7 @@ export default function DrawerJobFiles({
         <ScrollArea className="max-h-96">
           <div className="flex flex-col gap-4">
             <ScrollableList
+              ref={outputFilesListRef}
               originalList={getInitialOutputList}
               loadMore={(outputFiles.offset ?? 0) < outputFiles.total}
               loadMoreAction={getNextOutputFiles}
@@ -339,7 +341,7 @@ export default function DrawerJobFiles({
                   item.error ? "ring-destructive ring-2 rounded-xl" : "",
                 )
               }}
-              renderItem={(item, index) => {
+              renderItem={(item: any, index) => {
                 return (
                   <div
                     key={item.created_at}
@@ -395,7 +397,7 @@ export default function DrawerJobFiles({
                         <ConfirmationDialogAction
                           title={"Delete output file"}
                           description={`This will delete the ${item.file_name} output file permanently`}
-                          takeAction={() => deleteFile(item, "output")}
+                          takeAction={() => deleteFile(item, "output", index)}
                           confirmText={"Delete output file"}
                           confirmVariant={"destructive"}
                         >

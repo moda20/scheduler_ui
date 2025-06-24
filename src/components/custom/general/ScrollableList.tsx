@@ -1,4 +1,5 @@
-import { ReactElement, ReactNode, useMemo } from "react"
+import { forwardRef, ReactNode, useImperativeHandle } from "react"
+import { useMemo } from "react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import { Loader2 } from "lucide-react"
@@ -15,21 +16,28 @@ export interface ScrollableListProps<T> {
   autoFocus?: boolean
 }
 
-export default function ScrollableList<T>({
-  originalList,
-  loadMoreAction,
-  loadMore,
-  renderItem,
-  onItemClick,
-  className,
-  itemClassName,
-  autoFocus,
-  renderNoItems,
-}: ScrollableListProps<T>) {
+function ScrollableList<T>(
+  {
+    originalList,
+    loadMoreAction,
+    loadMore,
+    renderItem,
+    onItemClick,
+    className,
+    itemClassName,
+    autoFocus,
+    renderNoItems,
+  }: ScrollableListProps<T>,
+  ref: React.Ref<any>,
+) {
   const [items, setItems] = useState<T[]>(originalList ?? [])
   const [loading, setLoading] = useState(false)
   const [currentFocusIndex, setCurrentFocusIndex] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
+  useImperativeHandle(ref, () => ({
+    removeItem,
+    node: containerRef.current as HTMLDivElement,
+  }))
   const itemRefs = useRef<(HTMLDivElement | null)[]>([])
   const loaderRef = useRef<HTMLDivElement>(null)
 
@@ -54,6 +62,15 @@ export default function ScrollableList<T>({
       }
     },
     [loadMore, loading],
+  )
+
+  const removeItem = useCallback(
+    (index: number) => {
+      const itemsCopy = [...items]
+      itemsCopy.splice(index, 1)
+      setItems(itemsCopy)
+    },
+    [items],
   )
 
   // observable usage for infinite scrolling
@@ -214,3 +231,5 @@ export default function ScrollableList<T>({
     </div>
   )
 }
+
+export default forwardRef(ScrollableList)
