@@ -70,7 +70,6 @@ export function JobExecutionDialog({
   )
 
   const paramsValue = useMemo(() => {
-    console.log("ddsds")
     return JSON.parse(jobDetails?.param ?? "{}")
   }, [jobDetails?.param])
 

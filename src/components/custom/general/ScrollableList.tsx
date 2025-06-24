@@ -8,9 +8,11 @@ export interface ScrollableListProps<T> {
   loadMore?: boolean
   loadMoreAction?: (offset?: number) => Promise<T[]>
   renderItem?: (item: T, index: number) => ReactNode
+  renderNoItems?: () => ReactNode
   onItemClick?: (item: T, index: number) => void
   className?: string
   itemClassName?: string | ((item: T, index: number) => string)
+  autoFocus?: boolean
 }
 
 export default function ScrollableList<T>({
@@ -21,6 +23,8 @@ export default function ScrollableList<T>({
   onItemClick,
   className,
   itemClassName,
+  autoFocus,
+  renderNoItems,
 }: ScrollableListProps<T>) {
   const [items, setItems] = useState<T[]>(originalList ?? [])
   const [loading, setLoading] = useState(false)
@@ -72,7 +76,12 @@ export default function ScrollableList<T>({
 
   // Auto-focus first item when component mounts and no item is focused already
   useEffect(() => {
-    if (itemRefs.current[0] && items.length > 0 && currentFocusIndex === 0) {
+    if (
+      itemRefs.current[0] &&
+      items.length > 0 &&
+      currentFocusIndex === 0 &&
+      autoFocus
+    ) {
       itemRefs.current[0]?.focus()
     }
   }, [currentFocusIndex, items.length])
@@ -168,6 +177,7 @@ export default function ScrollableList<T>({
       {items.map((item, index) => {
         return (
           <div
+            autoFocus={autoFocus}
             key={index}
             className={cn(
               "focus-visible:outline-none",
@@ -185,6 +195,7 @@ export default function ScrollableList<T>({
           </div>
         )
       })}
+      {items.length === 0 && renderNoItems && renderNoItems()}
 
       <div
         ref={loaderRef}
