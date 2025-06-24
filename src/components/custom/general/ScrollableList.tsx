@@ -232,4 +232,9 @@ function ScrollableList<T>(
   )
 }
 
-export default forwardRef(ScrollableList)
+export default forwardRef(
+  <T,>(props: ScrollableListProps<T>, ref: React.Ref<any>) =>
+    ScrollableList<T>(props, ref),
+) as <T>(
+  props: ScrollableListProps<T> & { ref?: React.Ref<any> },
+) => React.ReactElement
