@@ -38,7 +38,7 @@ export const AuthenticationSlice = createAppSlice({
     setUser: create.reducer(
       (
         state: AuthenticationSliceState,
-        action: PayloadAction<LoginFormData>,
+        action: PayloadAction<SavedUserData>,
       ) => {
         state.user = action.payload
       },
