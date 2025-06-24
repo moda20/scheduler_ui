@@ -73,7 +73,6 @@ export default function ConfigsDashboard() {
   }, [getFullConfig])
 
   useEffect(() => {
-    console.log(config, shadowConfig)
     const isEqualConfigs = isEqual(config, shadowConfig)
     setConfigStatus(isEqualConfigs)
   }, [config, shadowConfig])
@@ -192,9 +191,6 @@ export default function ConfigsDashboard() {
       p[c.key] = c
       return p
     }, {})
-    console.log(config)
-    console.log(convertedConfig)
-    console.log(shadowConfigConverted)
     const newDiffs = convertedConfig.filter(
       e => !shadowConfigConverted.map(e => e.key).includes(e.key),
     )
@@ -212,9 +208,6 @@ export default function ConfigsDashboard() {
         (mappedShadowConfig[e.key].value !== e.value ||
           mappedShadowConfig[e.key].encrypted !== e.encrypted),
     )
-    console.log("new Diffs", newDiffs)
-    console.log("deleted Diffs", deletedDiffs)
-    console.log("updated Diffs", updatedDiffs)
     const fullDiffs = [...newDiffs, ...deletedDiffs, ...updatedDiffs]
     return configService.updateConfig(fullDiffs).then(response => {
       toast({

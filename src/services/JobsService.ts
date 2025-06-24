@@ -68,10 +68,16 @@ const jobsService = {
     return axios.get(`/jobs/jobMetrics`, {})
   },
 
-  getJobCacheFiles(jobId: string): Promise<any> {
+  getJobCacheFiles(
+    jobId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<any> {
     return axios.get("/files/getCachedFiles", {
       params: {
         jobId: jobId,
+        offset,
+        limit,
       },
     })
   },
@@ -98,10 +104,16 @@ const jobsService = {
       },
     })
   },
-  getJobOutputFiles(jobId: string): Promise<any> {
+  getJobOutputFiles(
+    jobId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<any> {
     return axios.get("/files/getOutputFiles", {
       params: {
         jobId: jobId,
+        offset,
+        limit,
       },
     })
   },
@@ -147,6 +159,7 @@ const jobsService = {
       params: {
         id,
         fileName,
+        nativeType: true,
       },
       fetchOptions: {
         fullResponse: true,

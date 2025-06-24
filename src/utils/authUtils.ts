@@ -5,14 +5,14 @@ import {
   setConnectionStatus,
   setUser,
 } from "@/app/reducers/authReducer"
-import type { LoginFormData } from "@/models/auth"
+import type { SavedUserData } from "@/models/auth"
 import SocketManager from "@/lib/socketUtils"
 
 export const verifyUserConnection = () => {
   authService
     .me()
     .then((data: any) => {
-      store.dispatch(setUser(data as LoginFormData))
+      store.dispatch(setUser(data as SavedUserData))
       store.dispatch(setConnectionStatus(ConnectionStatus.CONNECTED))
       const socketManager = new SocketManager()
       socketManager.createSocket()

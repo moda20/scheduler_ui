@@ -29,7 +29,7 @@ export const getLokiLogs = (
           })
           return {
             values: logValues,
-            uniqueId: `tab_${stream?.stream?.uniqueId?.toString()}`,
+            uniqueId: `tab_${stream?.stream?.logId?.toString()}`,
             name: stream?.stream?.job,
             title: si
               ? moment(logValues[logValues.length - 1]?.timestamp).format(

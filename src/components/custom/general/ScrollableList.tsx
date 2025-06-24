@@ -1,4 +1,5 @@
-import { ReactElement, ReactNode, useMemo } from "react"
+import { forwardRef, ReactNode, useImperativeHandle } from "react"
+import { useMemo } from "react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import { Loader2 } from "lucide-react"
@@ -8,24 +9,35 @@ export interface ScrollableListProps<T> {
   loadMore?: boolean
   loadMoreAction?: (offset?: number) => Promise<T[]>
   renderItem?: (item: T, index: number) => ReactNode
+  renderNoItems?: () => ReactNode
   onItemClick?: (item: T, index: number) => void
   className?: string
   itemClassName?: string | ((item: T, index: number) => string)
+  autoFocus?: boolean
 }
 
-export default function ScrollableList<T>({
-  originalList,
-  loadMoreAction,
-  loadMore,
-  renderItem,
-  onItemClick,
-  className,
-  itemClassName,
-}: ScrollableListProps<T>) {
+function ScrollableList<T>(
+  {
+    originalList,
+    loadMoreAction,
+    loadMore,
+    renderItem,
+    onItemClick,
+    className,
+    itemClassName,
+    autoFocus,
+    renderNoItems,
+  }: ScrollableListProps<T>,
+  ref: React.Ref<any>,
+) {
   const [items, setItems] = useState<T[]>(originalList ?? [])
   const [loading, setLoading] = useState(false)
   const [currentFocusIndex, setCurrentFocusIndex] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
+  useImperativeHandle(ref, () => ({
+    removeItem,
+    node: containerRef.current as HTMLDivElement,
+  }))
   const itemRefs = useRef<(HTMLDivElement | null)[]>([])
   const loaderRef = useRef<HTMLDivElement>(null)
 
@@ -52,6 +64,15 @@ export default function ScrollableList<T>({
     [loadMore, loading],
   )
 
+  const removeItem = useCallback(
+    (index: number) => {
+      const itemsCopy = [...items]
+      itemsCopy.splice(index, 1)
+      setItems(itemsCopy)
+    },
+    [items],
+  )
+
   // observable usage for infinite scrolling
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -72,7 +93,12 @@ export default function ScrollableList<T>({
 
   // Auto-focus first item when component mounts and no item is focused already
   useEffect(() => {
-    if (itemRefs.current[0] && items.length > 0 && currentFocusIndex === 0) {
+    if (
+      itemRefs.current[0] &&
+      items.length > 0 &&
+      currentFocusIndex === 0 &&
+      autoFocus
+    ) {
       itemRefs.current[0]?.focus()
     }
   }, [currentFocusIndex, items.length])
@@ -168,6 +194,7 @@ export default function ScrollableList<T>({
       {items.map((item, index) => {
         return (
           <div
+            autoFocus={autoFocus}
             key={index}
             className={cn(
               "focus-visible:outline-none",
@@ -185,6 +212,7 @@ export default function ScrollableList<T>({
           </div>
         )
       })}
+      {items.length === 0 && renderNoItems && renderNoItems()}
 
       <div
         ref={loaderRef}
@@ -203,3 +231,5 @@ export default function ScrollableList<T>({
     </div>
   )
 }
+
+export default forwardRef(ScrollableList)

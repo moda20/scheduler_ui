@@ -10,7 +10,11 @@ import {
   connectionStatus,
   setUser,
 } from "@/app/reducers/authReducer"
-import type { LoginFormData, RegisterFormData } from "@/models/auth"
+import type {
+  LoginFormData,
+  RegisterFormData,
+  SavedUserData,
+} from "@/models/auth"
 import { verifyUserConnection } from "@/utils/authUtils"
 
 export interface AuthenticationProps extends React.ComponentProps<"div"> {}
@@ -29,7 +33,7 @@ export default function Authentication({
 
   const checkLoginData = useCallback(async () => {
     const data = await authService.me()
-    dispatch(setUser(data as LoginFormData))
+    dispatch(setUser(data as SavedUserData))
   }, [dispatch])
 
   useEffect(() => {
@@ -44,8 +48,10 @@ export default function Authentication({
 
   const loginAction = useCallback(
     async (data: LoginFormData) => {
-      await authService.login(data)
-      dispatch(setUser(data))
+      await authService.login(data).then((resData: SavedUserData) => {
+        dispatch(setUser(resData))
+      })
+
       verifyUserConnection()
     },
     [dispatch],
@@ -53,8 +59,9 @@ export default function Authentication({
 
   const registerAction = useCallback(
     async (data: RegisterFormData) => {
-      await authService.register(data)
-      dispatch(setUser(data))
+      await authService.register(data).then((resData: SavedUserData) => {
+        dispatch(setUser(resData))
+      })
       verifyUserConnection()
     },
     [dispatch],

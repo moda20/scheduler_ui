@@ -1,6 +1,7 @@
 import axios from "@/lib/httpUtils"
 import type { ProxyTableData } from "@/models/proxies"
 import type { ProxyConfigUpdateType } from "@/components/custom/system/ProxyConfigDialog"
+import { downloadFile } from "@/utils/serviceUtils"
 
 const systemService = {
   getDatabaseInformation(): Promise<any> {
@@ -15,20 +16,7 @@ const systemService = {
           onlyJSON: false,
         },
       })
-      .then(response => {
-        const blob = new Blob([response.data], { type: "application/zip" })
-        const downloadUrl = URL.createObjectURL(blob)
-        const link = document.createElement("a")
-        link.href = downloadUrl
-        const filename =
-          response.headers["content-disposition"].split("filename=")[1]
-        link.download = filename
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        URL.revokeObjectURL(downloadUrl)
-        return filename
-      })
+      .then(response => downloadFile(response, "application/zip"))
   },
   getBaseDatabaseInformation(): Promise<any> {
     return axios.get("/system/getBaseDbConnection")
@@ -42,20 +30,7 @@ const systemService = {
           onlyJSON: false,
         },
       })
-      .then(response => {
-        const blob = new Blob([response.data], { type: "application/zip" })
-        const downloadUrl = URL.createObjectURL(blob)
-        const link = document.createElement("a")
-        link.href = downloadUrl
-        const filename =
-          response.headers["content-disposition"].split("filename=")[1]
-        link.download = filename
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        URL.revokeObjectURL(downloadUrl)
-        return filename
-      })
+      .then(response => downloadFile(response, "application/zip"))
   },
   getAllProxies(): Promise<Array<ProxyTableData>> {
     return axios.get("/proxies/getAllProxies")
