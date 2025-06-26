@@ -115,7 +115,7 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
         className="h-[calc(100%-3rem)] w-full"
       >
         {logs.length > 0 && (
-          <Tabs value={activeTab} className="w-full">
+          <Tabs value={activeTab} className="w-full h-full">
             <TabCarousel>
               <TabsList className="px-0">
                 {logs.map((stream: any, index) => {
