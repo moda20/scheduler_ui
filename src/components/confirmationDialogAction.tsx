@@ -66,7 +66,7 @@ export default function ConfirmationDialogAction(
             onClick={() =>
               props.takeAction(
                 ConfirmationDialogActionType.CANCEL,
-                ...props.extraTakeActionArgs,
+                ...(props?.extraTakeActionArgs ?? []),
               )
             }
             variant={props.cancelVariant}
@@ -78,7 +78,7 @@ export default function ConfirmationDialogAction(
             onClick={() =>
               props.takeAction(
                 ConfirmationDialogActionType.CONFIRM,
-                ...props.extraTakeActionArgs,
+                ...(props?.extraTakeActionArgs ?? []),
               )
             }
             variant={props.confirmVariant}

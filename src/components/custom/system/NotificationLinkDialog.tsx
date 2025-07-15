@@ -28,7 +28,9 @@ import { cn } from "@/lib/utils"
 import useDialogueManager from "@/hooks/useDialogManager"
 import type { NotificationService } from "@/models/notifications"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import ConfirmationDialogAction from "@/components/confirmationDialogAction"
+import ConfirmationDialogAction, {
+  ConfirmationDialogActionType,
+} from "@/components/confirmationDialogAction"
 import { MinusIcon } from "@radix-ui/react-icons"
 
 export interface NotificationLinkDialogProps {
@@ -74,6 +76,7 @@ export function NotificationLinkDialog({
           v.preventDefault()
           setDialogState(true)
         }}
+        asChild
       >
         {children}
       </DialogTrigger>
@@ -137,18 +140,19 @@ export function NotificationLinkDialog({
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 p-0 pb-2 text-foreground bg-background border-transparent rounded-t-xl">
                   <CardTitle className="text-lg font-bold">Jobs</CardTitle>
                   <ConfirmationDialogAction
-                    title={"Unlink All jobs"}
+                    title={"Detach all jobs"}
                     description={
-                      "Unlink all jobs from this notification service"
+                      "Detach all jobs from this notification service"
                     }
-                    takeAction={() =>
+                    takeAction={action => {
+                      if (action === ConfirmationDialogActionType.CANCEL) return
                       form.setValue("jobs", [], {
                         shouldTouch: true,
                         shouldDirty: true,
                         shouldValidate: true,
                       })
-                    }
-                    confirmText={"Unlink all jobs"}
+                    }}
+                    confirmText={"Detach all jobs"}
                   >
                     <Button
                       variant={"destructive"}
@@ -156,7 +160,7 @@ export function NotificationLinkDialog({
                       className="btn-rounded"
                     >
                       <MinusIcon />
-                      Unlink all
+                      Detach all
                     </Button>
                   </ConfirmationDialogAction>
                 </CardHeader>

@@ -108,7 +108,7 @@ function ScrollableList<T>(
 
   // force refresh of original list when parent changes.
   useEffect(() => {
-    if (!items.length) {
+    if (items.length) {
       setItems(originalList ?? [])
     }
   }, [items, originalList])

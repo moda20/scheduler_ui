@@ -16,23 +16,8 @@ export const notificationService = {
     })
   },
 
-  addNotificationService({
-    name,
-    description,
-    entryPoint,
-    image,
-  }: {
-    name: string
-    description?: string
-    entryPoint: string
-    image?: string
-  }) {
-    return axios.post("/notifications/addNotificationService", {
-      name,
-      description,
-      entryPoint,
-      image,
-    })
+  addNotificationService(formData: FormData) {
+    return axios.post("/notifications/addNotificationService", formData)
   },
   deleteNotificationService(id: number) {
     return axios.delete(`/notifications/deleteNotificationService`, {
@@ -41,26 +26,8 @@ export const notificationService = {
       },
     })
   },
-  updateNotificationService({
-    id,
-    name,
-    description,
-    entryPoint,
-    image,
-  }: {
-    id: number
-    name?: string
-    description?: string
-    entryPoint?: string
-    image?: string
-  }) {
-    return axios.put(`/notifications/updateNotificationService`, {
-      id,
-      name,
-      description,
-      entryPoint,
-      image,
-    })
+  updateNotificationService(formData: FormData) {
+    return axios.put(`/notifications/updateNotificationService`, formData)
   },
 
   getAttachedJobs(serviceId: number) {
@@ -69,5 +36,8 @@ export const notificationService = {
         serviceId: serviceId,
       },
     })
+  },
+  getAllServiceEntryPoints() {
+    return axios.get("/notifications/allExternalFiles")
   },
 }

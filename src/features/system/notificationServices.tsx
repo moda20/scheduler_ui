@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card"
 import {
   DatabaseBackup,
+  EditIcon,
   FileX2,
   LoaderPinwheelIcon,
   LucideDatabase,
@@ -32,6 +33,8 @@ import ConfirmationDialogAction, {
 } from "@/components/confirmationDialogAction"
 import { toast } from "@/hooks/use-toast"
 import { NotificationLinkDialog } from "@/components/custom/system/NotificationLinkDialog"
+import { NotificationConfigDialog } from "@/components/custom/system/NotificationConfigDialog"
+import BImage from "@/components/custom/general/PublicBackendImage"
 
 export default function NotificationServices() {
   const [notificationServices, setNotificationServices] = useState<{
@@ -53,6 +56,30 @@ export default function NotificationServices() {
     ) as Promise<any>
   }
 
+  const initializeServices = () => {
+    getServices().then(data => {
+      setNotificationServices(data)
+      if (selectedService) {
+        setSelectedService(
+          data.data.find((e: any) => e.id === selectedService.id) ??
+            data.data[0],
+        )
+      } else {
+        setSelectedService(data.data[0])
+      }
+    })
+  }
+
+  const deleteService = (serviceId: number) => {
+    return notificationService.deleteNotificationService(serviceId).then(() => {
+      toast({
+        title: `Service ${selectedService?.name} deleted`,
+        duration: 2000,
+      })
+      return initializeServices()
+    })
+  }
+
   const loadMoreServices = useCallback(
     async (offset?: number) => {
       setNotificationServices({
@@ -70,19 +97,19 @@ export default function NotificationServices() {
   }, [notificationServices.data])
 
   useEffect(() => {
-    getServices().then(data => {
-      setNotificationServices(data)
-      setSelectedService(data.data[0])
-    })
+    initializeServices()
   }, [])
 
   const onItemSelect = useCallback(
     (item: NotificationService) => {
-      setSelectedService(item)
       setInfoLoading(true)
       return notificationService
         .getAttachedJobs(Number(item.id))
-        .then((data: any) => setSelectedServicesAttachedJobs(data))
+        .then((data: any) => {
+          setSelectedServicesAttachedJobs(data)
+          item.jobs = data.map((e: any) => Number(e.id))
+          setSelectedService(item)
+        })
         .finally(() => {
           setInfoLoading(false)
         })
@@ -93,7 +120,6 @@ export default function NotificationServices() {
   const handleConfirmationDialogAction = useCallback(
     (action: ConfirmationDialogActionType, ...rest: any) => {
       if (action === ConfirmationDialogActionType.CANCEL) return
-      console.log(rest)
       return detachServiceFromJobNotifications(rest[0], rest[1])
         .then(() => {
           return onItemSelect(selectedService!)
@@ -118,7 +144,6 @@ export default function NotificationServices() {
       )
       job.param = JSON.stringify(jobsParam)
     }
-    console.log(job)
     return jobsService
       .executeActionWithUpdate(
         "UPDATE",
@@ -143,6 +168,17 @@ export default function NotificationServices() {
     })
   }, [])
 
+  const getAllServiceEntrypoints = useCallback(() => {
+    return notificationService.getAllServiceEntryPoints().then((data: any) => {
+      return data.map((item: any) => {
+        return {
+          value: item,
+          label: item,
+        }
+      })
+    })
+  }, [])
+
   const attachJobsToNotificationService = useCallback(
     (service: { id: string | number; jobs?: Array<any>; name: string }) => {
       return notificationService
@@ -156,6 +192,24 @@ export default function NotificationServices() {
             duration: 2000,
           })
         })
+    },
+    [selectedService, selectedServicesAttachedJobs],
+  )
+
+  const createNotificationService = useCallback(
+    (inputData: FormData) => {
+      return (
+        inputData.get("id")
+          ? notificationService.updateNotificationService
+          : notificationService.addNotificationService
+      )(inputData)
+        .then(() => {
+          toast({
+            title: `Notification service ${inputData.get("name")} ${inputData.get("id") ? "updated" : "created"}`,
+            duration: 2000,
+          })
+        })
+        .then(initializeServices)
     },
     [selectedService, selectedServicesAttachedJobs],
   )
@@ -175,14 +229,20 @@ export default function NotificationServices() {
           <CardContent className="p-4 pt-0">
             <div className={"flex gap-2 h-full"}>
               <div className="flex flex-col gap-2">
-                <Button
-                  variant="ghost"
-                  onClick={() => addConfigItem(undefined, "item")}
-                  className="w-full gap-2 border-dashed border-2 border-border hover:border-solid hover:bg-transparent"
+                <NotificationConfigDialog
+                  JobsList={getAllJobs}
+                  serviceFileList={getAllServiceEntrypoints}
+                  onChange={createNotificationService}
+                  isCreateDialog={true}
                 >
-                  <Plus className="h-4 w-4" />
-                  Add service
-                </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full gap-2 border-dashed border-2 border-border hover:border-solid hover:bg-transparent"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add service
+                  </Button>
+                </NotificationConfigDialog>
                 <ScrollableList
                   className="min-w-[230px]"
                   originalList={getAllServices}
@@ -208,9 +268,11 @@ export default function NotificationServices() {
                   renderItem={(item: NotificationService, index) => {
                     return (
                       <div className="flex flex-row gap-3 items-center rounded-xl p-2 bg-sidebar">
-                        <div className="w-10 h-10 ">
-                          <img src={item.image} alt="" />
-                        </div>
+                        <BImage
+                          className="rounded-md w-10 h-10 aspect-square"
+                          src={item.image}
+                          alt="NoImg"
+                        />
                         <div className="flex flex-col gap-1 ">
                           <div className="text-sm font-bold text-ellipsis overflow-hidden max-w-[200px] truncate">
                             {item.name}
@@ -230,84 +292,104 @@ export default function NotificationServices() {
                   icon={LoaderPinwheelIcon}
                   className="h-full w-full block"
                 >
-                  <div className="flex flex-col gap-2 ">
-                    <div className="text-l font-bold tracking-tight italic">
-                      Basic info
-                    </div>
-                    <div className="flex flex-col gap-1 ml-2">
-                      <div className="flex gap-2 ">
-                        <span className="m-w-[120px] font-bold">Name :</span>
-                        <div className="font-medium w-auto">
-                          {selectedService?.name}
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <span className="m-w-[120px] font-bold">
-                          description :
-                        </span>
-                        <div className="font-medium w-auto">
-                          {selectedService?.description}
-                        </div>
-                      </div>
-                      <div className="flex gap-2 ">
-                        <span className="m-w-[120px] font-bold">
-                          Addition Date :
-                        </span>
-                        <div className="font-medium w-auto">
-                          {moment(selectedService?.created_at).format(
-                            "YYYY-MM-DD HH:mm:ss",
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-l font-bold italic tracking-tight mt-2 flex gap-2 items-center">
-                      <span>
-                        Attached jobs ({selectedServicesAttachedJobs?.length})
-                      </span>
-                      <NotificationLinkDialog
-                        JobsList={getAllJobs}
-                        notificationDetails={selectedService}
-                        onChange={attachJobsToNotificationService}
-                      >
-                        <Button
-                          variant={"ghost"}
-                          size={"icon"}
-                          title="attach jobs to this service"
-                        >
-                          <PlusIcon />
-                        </Button>
-                      </NotificationLinkDialog>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 flex-wrap">
-                      {selectedServicesAttachedJobs.map(e => {
-                        return (
-                          <HoverScreenComponent
-                            key={e.job_id}
-                            hoverComponent={
-                              <ConfirmationDialogAction
-                                title={`Detach ${e.name} Job ?`}
-                                description={
-                                  "This will detach this service from the job making it not available on th next run of the job"
-                                }
-                                takeAction={handleConfirmationDialogAction}
-                                confirmText="Detach Job"
-                                extraTakeActionArgs={[
-                                  e,
-                                  Number(selectedService?.id),
-                                ]}
-                              >
-                                <Button variant="destructive" size={"sm"}>
-                                  <Unlock /> Detach Job
-                                </Button>
-                              </ConfirmationDialogAction>
-                            }
+                  {notificationServices.data.length && (
+                    <div className="flex flex-col gap-2 ">
+                      <div className="text-l font-bold tracking-tight italic flex gap-2 items-center">
+                        <span>Basic info</span>
+                        {selectedService && (
+                          <NotificationConfigDialog
+                            JobsList={getAllJobs}
+                            serviceFileList={getAllServiceEntrypoints}
+                            onChange={createNotificationService}
+                            triggerClassName={"gap-2"}
+                            notificationServiceDetails={selectedService}
+                            onDeletion={deleteService}
                           >
-                            <JobItem className="w-full bg-sidebar" job={e} />
-                          </HoverScreenComponent>
-                        )
-                      })}
+                            <Button
+                              variant={"ghost"}
+                              size={"icon"}
+                              title="Edit the notification info"
+                            >
+                              <EditIcon />
+                            </Button>
+                          </NotificationConfigDialog>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-1 pl-3 border-l-4 border-sidebar-border border-1-2">
+                        <div className="flex gap-2 ">
+                          <span className="m-w-[120px] font-bold">Name :</span>
+                          <div className="font-medium w-auto">
+                            {selectedService?.name}
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <span className="m-w-[120px] font-bold">
+                            description :
+                          </span>
+                          <div className="font-medium w-auto">
+                            {selectedService?.description}
+                          </div>
+                        </div>
+                        <div className="flex gap-2 ">
+                          <span className="m-w-[120px] font-bold">
+                            Creation Date :
+                          </span>
+                          <div className="font-medium w-auto">
+                            {moment(selectedService?.created_at).format(
+                              "YYYY-MM-DD HH:mm:ss",
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-l font-bold italic tracking-tight mt-2 flex gap-2 items-center">
+                        <span>
+                          Attached jobs ({selectedServicesAttachedJobs?.length})
+                        </span>
+                        <NotificationLinkDialog
+                          JobsList={getAllJobs}
+                          notificationDetails={selectedService}
+                          onChange={attachJobsToNotificationService}
+                        >
+                          <Button
+                            variant={"ghost"}
+                            size={"icon"}
+                            title="Edit attached jobs"
+                          >
+                            <EditIcon />
+                          </Button>
+                        </NotificationLinkDialog>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 flex-wrap max-h-[350px] overflow-y-auto">
+                        {selectedServicesAttachedJobs.map(e => {
+                          return (
+                            <HoverScreenComponent
+                              key={e.id}
+                              hoverComponent={
+                                <ConfirmationDialogAction
+                                  title={`Detach ${e.name} Job ?`}
+                                  description={
+                                    "This will detach this service from the job making it not available on th next run of the job"
+                                  }
+                                  takeAction={handleConfirmationDialogAction}
+                                  confirmText="Detach Job"
+                                  extraTakeActionArgs={[
+                                    e,
+                                    Number(selectedService?.id),
+                                  ]}
+                                >
+                                  <Button variant="destructive" size={"sm"}>
+                                    <Unlock /> Detach Job
+                                  </Button>
+                                </ConfirmationDialogAction>
+                              }
+                            >
+                              <JobItem className="w-full bg-sidebar" job={e} />
+                            </HoverScreenComponent>
+                          )
+                        })}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </Spinner>
               </div>
             </div>
