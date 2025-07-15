@@ -267,17 +267,17 @@ export default function NotificationServices() {
                   }
                   renderItem={(item: NotificationService, index) => {
                     return (
-                      <div className="flex flex-row gap-3 items-center rounded-xl p-2 bg-sidebar">
+                      <div className="flex flex-row gap-3 items-center rounded-xl p-2 bg-sidebar max-w-[230px]">
                         <BImage
                           className="rounded-md w-10 h-10 aspect-square"
                           src={item.image}
                           alt="NoImg"
                         />
-                        <div className="flex flex-col gap-1 ">
+                        <div className="flex flex-col gap-1 min-w-0">
                           <div className="text-sm font-bold text-ellipsis overflow-hidden max-w-[200px] truncate">
                             {item.name}
                           </div>
-                          <div className="text-xs text-[--muted-foreground] text-ellipsis truncate">
+                          <div className="text-xs text-[--muted-foreground] text-ellipsis truncate min-w-0">
                             {item.description}
                           </div>
                         </div>
@@ -318,7 +318,7 @@ export default function NotificationServices() {
                       <div className="flex flex-col gap-1 pl-3 border-l-4 border-sidebar-border border-1-2">
                         <div className="flex gap-2 ">
                           <span className="m-w-[120px] font-bold">Name :</span>
-                          <div className="font-medium w-auto">
+                          <div className="font-medium w-auto capitalize">
                             {selectedService?.name}
                           </div>
                         </div>
@@ -326,7 +326,7 @@ export default function NotificationServices() {
                           <span className="m-w-[120px] font-bold">
                             description :
                           </span>
-                          <div className="font-medium w-auto">
+                          <div className="font-medium w-auto ">
                             {selectedService?.description}
                           </div>
                         </div>
