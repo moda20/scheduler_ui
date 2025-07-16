@@ -1,19 +1,9 @@
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  DatabaseBackup,
   EditIcon,
   FileX2,
   LoaderPinwheelIcon,
-  LucideDatabase,
-  LucideDatabaseZap,
   Plus,
-  PlusIcon,
   Unlock,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -26,7 +16,7 @@ import Spinner from "@/components/ui/spinner"
 import moment from "moment"
 import JobItem from "@/components/custom/general/JobItem"
 import HoverScreenComponent from "@/components/custom/general/HoverScreenComponent"
-import { jobActions, jobsTableData } from "@/features/jobsTable/interfaces"
+import type { jobsTableData } from "@/features/jobsTable/interfaces"
 import jobsService from "@/services/JobsService"
 import ConfirmationDialogAction, {
   ConfirmationDialogActionType,
