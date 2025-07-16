@@ -7,6 +7,7 @@ import Dashboard from "@/features/dashboard/dashboard"
 import DatabaseDashboard from "@/features/system/database"
 import Proxies from "@/features/network/proxies"
 import ConfigsDashboard from "@/features/system/configs"
+import NotificationServices from "@/features/system/notificationServices"
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,11 @@ const router = createBrowserRouter([
         path: "/configs",
         index: true,
         element: <ConfigsDashboard />,
+      },
+      {
+        path: "/notifications",
+        index: true,
+        element: <NotificationServices />,
       },
     ],
   },

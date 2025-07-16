@@ -27,9 +27,10 @@ export interface ConfirmationDialogActionProps {
   confirmText?: string
   confirmVariant?: VariantProps<typeof buttonVariants>["variant"]
   cancelVariant?: VariantProps<typeof buttonVariants>["variant"]
-  takeAction: (arg: ConfirmationDialogActionType) => void
+  takeAction: (arg: ConfirmationDialogActionType, ...rest: any) => void
   onOpenChange?: (open: boolean) => void
   disableConfirm?: boolean
+  extraTakeActionArgs?: any
 }
 
 export default function ConfirmationDialogAction(
@@ -63,7 +64,10 @@ export default function ConfirmationDialogAction(
           <AlertDialogCancel
             title={props.cancelText ?? "Cancel"}
             onClick={() =>
-              props.takeAction(ConfirmationDialogActionType.CANCEL)
+              props.takeAction(
+                ConfirmationDialogActionType.CANCEL,
+                ...(props?.extraTakeActionArgs ?? []),
+              )
             }
             variant={props.cancelVariant}
           >
@@ -72,7 +76,10 @@ export default function ConfirmationDialogAction(
           <AlertDialogAction
             title={props.confirmText ?? "Confirm"}
             onClick={() =>
-              props.takeAction(ConfirmationDialogActionType.CONFIRM)
+              props.takeAction(
+                ConfirmationDialogActionType.CONFIRM,
+                ...(props?.extraTakeActionArgs ?? []),
+              )
             }
             variant={props.confirmVariant}
             disabled={props.disableConfirm}

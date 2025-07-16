@@ -201,7 +201,6 @@ export function ProxyConfigDialog({
                     <Checkbox
                       checked={field.value === ProxyStatus.ACTIVE.toString()}
                       onCheckedChange={v => {
-                        console.log("active status ", v)
                         field.onChange(
                           v ? ProxyStatus.ACTIVE : ProxyStatus.INACTIVE,
                         )

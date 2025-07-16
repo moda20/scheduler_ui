@@ -14,6 +14,7 @@ export interface ScrollableListProps<T> {
   className?: string
   itemClassName?: string | ((item: T, index: number) => string)
   autoFocus?: boolean
+  autoClickFocusedItem?: boolean
 }
 
 function ScrollableList<T>(
@@ -27,6 +28,7 @@ function ScrollableList<T>(
     itemClassName,
     autoFocus,
     renderNoItems,
+    autoClickFocusedItem,
   }: ScrollableListProps<T>,
   ref: React.Ref<any>,
 ) {
@@ -100,12 +102,13 @@ function ScrollableList<T>(
       autoFocus
     ) {
       itemRefs.current[0]?.focus()
+      if (autoClickFocusedItem && onItemClick) onItemClick(items[0], 0)
     }
-  }, [currentFocusIndex, items.length])
+  }, [items.length])
 
   // force refresh of original list when parent changes.
   useEffect(() => {
-    if (!items.length) {
+    if (items.length) {
       setItems(originalList ?? [])
     }
   }, [items, originalList])
