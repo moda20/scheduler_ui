@@ -70,7 +70,6 @@ export default function ImageDropInComponent({
   }
 
   useEffect(() => {
-    console.log(image)
     if (!image) return
     if (image?.url) {
       setImageUrl(image?.url)
