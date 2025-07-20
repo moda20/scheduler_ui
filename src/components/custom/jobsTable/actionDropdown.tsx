@@ -166,6 +166,7 @@ export default function ActionDropdown({
             }
             takeAction={handleConfirmationDialogAction}
             confirmText={row.status === "STARTED" ? "Un-schedule" : "Schedule"}
+            autoFocus={true}
           >
             <DropdownMenuItemExtended keyBinding="S">
               <Settings />
@@ -284,6 +285,7 @@ export default function ActionDropdown({
               "This action will un-schedule and set to inactive the job but will NOT stop it if it's running"
             }
             takeAction={handleConfirmationDeleteAction}
+            autoFocus={true}
           >
             <DropdownMenuItem
               className={"bg-destructive"}
