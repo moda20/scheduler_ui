@@ -111,7 +111,7 @@ function ScrollableList<T>(
     if (items.length) {
       setItems(originalList ?? [])
     }
-  }, [items, originalList])
+  }, [originalList])
 
   const focusItem = (newIndex: number) => {
     setCurrentFocusIndex(newIndex)
