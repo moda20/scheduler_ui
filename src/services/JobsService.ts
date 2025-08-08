@@ -146,6 +146,7 @@ const jobsService = {
       params: {
         id,
         fileName,
+        nativeType: true,
       },
       fetchOptions: {
         fullResponse: true,
