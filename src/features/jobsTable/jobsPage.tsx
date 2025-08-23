@@ -2,13 +2,18 @@ import jobsService from "@/services/JobsService"
 import { DataTable } from "@/features/jobsTable/jobsTable"
 import type { jobsTableData } from "@/features/jobsTable/interfaces"
 import { getTableColumns, jobActions } from "@/features/jobsTable/interfaces"
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Spinner from "@/components/ui/spinner"
 import type { ColumnDef, SortingState } from "@tanstack/react-table"
 import type { JobUpdateType } from "@/components/job-update-dialog"
 import { JobUpdateDialog } from "@/components/job-update-dialog"
 import { Button } from "@/components/ui/button"
-import { PlusIcon, LoaderPinwheelIcon } from "lucide-react"
+import {
+  PlusIcon,
+  LoaderPinwheelIcon,
+  FilterIcon,
+  Trash2Icon,
+} from "lucide-react"
 import { useAppDispatch, useAppSelector } from "@/app/hooks"
 import { config } from "@/app/reducers/uiReducer"
 import { getConsumersCBox, takeAction } from "@/features/jobsTable/jobsUtils"
@@ -17,36 +22,58 @@ import {
   setJobsList,
   setRunningJobsCount,
 } from "@/app/reducers/jobsReducer"
+import type { AdvancedJobFilteringDialogHandle } from "@/components/custom/jobsTable/advancedJobFilteringDialog"
+import { AdvancedJobFilteringDialog } from "@/components/custom/jobsTable/advancedJobFilteringDialog"
+import { ButtonGroup } from "@/components/ui/buttonGroup"
 
 export const defaultSortingState = [{ id: "cronSetting", desc: true }]
 
 export default function JobsPage() {
   const [loading, setLoading] = useState(true)
   const [fetchingData, setFetchingStatus] = useState(false)
+  const [advancedFilters, setAdvancedFilters] = useState<any>()
   const [sorting, setSorting] = useState<SortingState>(defaultSortingState)
   const savedConfig = useAppSelector(config)
   const JobsList = useAppSelector(jobsList)
   const dispatch = useAppDispatch()
-  async function fetchTableData(inputSorting?: SortingState) {
+  const avFilteringRef = useRef<AdvancedJobFilteringDialogHandle>(null)
+
+  async function fetchTableData(inputSorting?: SortingState, avFilters?: any) {
     setFetchingStatus(true)
-    return await jobsService
-      .getAllJobs(null, inputSorting ?? sorting)
+    setLoading(true)
+    return await (
+      (avFilters ?? advancedFilters)
+        ? jobsService.filterJobs
+        : jobsService.getAllJobs
+    )(null, inputSorting ?? sorting, avFilters ?? advancedFilters)
       .then(data => {
         dispatch(setJobsList(data))
-        setLoading(false)
       })
       .catch(err => {
         dispatch(setJobsList([]))
+      })
+      .finally(() => {
+        setFetchingStatus(false)
         setLoading(false)
       })
-      .finally(() => setFetchingStatus(false))
   }
 
   const updateTableData = useCallback(
-    (sorting?: any) => {
-      return Promise.all([getRunningJobs(), fetchTableData(sorting)])
+    (sorting?: any, avFilters?: any) => {
+      return Promise.all([getRunningJobs(), fetchTableData(sorting, avFilters)])
     },
     [sorting],
+  )
+
+  const onAdvancedFilterChange = useCallback(
+    (value: any) => {
+      if (!value) {
+        avFilteringRef.current?.reset()
+      }
+      setAdvancedFilters(value)
+      updateTableData(undefined, value)
+    },
+    [updateTableData],
   )
 
   async function getRunningJobs() {
@@ -123,6 +150,28 @@ export default function JobsPage() {
             <PlusIcon /> New job
           </Button>
         </JobUpdateDialog>
+        <AdvancedJobFilteringDialog
+          onSubmit={onAdvancedFilterChange}
+          ref={avFilteringRef}
+        >
+          {advancedFilters ? (
+            <ButtonGroup>
+              <Button
+                variant="destructive"
+                onClick={() => onAdvancedFilterChange(undefined)}
+              >
+                <Trash2Icon />
+              </Button>
+              <Button variant="outline" className={"border-border"}>
+                <FilterIcon /> Advanced filtering
+              </Button>
+            </ButtonGroup>
+          ) : (
+            <Button variant="outline" className={"border-border"}>
+              <FilterIcon /> Advanced filtering
+            </Button>
+          )}
+        </AdvancedJobFilteringDialog>
       </div>
       <Spinner isLoading={loading} icon={LoaderPinwheelIcon}>
         <DataTable

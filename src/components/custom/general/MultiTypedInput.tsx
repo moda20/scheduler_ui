@@ -1,0 +1,213 @@
+import { useState, useEffect } from "react"
+import { cn } from "@/lib/utils"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
+
+export const allAcceptedTypes = ["exact", "regex", "between"] as const
+export type InputType = (typeof allAcceptedTypes)[number]
+
+export interface BetweenValue {
+  value1: string | number
+  value2: string | number
+}
+export interface defaultValue {
+  value: string
+  type: string
+}
+
+export const defaultMultiTypeNullValue: defaultValue = {
+  value: "",
+  type: "exact",
+}
+export interface FlexibleInputProps {
+  type?: InputType
+  value?: string | BetweenValue | defaultValue | number
+  name?: string
+  onChange?: (value: string | BetweenValue | defaultValue) => void
+  onError?: (field: any, error?: string) => void
+  placeholder?: string
+  className?: string
+  disabled?: boolean
+  acceptedInputTypes?: Array<InputType>
+}
+
+const validateRegex = (pattern: string): string | undefined => {
+  if (!pattern) return
+  try {
+    new RegExp(pattern)
+    return
+  } catch (error) {
+    return `Invalid regex: ${error instanceof Error ? error.message : "Unknown error"}`
+  }
+}
+
+export function FlexibleInput({
+  type = "exact",
+  value,
+  onChange,
+  onError,
+  placeholder = "Enter value...",
+  className,
+  disabled = false,
+  name,
+  acceptedInputTypes,
+}: FlexibleInputProps) {
+  const [inputType, setInputType] = useState<InputType>(type)
+  const inputTypeList = acceptedInputTypes ?? allAcceptedTypes
+  const [exactValue, setExactValue] = useState<defaultValue>(
+    defaultMultiTypeNullValue,
+  )
+  const [regexValue, setRegexValue] = useState<defaultValue>(
+    defaultMultiTypeNullValue,
+  )
+  const [betweenValue, setBetweenValue] = useState<BetweenValue>({
+    value1: "",
+    value2: "",
+  })
+
+  // Initialize values based on prop
+  useEffect(() => {
+    if (value !== undefined) {
+      switch (inputType) {
+        case "exact":
+          setExactValue(value as defaultValue)
+          break
+        case "regex":
+          setRegexValue(value as defaultValue)
+          break
+        case "between":
+          setBetweenValue(value as BetweenValue)
+          break
+      }
+    }
+  }, [value, inputType])
+
+  // Handle type change
+  const handleTypeChange = (newType: InputType) => {
+    setInputType(newType)
+
+    // Reset values and errors when switching types
+    setExactValue(defaultMultiTypeNullValue)
+    setRegexValue(defaultMultiTypeNullValue)
+    setBetweenValue({ value1: "", value2: "" })
+    onError?.({ name })
+
+    // Emit initial value for new type
+    if (newType === "exact" || newType === "regex") {
+      onChange?.(defaultMultiTypeNullValue)
+    } else if (newType === "between") {
+      onChange?.({ value1: "", value2: "" })
+    }
+  }
+
+  // Handle exact value change
+  const handleExactChange = (newValue: string) => {
+    const typedValue = {
+      value: newValue,
+      type: "exact",
+    }
+    setExactValue(typedValue)
+    onChange?.(typedValue)
+  }
+
+  // Handle regex value change
+  const handleRegexChange = (newValue: string) => {
+    const typedValue = {
+      value: newValue,
+      type: "regex",
+    }
+    setRegexValue(typedValue)
+    const error = validateRegex(newValue)
+    if (error) {
+      onError?.({ name }, error)
+    }
+    onChange?.(typedValue)
+  }
+
+  // Handle between value change
+  const handleBetweenChange = (field: keyof BetweenValue, newValue: string) => {
+    const updated = { ...betweenValue, [field]: newValue, type: "between" }
+    setBetweenValue(updated)
+    onChange?.(updated)
+  }
+
+  const renderInput = () => {
+    switch (inputType) {
+      case "exact":
+        return (
+          <Input
+            value={exactValue.value}
+            onChange={e => handleExactChange(e.target.value)}
+            placeholder={placeholder}
+            disabled={disabled}
+            className="border-l-0 rounded-l-none focus-visible:ring-offset-0 bg-background text-foreground"
+          />
+        )
+
+      case "regex":
+        return (
+          <Input
+            value={regexValue.value}
+            onChange={e => handleRegexChange(e.target.value)}
+            placeholder="Enter regex pattern..."
+            disabled={disabled}
+            className="border-l-0 rounded-l-none focus-visible:ring-offset-0 font-mono bg-background text-foreground"
+          />
+        )
+
+      case "between":
+        return (
+          <div className="flex flex-1">
+            <Input
+              value={betweenValue.value1}
+              onChange={e => handleBetweenChange("value1", e.target.value)}
+              placeholder="Min value"
+              disabled={disabled}
+              className="border-l-0 border-r-0 rounded-none focus-visible:ring-offset-0 bg-background text-foreground"
+            />
+            <Input
+              value={betweenValue.value2}
+              onChange={e => handleBetweenChange("value2", e.target.value)}
+              placeholder="Max value"
+              disabled={disabled}
+              className="border-l-0 rounded-l-none focus-visible:ring-offset-0"
+            />
+          </div>
+        )
+
+      default:
+        return null
+    }
+  }
+
+  return (
+    <div className={cn("flex w-full", className)}>
+      <Select
+        value={inputType}
+        onValueChange={handleTypeChange}
+        disabled={disabled}
+      >
+        <SelectTrigger className="w-32 rounded-r-none border-r-0 focus:ring-offset-0 capitalize">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className="bg-background text-foreground">
+          {inputTypeList.map(type => (
+            <SelectItem
+              className="bg-background text-foreground capitalize"
+              value={type}
+            >
+              {type}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {renderInput()}
+    </div>
+  )
+}

@@ -16,6 +16,16 @@ const jobsService = {
       },
     })
   },
+  filterJobs(
+    status: string | Array<string> | null,
+    sorting: any,
+    advancedFilters?: any,
+  ): Promise<any> {
+    return axios.post("/jobs/filterJobs", {
+      ...advancedFilters,
+      sorting,
+    })
+  },
   getRunningJobs() {
     return axios.get("/jobs/getRunningJobs")
   },

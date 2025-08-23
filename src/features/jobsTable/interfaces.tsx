@@ -1,4 +1,4 @@
-import type { ColumnDef, Row } from "@tanstack/react-table"
+import type { ColumnDef, Row, Table } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge"
 import { getStringFromCronExpression } from "@/lib/utils"
 import moment from "moment"
@@ -9,7 +9,9 @@ import type { ComboBoxItem } from "@/components/ui/combo-box"
 import ActionDropdown from "@/components/custom/jobsTable/actionDropdown"
 import HeaderSortButton from "@/components/custom/jobsTable/headerSortButton"
 import { FileArchive, LucideFileWarning } from "lucide-react"
-import React from "react"
+import React, { useCallback } from "react"
+import { Checkbox } from "@/components/ui/checkbox"
+import { CheckedState } from "@radix-ui/react-checkbox"
 
 export interface jobsTableData {
   id: string
@@ -52,6 +54,28 @@ export interface tableColumnsProps {
 export const getTableColumns = (
   props: tableColumnsProps,
 ): ColumnDef<jobsTableData>[] => [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected() || row.getIsSomeSelected()}
+        onCheckedChange={value => row.toggleSelected(!!value)}
+        aria-label={`Select row ${row.original.name}`}
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: "id",
     header: ({ column }) => (

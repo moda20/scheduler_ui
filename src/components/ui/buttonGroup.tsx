@@ -33,6 +33,7 @@ export const ButtonGroup = ({
       {Children.map(children, (child, index) => {
         const isFirst = index === 0
         const isLast = index === totalButtons - 1
+        if (!child) return
         return cloneElement(child, {
           className: cn(
             {

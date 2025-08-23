@@ -120,3 +120,7 @@ export const genUID = () => {
     Math.random().toString(24).substring(2, 10)
   )
 }
+
+export const safeStringCast = (value: any) => {
+  return value?.toString() || "undefined"
+}
