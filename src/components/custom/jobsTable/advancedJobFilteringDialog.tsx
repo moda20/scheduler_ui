@@ -28,13 +28,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon, Search } from "lucide-react"
+import { CalendarIcon, LucideScanEye, Search } from "lucide-react"
 import { format } from "date-fns"
 import { DatePickerWithPresets } from "@/components/ui/date-picker-presets"
 import type { InputType } from "@/components/custom/general/MultiTypedInput"
 import { defaultMultiTypeNullValue } from "@/components/custom/general/MultiTypedInput"
 import { FlexibleInput } from "@/components/custom/general/MultiTypedInput"
-import { forwardRef, useCallback, useImperativeHandle } from "react"
+import { forwardRef, useCallback, useImperativeHandle, useState } from "react"
 import {
   Select,
   SelectContent,
@@ -44,11 +44,18 @@ import {
 } from "@/components/ui/select"
 import { proxyProtocolOptions } from "@/models/proxies"
 import ManagedSelect from "@/components/custom/ManagedSelect"
+import type { advancedJobExecutionFormSchemaType } from "@/components/custom/jobsTable/AdvancedJobExecutionForm"
+import { AdvancedJobExecutionForm } from "@/components/custom/jobsTable/AdvancedJobExecutionForm"
+import type { jobsTableData } from "@/features/jobsTable/interfaces"
+import jobsService from "@/services/JobsService"
+import ScrollableList from "@/components/custom/general/ScrollableList"
+import JobItem from "@/components/custom/general/JobItem"
 
 export interface AdvancedJobFilteringDialogProps {
   children: React.ReactNode
   triggerClassName?: string
   onSubmit?: (value: any) => void
+  onExecutionSubmit?: (value: any) => void
 }
 
 const jobFilteringSchema = z.object({
@@ -112,11 +119,20 @@ const textOnlyInputTypes: InputType[] = ["exact", "regex"]
 export const AdvancedJobFilteringDialog = forwardRef<
   AdvancedJobFilteringDialogHandle,
   AdvancedJobFilteringDialogProps
->(({ triggerClassName, children, onSubmit }, ref) => {
+>(({ triggerClassName, children, onSubmit, onExecutionSubmit }, ref) => {
   const { isDialogOpen, setDialogState } = useDialogueManager()
+  const [previewJobList, setPreviewJobList] = useState<Array<jobsTableData>>([])
+
+  const getPreviewJobs = (values: jobFilteringSchemaType) => {
+    const finalFormValues = sanitizeFormValues(values)
+    jobsService.filterJobs(null, [], finalFormValues).then(d => {
+      setPreviewJobList(d)
+    })
+  }
+
   useImperativeHandle(ref, () => ({
     reset: () => {
-      form.reset()
+      resetFilteringForm()
     },
   }))
 
@@ -133,9 +149,12 @@ export const AdvancedJobFilteringDialog = forwardRef<
     },
   })
 
-  function submitForm(values: jobFilteringSchemaType) {
-    setDialogState(false)
-    onSubmit?.({
+  const resetFilteringForm = useCallback(() => {
+    form.reset()
+    setPreviewJobList([])
+  }, [form, previewJobList])
+  const sanitizeFormValues = (values: jobFilteringSchemaType) => {
+    return {
       ...values,
       status: values.status ? [values.status] : ["STOPPED", "STARTED"],
       latestRun: values.latestRun
@@ -145,7 +164,20 @@ export const AdvancedJobFilteringDialog = forwardRef<
             value2: values.latestRun.to,
           }
         : undefined,
-    })
+    }
+  }
+
+  function submitForm(values: jobFilteringSchemaType) {
+    setDialogState(false)
+    onSubmit?.(sanitizeFormValues(values))
+  }
+
+  const submitExecutionForm = (values: advancedJobExecutionFormSchemaType) => {
+    const finalValues = {
+      ...values,
+      targetJobs: previewJobList.map(e => e.id),
+    }
+    onExecutionSubmit?.(finalValues)
   }
 
   const errorHandler = useCallback(
@@ -177,7 +209,7 @@ export const AdvancedJobFilteringDialog = forwardRef<
         {children}
       </DialogTrigger>
       <DialogContent
-        className={cn("sm:max-w-[425px] text-foreground bg-background")}
+        className={cn("sm:max-w-[925px] text-foreground bg-background")}
         onEscapeKeyDown={e => {
           e.preventDefault()
           setDialogState(false)
@@ -189,143 +221,185 @@ export const AdvancedJobFilteringDialog = forwardRef<
             Filter and execute tasks in batches
           </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(submitForm)}
-            className="grid gap-4 py-4"
-          >
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <FlexibleInput
-                      placeholder="Job name"
-                      {...field}
-                      onError={errorHandler}
-                      acceptedInputTypes={textOnlyInputTypes}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="cronSetting"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Cron Setting</FormLabel>
-                  <FormControl>
-                    <FlexibleInput
-                      placeholder="Cron setting"
-                      {...field}
-                      onError={errorHandler}
-                      acceptedInputTypes={textOnlyInputTypes}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="consumer"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Consumer</FormLabel>
-                  <FormControl>
-                    <FlexibleInput
-                      placeholder="Consumer"
-                      {...field}
-                      onError={errorHandler}
-                      acceptedInputTypes={textOnlyInputTypes}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="flex gap-2 justify-evenly w-full">
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Status</FormLabel>
-                    <ManagedSelect
-                      onChange={field.onChange}
-                      inputOptions={statusOptions}
-                      defaultValue={field.value}
-                      exportOnlyValue={true}
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="isRunning"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Is Running</FormLabel>
-                    <FormControl>
-                      <div className="flex flex-col space-y-2">
+        <div className="flex gap-4 ">
+          <div className="flex flex-col gap-2 w-6/12">
+            <h4>Filtering</h4>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(submitForm)}
+                className="flex flex-col gap-4 py-4 "
+              >
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <FlexibleInput
+                          placeholder="Job name"
+                          {...field}
+                          onError={errorHandler}
+                          acceptedInputTypes={textOnlyInputTypes}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="cronSetting"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Cron Setting</FormLabel>
+                      <FormControl>
+                        <FlexibleInput
+                          placeholder="Cron setting"
+                          {...field}
+                          onError={errorHandler}
+                          acceptedInputTypes={textOnlyInputTypes}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="consumer"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Consumer</FormLabel>
+                      <FormControl>
+                        <FlexibleInput
+                          placeholder="Consumer"
+                          {...field}
+                          onError={errorHandler}
+                          acceptedInputTypes={textOnlyInputTypes}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex gap-2 justify-evenly w-full">
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel>Status</FormLabel>
                         <ManagedSelect
                           onChange={field.onChange}
-                          inputOptions={runningStatusOptions}
+                          inputOptions={statusOptions}
                           defaultValue={field.value}
                           exportOnlyValue={true}
                         />
-                      </div>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="isRunning"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel>Is Running</FormLabel>
+                        <FormControl>
+                          <div className="flex flex-col space-y-2">
+                            <ManagedSelect
+                              onChange={field.onChange}
+                              inputOptions={runningStatusOptions}
+                              defaultValue={field.value}
+                              exportOnlyValue={true}
+                            />
+                          </div>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-            <FormField
-              control={form.control}
-              name="averageTime"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Average Time (sec)</FormLabel>
-                  <FormControl>
-                    <FlexibleInput
-                      placeholder="Average time"
-                      {...field}
-                      onError={errorHandler}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+                <FormField
+                  control={form.control}
+                  name="averageTime"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Average Time (sec)</FormLabel>
+                      <FormControl>
+                        <FlexibleInput
+                          placeholder="Average time"
+                          {...field}
+                          onError={errorHandler}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="latestRun"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Last Run Date Range</FormLabel>
+                      <FormControl>
+                        <DatePickerWithPresets onChange={field.onChange} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex gap-2 items-center justify-evenly w-full mt-auto">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={resetFilteringForm}
+                  >
+                    Reset
+                  </Button>
+                  <Button type="submit" className="w-full">
+                    <Search className="mr-2 h-4 w-4" /> Apply Filters
+                  </Button>
+                  <Button
+                    type="button"
+                    className="w-4/12"
+                    variant="outline"
+                    onClick={() => getPreviewJobs(form.getValues())}
+                  >
+                    <LucideScanEye className="mr-2 h-4 w-4" /> Preview
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
+          <div className="flex flex-col gap-2 w-6/12">
+            <h4>Manual queue execution</h4>
+            {previewJobList.length > 0 && (
+              <div className="max-h-[240px]  flex flex-col gap-2">
+                <h6 className="text-sm italic">
+                  Affected Jobs ({previewJobList.length})
+                </h6>
+                <ScrollableList
+                  className="min-w-[230px] overflow-y-auto"
+                  originalList={previewJobList}
+                  autoFocus={false}
+                  loadMore={false}
+                  autoClickFocusedItem={true}
+                  renderItem={(job: jobsTableData, index: number) => {
+                    return <JobItem className="w-full bg-sidebar" job={job} />
+                  }}
+                />
+              </div>
+            )}
+            <AdvancedJobExecutionForm
+              onSubmit={submitExecutionForm}
+              className=""
+              disabled={!previewJobList.length}
             />
-            <FormField
-              control={form.control}
-              name="latestRun"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Last Run Date Range</FormLabel>
-                  <FormControl>
-                    <DatePickerWithPresets onChange={field.onChange} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="flex gap-2 items-center justify-evenly w-full">
-              <Button variant="ghost" onClick={() => form.reset()}>
-                Reset
-              </Button>
-              <Button type="submit" className="w-full">
-                <Search className="mr-2 h-4 w-4" /> Apply Filters
-              </Button>
-            </div>
-          </form>
-        </Form>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   )

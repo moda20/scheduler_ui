@@ -25,6 +25,7 @@ import {
 import type { AdvancedJobFilteringDialogHandle } from "@/components/custom/jobsTable/advancedJobFilteringDialog"
 import { AdvancedJobFilteringDialog } from "@/components/custom/jobsTable/advancedJobFilteringDialog"
 import { ButtonGroup } from "@/components/ui/buttonGroup"
+import { toast } from "@/hooks/use-toast"
 
 export const defaultSortingState = [{ id: "cronSetting", desc: true }]
 
@@ -72,6 +73,27 @@ export default function JobsPage() {
       }
       setAdvancedFilters(value)
       updateTableData(undefined, value)
+    },
+    [updateTableData],
+  )
+
+  const onAdvancedExecutionSubmission = useCallback(
+    (value: any) => {
+      return jobsService
+        .queueJobExecution(value)
+        .then((data: any) => {
+          toast({
+            title: `Jobs queued`,
+            duration: 2000,
+          })
+          return data
+        })
+        .catch(err => {
+          toast({
+            title: err.message,
+            variant: "destructive",
+          })
+        })
     },
     [updateTableData],
   )
@@ -152,6 +174,7 @@ export default function JobsPage() {
         </JobUpdateDialog>
         <AdvancedJobFilteringDialog
           onSubmit={onAdvancedFilterChange}
+          onExecutionSubmit={onAdvancedExecutionSubmission}
           ref={avFilteringRef}
         >
           {advancedFilters ? (

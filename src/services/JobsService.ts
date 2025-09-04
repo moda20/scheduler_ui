@@ -26,6 +26,9 @@ const jobsService = {
       sorting,
     })
   },
+  queueJobExecution(execConfig: any) {
+    return axios.post("/jobs/queueJobs", execConfig)
+  },
   getRunningJobs() {
     return axios.get("/jobs/getRunningJobs")
   },

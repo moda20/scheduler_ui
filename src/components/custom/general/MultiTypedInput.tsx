@@ -25,6 +25,10 @@ export const defaultMultiTypeNullValue: defaultValue = {
   value: "",
   type: "exact",
 }
+export const defaultBetweenValue: BetweenValue = {
+  value1: "",
+  value2: "",
+}
 export interface FlexibleInputProps {
   type?: InputType
   value?: string | BetweenValue | defaultValue | number
@@ -73,18 +77,16 @@ export function FlexibleInput({
 
   // Initialize values based on prop
   useEffect(() => {
-    if (value !== undefined) {
-      switch (inputType) {
-        case "exact":
-          setExactValue(value as defaultValue)
-          break
-        case "regex":
-          setRegexValue(value as defaultValue)
-          break
-        case "between":
-          setBetweenValue(value as BetweenValue)
-          break
-      }
+    switch (inputType) {
+      case "exact":
+        setExactValue((value ?? defaultMultiTypeNullValue) as defaultValue)
+        break
+      case "regex":
+        setRegexValue((value ?? defaultMultiTypeNullValue) as defaultValue)
+        break
+      case "between":
+        setBetweenValue((value ?? defaultBetweenValue) as BetweenValue)
+        break
     }
   }, [value, inputType])
 
