@@ -8,6 +8,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
+import ManagedSelect from "@/components/custom/ManagedSelect"
+import { defaultBatchOrderingItems } from "@/components/custom/jobsTable/AdvancedJobExecutionForm"
 
 export const allAcceptedTypes = ["exact", "regex", "between"] as const
 export type InputType = (typeof allAcceptedTypes)[number]
@@ -62,8 +64,13 @@ export function FlexibleInput({
   name,
   acceptedInputTypes,
 }: FlexibleInputProps) {
-  const [inputType, setInputType] = useState<InputType>(type)
-  const inputTypeList = acceptedInputTypes ?? allAcceptedTypes
+  const [inputType, setInputType] = useState<InputType>(
+    typeof value === "object" ? (value as any)?.type : "exact",
+  )
+  const inputTypeList = (acceptedInputTypes ?? allAcceptedTypes).map(e => ({
+    label: e,
+    value: e,
+  }))
   const [exactValue, setExactValue] = useState<defaultValue>(
     defaultMultiTypeNullValue,
   )
@@ -190,25 +197,15 @@ export function FlexibleInput({
 
   return (
     <div className={cn("flex w-full", className)}>
-      <Select
-        value={inputType}
-        onValueChange={handleTypeChange}
+      <ManagedSelect
+        onChange={handleTypeChange}
+        inputOptions={inputTypeList}
+        defaultValue={inputType}
         disabled={disabled}
-      >
-        <SelectTrigger className="w-32 rounded-r-none border-r-0 focus:ring-offset-0 capitalize">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent className="bg-background text-foreground">
-          {inputTypeList.map(type => (
-            <SelectItem
-              className="bg-background text-foreground capitalize"
-              value={type}
-            >
-              {type}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+        exportOnlyValue={true}
+        className="w-32 rounded-r-none border-r-0 focus:ring-offset-0 capitalize"
+        itemClassName="capitalize"
+      />
       {renderInput()}
     </div>
   )

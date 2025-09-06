@@ -32,10 +32,15 @@ const jobsService = {
   getRunningJobs() {
     return axios.get("/jobs/getRunningJobs")
   },
-  executeAction(jobId: string, action: string) {
+  executeAction(
+    jobId: string,
+    action: string,
+    batchProcessIds?: Array<number>,
+  ) {
     return axios.post("/jobs/executeAction", {
       jobId: jobId,
       action: action,
+      jobIdList: batchProcessIds,
     })
   },
   executeActionWithUpdate(action: string, config: any, jobId?: string | null) {

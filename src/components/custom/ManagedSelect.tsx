@@ -9,6 +9,7 @@ import {
 import useDialogueManager from "@/hooks/useDialogManager"
 import { useEffect, useState } from "react"
 import { safeStringCast } from "@/utils/generalUtils"
+import { cn } from "@/lib/utils"
 
 export type ManagedSelectInputValue = {
   value?: string | boolean
@@ -26,6 +27,9 @@ export interface ManagedSelectProps {
   inputOptions: Array<ManagedSelectInputValue>
   inputPlaceholder?: string
   exportOnlyValue?: boolean
+  disabled?: boolean
+  className?: string
+  itemClassName?: string
 }
 
 export default function ManagedSelect(props: ManagedSelectProps) {
@@ -57,12 +61,14 @@ export default function ManagedSelect(props: ManagedSelectProps) {
         setDialogState(false)
       }}
       defaultValue={safeStringCast(props.defaultValue)}
+      disabled={props.disabled}
     >
       <SelectTrigger
         onClick={v => {
           v.preventDefault()
           setDialogState(true)
         }}
+        className={cn(props.className)}
       >
         <SelectValue placeholder={props.inputPlaceholder} />
       </SelectTrigger>
@@ -74,7 +80,11 @@ export default function ManagedSelect(props: ManagedSelectProps) {
         }}
       >
         {parsedInputs.map(option => (
-          <SelectItem key={option.value?.toString()} value={option.value}>
+          <SelectItem
+            key={option.value?.toString()}
+            value={option.value}
+            className={cn(props.itemClassName)}
+          >
             {option.label}
           </SelectItem>
         ))}

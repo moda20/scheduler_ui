@@ -8,29 +8,34 @@ export const takeAction = (
   row: jobsTableData | null,
   action: jobActions,
   data?: JobUpdateType | any,
+  batchProcessIds?: number[],
 ) => {
   switch (action) {
     case jobActions.SCHEDULE:
-      return jobsService.executeAction(row!.id, "START").then(data => {
-        toast({
-          title: `Service ${row!.name} Scheduled`,
-          duration: 3000,
+      return jobsService
+        .executeAction(row!.id, "START", batchProcessIds)
+        .then(data => {
+          toast({
+            title: `${batchProcessIds?.length ?? ""} Service${!batchProcessIds ? " " + row!.name : "s"} Scheduled`,
+            duration: 3000,
+          })
         })
-      })
     case jobActions.UNSCHEDULE:
-      return jobsService.executeAction(row!.id, "STOP").then(data => {
-        toast({
-          title: `Service ${row!.name} De-scheduled`,
-          duration: 3000,
+      return jobsService
+        .executeAction(row!.id, "STOP", batchProcessIds)
+        .then(data => {
+          toast({
+            title: `${batchProcessIds?.length ?? ""} Service${!batchProcessIds ? " " + row!.name : "s"} De-scheduled`,
+            duration: 3000,
+          })
         })
-      })
     case jobActions.EXECUTE:
     case jobActions.EXECUTE_IN_THE_BACKGROUND:
       return jobsService
-        .executeAction(row!.id, "EXECUTE")
+        .executeAction(row!.id, "EXECUTE", batchProcessIds)
         .then(() => {
           toast({
-            title: `Service ${row!.name} Launched`,
+            title: `${batchProcessIds?.length ?? ""} Service${!batchProcessIds ? " " + row!.name : "s"} Launched`,
             duration: 3000,
           })
         })

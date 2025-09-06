@@ -2,7 +2,6 @@ import type { ColumnDef, SortingState } from "@tanstack/react-table"
 import {
   flexRender,
   getCoreRowModel,
-  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
 
@@ -22,10 +21,12 @@ interface DataTableProps<TData, TValue> {
   events: {
     onPageChange: ({ sorting }: { sorting: SortingState }) => void
     actionConfirmed: () => void
+    onRowSelectionChange: (selectedRowIds: {}) => void
   }
   filters: {
     sorting: SortingState
   }
+  rowSelection?: {}
 }
 
 export function DataTable<TData, TValue>({
@@ -33,6 +34,7 @@ export function DataTable<TData, TValue>({
   data,
   events,
   filters,
+  rowSelection,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -46,7 +48,10 @@ export function DataTable<TData, TValue>({
     },
     state: {
       sorting: filters.sorting,
+      rowSelection,
     },
+    onRowSelectionChange: events.onRowSelectionChange,
+    getRowId: (row: any) => row.id,
   })
 
   return (
