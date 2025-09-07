@@ -81,12 +81,12 @@ export default function JobsPage() {
   )
 
   const onAdvancedFilterChange = useCallback(
-    (value: any) => {
+    (value: any, reset?: boolean) => {
       if (!value) {
         avFilteringRef.current?.reset()
       }
-      setAdvancedFilters(value)
-      updateTableData(undefined, value)
+      setAdvancedFilters(reset ? undefined : value)
+      updateTableData(undefined, reset ? undefined : value)
     },
     [updateTableData],
   )

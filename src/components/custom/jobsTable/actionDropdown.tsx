@@ -216,7 +216,7 @@ export default function ActionDropdown({
             >
               <DockIcon />
               <span>Custom run</span>
-              <DropdownMenuShortcut>⌘+⇧+R</DropdownMenuShortcut>
+              <DropdownMenuShortcut>⌘+⇧+E</DropdownMenuShortcut>
             </DropdownMenuItemExtended>
           </JobExecutionDialog>
           <DropdownMenuItemExtended
