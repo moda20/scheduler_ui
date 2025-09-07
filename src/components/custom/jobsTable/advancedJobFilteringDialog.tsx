@@ -54,29 +54,37 @@ import JobItem from "@/components/custom/general/JobItem"
 export interface AdvancedJobFilteringDialogProps {
   children: React.ReactNode
   triggerClassName?: string
-  onSubmit?: (value: any) => void
+  onSubmit?: (value: any, reset?: boolean) => void
   onExecutionSubmit?: (value: any) => void
 }
 
 const jobFilteringSchema = z.object({
-  name: z.object({ value: z.string(), type: z.string() }).optional(),
-  cronSetting: z.object({ value: z.string(), type: z.string() }).optional(),
-  consumer: z.object({ value: z.string(), type: z.string() }).optional(),
-  status: z.string().optional(),
-  isRunning: z.boolean().optional(),
+  name: z.object({ value: z.string(), type: z.string() }).optional().nullish(),
+  cronSetting: z
+    .object({ value: z.string(), type: z.string() })
+    .optional()
+    .nullish(),
+  consumer: z
+    .object({ value: z.string(), type: z.string() })
+    .optional()
+    .nullish(),
+  status: z.string().optional().nullish(),
+  isRunning: z.boolean().optional().nullish(),
   averageTime: z
     .object({
       value1: z.coerce.number(),
       value2: z.coerce.number(),
       type: z.string(),
     })
-    .optional(),
+    .optional()
+    .nullish(),
   latestRun: z
     .object({
       from: z.union([z.date(), z.literal(undefined)]),
       to: z.union([z.date(), z.literal(undefined)]).optional(),
     })
-    .optional(),
+    .optional()
+    .nullish(),
 })
 
 export type jobFilteringSchemaType = z.infer<typeof jobFilteringSchema>
@@ -132,7 +140,8 @@ export const AdvancedJobFilteringDialog = forwardRef<
 
   useImperativeHandle(ref, () => ({
     reset: () => {
-      resetFilteringForm()
+      form.reset()
+      setPreviewJobList([])
     },
   }))
 
@@ -150,9 +159,20 @@ export const AdvancedJobFilteringDialog = forwardRef<
   })
 
   const resetFilteringForm = useCallback(() => {
-    form.reset()
+    form.reset({
+      name: null,
+      cronSetting: null,
+      consumer: null,
+      status: null,
+      isRunning: null,
+      averageTime: null,
+      latestRun: null,
+    })
+
     setPreviewJobList([])
+    submitForm(form.getValues(), null, true)
   }, [form, previewJobList])
+
   const sanitizeFormValues = (values: jobFilteringSchemaType) => {
     return {
       ...values,
@@ -164,12 +184,21 @@ export const AdvancedJobFilteringDialog = forwardRef<
             value2: values.latestRun.to,
           }
         : undefined,
+      name: values.name ?? undefined,
+      cronSetting: values.cronSetting ?? undefined,
+      consumer: values.consumer ?? undefined,
+      isRunning: values.isRunning ?? undefined,
+      averageTime: values.averageTime ?? undefined,
     }
   }
 
-  function submitForm(values: jobFilteringSchemaType) {
+  function submitForm(
+    values: jobFilteringSchemaType,
+    event?: any,
+    reset?: boolean,
+  ) {
     setDialogState(false)
-    onSubmit?.(sanitizeFormValues(values))
+    onSubmit?.(sanitizeFormValues(values), reset ?? false)
   }
 
   const submitExecutionForm = (values: advancedJobExecutionFormSchemaType) => {
@@ -239,6 +268,7 @@ export const AdvancedJobFilteringDialog = forwardRef<
                         <FlexibleInput
                           placeholder="Job name"
                           {...field}
+                          value={field.value ?? ""}
                           onError={errorHandler}
                           acceptedInputTypes={textOnlyInputTypes}
                         />
@@ -257,6 +287,7 @@ export const AdvancedJobFilteringDialog = forwardRef<
                         <FlexibleInput
                           placeholder="Cron setting"
                           {...field}
+                          value={field.value ?? ""}
                           onError={errorHandler}
                           acceptedInputTypes={textOnlyInputTypes}
                         />
@@ -275,6 +306,7 @@ export const AdvancedJobFilteringDialog = forwardRef<
                         <FlexibleInput
                           placeholder="Consumer"
                           {...field}
+                          value={field.value ?? ""}
                           onError={errorHandler}
                           acceptedInputTypes={textOnlyInputTypes}
                         />
@@ -293,7 +325,7 @@ export const AdvancedJobFilteringDialog = forwardRef<
                         <ManagedSelect
                           onChange={field.onChange}
                           inputOptions={statusOptions}
-                          defaultValue={field.value}
+                          defaultValue={field.value ?? undefined}
                           exportOnlyValue={true}
                         />
                         <FormMessage />
@@ -311,7 +343,7 @@ export const AdvancedJobFilteringDialog = forwardRef<
                             <ManagedSelect
                               onChange={field.onChange}
                               inputOptions={runningStatusOptions}
-                              defaultValue={field.value}
+                              defaultValue={field.value ?? undefined}
                               exportOnlyValue={true}
                             />
                           </div>
@@ -332,6 +364,7 @@ export const AdvancedJobFilteringDialog = forwardRef<
                           placeholder="Average time"
                           {...field}
                           onError={errorHandler}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />
