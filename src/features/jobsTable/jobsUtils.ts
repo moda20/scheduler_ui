@@ -129,6 +129,20 @@ export const takeAction = (
             })
         }
       })
+    case jobActions.EXPORT:
+      return jobsService
+        .exportJobsToJSON(undefined, batchProcessIds)
+        .then(() => {
+          toast({
+            title: `${batchProcessIds?.length} jobs exported to JSON`,
+          })
+        })
+        .catch(err => {
+          toast({
+            title: err.message,
+            variant: "destructive",
+          })
+        })
   }
 }
 

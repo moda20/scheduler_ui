@@ -28,7 +28,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon, LucideScanEye, Search } from "lucide-react"
+import { CalendarIcon, Download, LucideScanEye, Search } from "lucide-react"
 import { format } from "date-fns"
 import { DatePickerWithPresets } from "@/components/ui/date-picker-presets"
 import type { InputType } from "@/components/custom/general/MultiTypedInput"
@@ -50,6 +50,7 @@ import type { jobsTableData } from "@/features/jobsTable/interfaces"
 import jobsService from "@/services/JobsService"
 import ScrollableList from "@/components/custom/general/ScrollableList"
 import JobItem from "@/components/custom/general/JobItem"
+import { ButtonWithTooltip } from "@/components/custom/general/ButtonWithTooltip"
 
 export interface AdvancedJobFilteringDialogProps {
   children: React.ReactNode
@@ -136,6 +137,11 @@ export const AdvancedJobFilteringDialog = forwardRef<
     jobsService.filterJobs(null, [], finalFormValues).then(d => {
       setPreviewJobList(d)
     })
+  }
+
+  const exportFilteredJobsToJSON = (values: jobFilteringSchemaType) => {
+    const finalFormValues = sanitizeFormValues(values)
+    jobsService.exportJobsToJSON(finalFormValues)
   }
 
   useImperativeHandle(ref, () => ({
@@ -403,6 +409,16 @@ export const AdvancedJobFilteringDialog = forwardRef<
                   >
                     <LucideScanEye className="mr-2 h-4 w-4" /> Preview
                   </Button>
+                  <ButtonWithTooltip
+                    type="button"
+                    className="w-3/12"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => exportFilteredJobsToJSON(form.getValues())}
+                    tooltipContent="Export filtered jobs to JSON"
+                  >
+                    <Download className="h-4 w-4" />
+                  </ButtonWithTooltip>
                 </div>
               </form>
             </Form>
