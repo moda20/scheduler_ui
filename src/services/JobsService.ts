@@ -2,6 +2,7 @@ import axios from "@/lib/httpUtils"
 import type { DateRange } from "react-day-picker"
 import { downloadFile } from "@/utils/serviceUtils"
 import type { JobRunsQuerySchema } from "@/models/jobs"
+import { jobFilteringSchemaType } from "@/components/custom/jobsTable/advancedJobFilteringDialog"
 
 const jobsService = {
   getAllJobs(
@@ -200,6 +201,27 @@ const jobsService = {
     return axios.get("/jobs/getJobRuns", {
       params: query,
     })
+  },
+  exportJobsToJSON(avFilters?: any, jobIds?: number[]): Promise<any> {
+    return axios
+      .post(
+        "/jobs/exportJobsToJSON",
+        {
+          jobIds: jobIds,
+          advancedFilters: avFilters,
+        },
+        {
+          responseType: "arraybuffer",
+          fetchOptions: {
+            fullResponse: true,
+            onlyJSON: false,
+          },
+        },
+      )
+      .then(downloadFile)
+  },
+  importJobsFromJSON(jobList: any[]) {
+    return axios.post("/jobs/importJobsFromJSON", jobList)
   },
 }
 

@@ -21,6 +21,7 @@ import {
   Play,
   BoxSelectIcon,
   TextSelectIcon,
+  DownloadIcon,
 } from "lucide-react"
 import { useAppDispatch, useAppSelector } from "@/app/hooks"
 import { config } from "@/app/reducers/uiReducer"
@@ -39,6 +40,7 @@ import { GearIcon, StopIcon } from "@radix-ui/react-icons"
 import { SelectIcon } from "@radix-ui/react-select"
 import ConfirmationDialogAction from "@/components/confirmationDialogAction"
 import { cn } from "@/lib/utils"
+import { BatchImportDialog } from "@/components/custom/jobsTable/batchImportDialog"
 
 export const defaultSortingState = [{ id: "cronSetting", desc: true }]
 
@@ -194,19 +196,59 @@ export default function JobsPage() {
     }
   }, [sorting])
 
+  const importJobs = useCallback(async (jobsList: any[]) => {
+    setLoading(true)
+    await jobsService
+      .importJobsFromJSON(jobsList)
+      .then(res => {
+        toast({
+          title: `${jobsList.length} Jobs imported successfully`,
+          duration: 2000,
+        })
+        return updateTableData()
+      })
+      .catch(err => {
+        toast({
+          title: err.message,
+          duration: 2000,
+          variant: "destructive",
+        })
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [])
+
   return (
     <div className="">
       <div className={"table-header flex items-center py-4 justify-between"}>
-        <JobUpdateDialog
-          jobDetails={undefined}
-          isCreateDialog={true}
-          itemList={getConsumersCBox}
-          onChange={jobData => takeJobsAction(null, jobActions.CREATE, jobData)}
-        >
-          <Button variant="outline" className={"border-border"}>
-            <PlusIcon /> New job
-          </Button>
-        </JobUpdateDialog>
+        <ButtonGroup>
+          <JobUpdateDialog
+            jobDetails={undefined}
+            isCreateDialog={true}
+            itemList={getConsumersCBox}
+            onChange={jobData =>
+              takeJobsAction(null, jobActions.CREATE, jobData)
+            }
+          >
+            <Button
+              variant="outline"
+              className={"border-border rounded-r-none"}
+            >
+              <PlusIcon /> New job
+            </Button>
+          </JobUpdateDialog>
+          <BatchImportDialog onChange={importJobs}>
+            <ButtonWithTooltip
+              variant="outline"
+              className="border-l-0 rounded-l-none"
+              tooltipContent={"Import jobs"}
+              size="icon"
+            >
+              <PlusIcon />
+            </ButtonWithTooltip>
+          </BatchImportDialog>
+        </ButtonGroup>
         <div className="flex gap-2 items-center">
           {Object.keys(selectedRowIds)?.length > 0 && (
             <ButtonGroup>
@@ -217,6 +259,15 @@ export default function JobsPage() {
                 tooltipContentClassName="text-foreground bg-background border-border border-2"
               >
                 <TextSelectIcon /> {Object.keys(selectedRowIds)?.length}
+              </ButtonWithTooltip>
+              <ButtonWithTooltip
+                variant="outline"
+                className="rounded-none border-l-0"
+                tooltipContent="Export selected jobs to JSON"
+                tooltipContentClassName="text-foreground bg-background border-border border-2"
+                onClick={() => takeBatchJobsAction(jobActions.EXPORT)}
+              >
+                <DownloadIcon />
               </ButtonWithTooltip>
               <ConfirmationDialogAction
                 title={"Run all Jobs"}

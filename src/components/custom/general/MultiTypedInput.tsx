@@ -84,7 +84,6 @@ export function FlexibleInput({
 
   // Initialize values based on prop
   useEffect(() => {
-    console.log(inputType, value, type)
     switch (inputType) {
       case "exact":
       default:
