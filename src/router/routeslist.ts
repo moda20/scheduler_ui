@@ -43,6 +43,11 @@ export const routesList = [
         title: "Notifications",
         url: "/notifications",
       },
+      {
+        id: "eventLog",
+        title: "Event Log",
+        url: "/eventLog",
+      },
     ],
   },
 ]
