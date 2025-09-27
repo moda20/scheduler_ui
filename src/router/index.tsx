@@ -8,6 +8,7 @@ import DatabaseDashboard from "@/features/system/database"
 import Proxies from "@/features/network/proxies"
 import ConfigsDashboard from "@/features/system/configs"
 import NotificationServices from "@/features/system/notificationServices"
+import { EventLog } from "@/features/system/eventLog"
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,11 @@ const router = createBrowserRouter([
         path: "/notifications",
         index: true,
         element: <NotificationServices />,
+      },
+      {
+        path: "/eventLog",
+        index: true,
+        element: <EventLog />,
       },
     ],
   },

@@ -5,14 +5,22 @@ export const getLokiLogs = (
   query: string,
   start?: Date,
   end?: Date,
-  options?: { setEndToMidnight?: boolean },
+  options?: { setEndToMidnight?: boolean; mergeOutputStreams?: boolean },
 ) => {
   const endMomentDate = options?.setEndToMidnight
     ? moment(end).set("hours", 23).set("minutes", 59).set("seconds", 59)
     : moment(end)
   return jobsService
-    .jobLogs(query, moment(start).unix(), endMomentDate.unix())
+    .jobLogs(
+      query,
+      moment(start).unix(),
+      endMomentDate.unix(),
+      options?.mergeOutputStreams,
+    )
     .then(res => {
+      if (options?.mergeOutputStreams) {
+        return res
+      }
       return res.data?.result
         ?.sort(
           (a: any, b: any) =>

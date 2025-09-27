@@ -63,12 +63,18 @@ const jobsService = {
     })
   },
 
-  jobLogs(query: string, start: string | number, end: string | number) {
+  jobLogs(
+    query: string,
+    start: string | number,
+    end: string | number,
+    mergeStreams?: boolean,
+  ) {
     return axios.get(`/jobs/jobLogs/loki`, {
       params: {
         start: start,
         end: end,
         query: query,
+        mergeStreams,
       },
     })
   },

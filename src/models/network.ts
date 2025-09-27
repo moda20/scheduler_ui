@@ -1,4 +1,6 @@
 import type { AxiosRequestConfig } from "axios"
+import type { DateRange } from "react-day-picker"
+import { defaultLogPeriod } from "@/features/jobsTable/interfaces"
 
 type BaseFetchOptions =
   | Omit<RequestInit, "body" | "headers" | "method" | "signal">
@@ -20,6 +22,12 @@ export enum JobNotificationTopics {
   JobFailed = "JobFailed",
   Status = "Status",
   NOOP = "NOOP",
+  SubscribeToTopic = "SubscribeToTopic",
+  UnsubscribeFromTopic = "UnsubscribeFromTopic",
+}
+
+export enum MiscNotificationTopics {
+  EventLog = "EventLog",
 }
 
 export interface JobNotification {
@@ -32,4 +40,16 @@ export interface JobStartedNotification extends JobNotification {
   runningJobCount: number
   isSingular: boolean
   averageTime: number
+}
+
+export interface useSocketHookProps {
+  actions: string[]
+  format: (data: any) => any
+  initialLogsFilter: DateRange
+}
+
+export const defaultSocketHookProps: useSocketHookProps = {
+  actions: [],
+  format: (data: any) => data,
+  initialLogsFilter: defaultLogPeriod,
 }
