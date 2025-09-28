@@ -1,6 +1,7 @@
 import { Label } from "@/components/ui/label"
 import SheetActionDialog from "@/components/sheet-action-dialog"
 import type { ReactNode } from "react"
+import { useEffect } from "react"
 import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -14,6 +15,9 @@ import { LoaderPinwheelIcon, LogsIcon } from "lucide-react"
 import { getLokiLogs } from "@/services/components/logsService"
 import TabCarousel from "@/components/custom/general/TabCarousel"
 import Spinner from "@/components/ui/spinner"
+import { useSocketLogs } from "@/lib/socketUtils"
+import { MiscNotificationTopics } from "@/models/network"
+import { LiveLogViewer } from "@/components/custom/general/LogViewer"
 
 export interface DrawerLokiLogsProps {
   start?: Date
@@ -23,7 +27,6 @@ export interface DrawerLokiLogsProps {
 }
 
 export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
-  const [logs, setLogs] = useState([])
   const [watch, setWatch] = useState<CheckedState>(true)
   const [dialogOpen, setDialogOpen] = useState<CheckedState>(false)
   const [period, setPeriod] = useState<DateRange | undefined>({
@@ -33,40 +36,31 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
   const [activeTab, setActiveTab] = useState<string>("")
   const [loading, setLoading] = useState(false)
 
-  useInterval(
-    () => {
-      getLogs()
+  const { logs } = useSocketLogs({
+    actions: [],
+    format: (stream: any) => {
+      stream.values.forEach((log: any) => {
+        log.fullMessage = `${log.timestamp} | ${log.type?.toUpperCase()} | ${log.message}`
+      })
+      return stream
     },
-    dialogOpen && watch ? 10000 : null,
-  )
-
-  const getLogs = () => {
-    return getLokiLogs(`{job="${props.jobName}"}`, period?.from, period?.to, {
-      setEndToMidnight: true,
-    }).then(parsedLogs => {
-      setLogs(parsedLogs ?? [])
-      if (!activeTab) setActiveTab(parsedLogs[0]?.uniqueId)
-      return
-    })
-  }
+    initialLogsFilter: period,
+    logInterval: dialogOpen && watch ? 10000 : undefined,
+    mergeOutputStreams: false,
+    logQuery: `{job="${props.jobName}"}`,
+  })
 
   const fetchLogs = (open?: boolean) => {
     setDialogOpen(!!open)
-    if (open) {
-      setLoading(true)
-      getLogs().then(() => {
-        setLoading(false)
-      })
-    }
   }
 
   const updatePeriod = (period: DateRange | undefined) => {
     setPeriod(period)
-    setLoading(true)
-    getLogs().then(() => {
-      setLoading(false)
-    })
   }
+
+  useEffect(() => {
+    if (!activeTab) setActiveTab(logs[0]?.uniqueId)
+  }, [logs])
 
   return (
     <SheetActionDialog
@@ -79,6 +73,7 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
       }
       onOpenChange={open => fetchLogs(open)}
       modal={true}
+      innerContainerClassName="pb-2"
     >
       <div className={"flex flex-row items-center gap-2 my-2 h-100"}>
         <div className="flex flex-row items-center gap-2 border rounded-md p-2 bg-sidebar">
@@ -141,28 +136,12 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
                   className="h-[inherit]"
                   title={stream.title}
                 >
-                  <ScrollArea className="pb-2 flex flex-col gap-0.5 h-full">
-                    <div
-                      className={
-                        "rounded-md h-full p-1 overflow-clip bg-sidebar"
-                      }
-                    >
-                      {stream.values.map((log: any, index: number) => {
-                        return (
-                          <div
-                            key={index}
-                            className={"flex flex-row items-center gap-2 mb-2"}
-                          >
-                            <Label className="min-w-[170px] whitespace-nowrap">
-                              {log.timestamp}
-                            </Label>
-                            <Badge variant={"defaultTeal"}>{log.type}</Badge>
-                            <Label className="leading-5">{log.message}</Label>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </ScrollArea>
+                  <LiveLogViewer
+                    initialLogs={stream.values.map((e: any) => e.fullMessage)}
+                    wrapLines={false}
+                    scrollToLine={1}
+                    extraLines={4}
+                  />
                 </TabsContent>
               )
             })}

@@ -16,6 +16,7 @@ export function EventLog() {
       fullMessage: `${data.logs.timestamp} | ${data.logs.level?.toUpperCase()} | ${data.logs.message}`,
     }),
     initialLogsFilter: period,
+    mergeOutputStreams: true,
   })
 
   const onPeriodFilterChange = useCallback((period?: DateRange) => {

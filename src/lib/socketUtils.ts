@@ -12,6 +12,7 @@ import {
 } from "@/app/reducers/jobsReducer"
 import { useCallback, useEffect, useState } from "react"
 import { getLokiLogs } from "@/services/components/logsService"
+import useInterval from "@/hooks/useInterval"
 
 export default class SocketManager {
   socket?: WebSocket
@@ -110,6 +111,10 @@ export function useSocketLogs({
   actions,
   format,
   initialLogsFilter,
+  logInterval,
+  mergeOutputStreams,
+  setEndToMidnight,
+  logQuery,
 }: useSocketHookProps = defaultSocketHookProps) {
   const socketInstance = SocketManager.instance
   const [handler, setHandler] = useState<any>()
@@ -164,27 +169,41 @@ export function useSocketLogs({
 
   const getLogs = useCallback(() => {
     return getLokiLogs(
-      `{eventName=~".+"}`,
+      logQuery!,
       initialLogsFilter?.from,
       initialLogsFilter?.to,
       {
-        setEndToMidnight: true,
-        mergeOutputStreams: true,
+        setEndToMidnight,
+        mergeOutputStreams,
       },
     ).then(rawLogs => {
-      const parsedLogs = rawLogs.map((logArray: any[]) => {
-        return {
-          id: logArray[2]?.eventName,
-          logs: {
-            ...logArray[2],
-          },
-          fullMessage: logArray[1],
-        }
-      })
-      setLogs(parsedLogs)
+      if (mergeOutputStreams) {
+        const parsedLogs = rawLogs.map((logArray: any[]) => {
+          return {
+            id: logArray[2]?.eventName,
+            logs: {
+              ...logArray[2],
+            },
+            fullMessage: logArray[1],
+          }
+        })
+        setLogs(parsedLogs)
+        return
+      } else {
+        setLogs(rawLogs.map(format))
+      }
       return
     })
-  }, [initialLogsFilter])
+  }, [initialLogsFilter, logInterval])
+
+  useInterval(
+    () => {
+      if (initialLogsFilter) {
+        getLogs()
+      }
+    },
+    logInterval ? 10000 : null,
+  )
 
   useEffect(() => {
     if (actions.length) {
@@ -202,7 +221,7 @@ export function useSocketLogs({
     if (initialLogsFilter) {
       getLogs()
     }
-  }, [initialLogsFilter])
+  }, [initialLogsFilter, logInterval])
 
   return { subscribeToEvents, unsubscribeFromEvents, logs, latestLogs }
 }

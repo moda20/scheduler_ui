@@ -1,3 +1,4 @@
+import c from "ansi-colors"
 export const debounce = (fn: Function, ms = 300) => {
   let timeoutId: ReturnType<typeof setTimeout>
   return function (this: any, ...args: any[]) {
@@ -123,4 +124,17 @@ export const genUID = () => {
 
 export const safeStringCast = (value: any) => {
   return value?.toString() || "undefined"
+}
+
+export const colorLog = (log: string[]) => {
+  log.forEach(lge => {
+    switch (true) {
+      case log.includes("error"):
+        lge = c.bgRed(lge)
+        break
+      default:
+        break
+    }
+  })
+  return log
 }
