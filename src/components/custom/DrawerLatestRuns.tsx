@@ -10,7 +10,7 @@ import {
 } from "lucide-react"
 import SheetActionDialog from "@/components/sheet-action-dialog"
 import type { jobsTableData } from "@/features/jobsTable/interfaces"
-import type { ReactNode } from "react"
+import { ReactNode, useMemo } from "react"
 import jobsService from "@/services/JobsService"
 import { useCallback, useState } from "react"
 import moment from "moment"
@@ -24,6 +24,9 @@ import ScrollableList from "@/components/custom/general/ScrollableList"
 import { getLokiLogs } from "@/services/components/logsService"
 import { Label } from "@/components/ui/label"
 import { Loader } from "lucide"
+import { useSocketLogs } from "@/lib/socketUtils"
+import { MiscNotificationTopics } from "@/models/network"
+import { LiveLogViewer } from "@/components/custom/general/LogViewer"
 
 export interface DrawerLatestRunsProps {
   JobDetails: jobsTableData
@@ -35,6 +38,9 @@ export default function DrawerLatestRuns({
   trigger,
 }: DrawerLatestRunsProps) {
   const [LogItems, setLogItems] = useState<JobRunLog[]>([])
+  const [selectedLogItem, setSelectedLogItem] = useState<any | undefined>(
+    undefined,
+  )
   const [itemsTotal, setItemstotal] = useState(0)
   const [inputSchema, setInputSchema] = useState<JobRunsQuerySchema>({
     jobId: JobDetails.id,
@@ -43,7 +49,21 @@ export default function DrawerLatestRuns({
   })
   const [loading, setLoading] = useState(false)
   const [showLogs, setShowLogs] = useState(false)
-  const [logLines, setLogLines] = useState<any[]>([])
+
+  const { logs } = useSocketLogs({
+    actions: [],
+    format: (stream: any) => {
+      stream.values.forEach((log: any) => {
+        log.fullMessage = `${log.timestamp} | ${log.type?.toUpperCase()} | ${log.message}`
+      })
+      return stream
+    },
+    initialLogsFilter: selectedLogItem?.filterRange,
+    logInterval: undefined,
+    mergeOutputStreams: false,
+    setEndToMidnight: false,
+    logQuery: `{logId="${selectedLogItem?.log_id}"}`,
+  })
 
   const resetDrawer = useCallback(() => {
     setLogItems([])
@@ -54,7 +74,6 @@ export default function DrawerLatestRuns({
     })
     setLoading(false)
     setShowLogs(false)
-    setLogLines([])
   }, [inputSchema])
 
   const getLatestRuns = useCallback(() => {
@@ -72,6 +91,13 @@ export default function DrawerLatestRuns({
               ? moment(log.start_time).format("YYYY-MM-DD HH-mm")
               : moment(log.start_time).fromNow()
           log.start_time_title = `Start time : ${moment(log.start_time).format("YYYY-MM-DD HH-mm-ss")}`
+          log.offsettedStartedTime = log.offsettedEndTime = new Date(
+            log.end_time.getTime(),
+          )
+          log.filterRange = {
+            from: new Date(log.start_time.getTime()),
+            to: new Date(log.end_time.getTime()),
+          }
         })
         return data
       })
@@ -95,16 +121,8 @@ export default function DrawerLatestRuns({
 
   const openAndFetchLogs = useCallback((LogItem: JobRunLog) => {
     if (LogItem && LogItem.end_time) {
-      const offsetStartTime = new Date(LogItem.start_time.getTime())
-      const offsetEndTime = new Date(LogItem.end_time.getTime())
+      setSelectedLogItem(LogItem)
       setShowLogs(true)
-      return getLokiLogs(
-        `{logId="${LogItem.log_id}"}`,
-        offsetStartTime,
-        offsetEndTime,
-      ).then(data => {
-        setLogLines(data)
-      })
     }
   }, [])
 
@@ -139,12 +157,10 @@ export default function DrawerLatestRuns({
         >
           <ScrollableList
             originalList={LogItems}
-            loadMore={(inputSchema.offset ?? 0) <= itemsTotal}
+            loadMore={!loading && (inputSchema.offset ?? 0) <= itemsTotal}
             loadMoreAction={getMoreRuns}
             className="px-[1px] py-[2px] min-w-[280px]"
-            onItemClick={(item: JobRunLog, index: number) => {
-              openAndFetchLogs(item)
-            }}
+            onItemClick={openAndFetchLogs}
             itemClassName={(item: any) => {
               return cn(
                 "focus:rounded-lg outline-none focus:ring-2  focus:ring-opacity-50 focus-visible:ring-2 focus-visible:ring-offset-0 focus-visible:ring-opacity-50 hover:ring-2 hover:ring-opacity-50 hover:rounded-lg focus:ring-blue-500 focus-visible:ring-blue-500 hover:ring-blue-500",
@@ -234,25 +250,15 @@ export default function DrawerLatestRuns({
             icon={LoaderPinwheelIcon}
             className="h-full"
           >
-            {logLines?.[0] && (
-              <ScrollArea className="pb-2 flex flex-col gap-0.5 h-full">
-                {logLines[0]?.values.map((log: any, index: number) => {
-                  return (
-                    <div
-                      key={index}
-                      className={"flex flex-row items-center gap-2 mb-2"}
-                    >
-                      <Label className="min-w-[170px] whitespace-nowrap">
-                        {log.timestamp}
-                      </Label>
-                      <Badge variant={"defaultTeal"}>{log.type}</Badge>
-                      <Label className="leading-5">{log.message}</Label>
-                    </div>
-                  )
-                })}
-              </ScrollArea>
+            {logs?.[0] && (
+              <LiveLogViewer
+                initialLogs={logs[0]?.values.map((e: any) => e.fullMessage)}
+                wrapLines={false}
+                scrollToLine={1}
+                extraLines={4}
+              />
             )}
-            {!logLines?.[0] && !loading && (
+            {!logs?.[0] && !loading && (
               <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
                 <LogsIcon className="w-16 h-16 text-destructive" />
                 <div className="text-muted-foreground text-md">

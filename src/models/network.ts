@@ -45,11 +45,16 @@ export interface JobStartedNotification extends JobNotification {
 export interface useSocketHookProps {
   actions: string[]
   format: (data: any) => any
-  initialLogsFilter: DateRange
+  initialLogsFilter?: DateRange
+  logInterval?: number
+  mergeOutputStreams?: boolean
+  setEndToMidnight?: boolean
+  logQuery?: string
 }
 
 export const defaultSocketHookProps: useSocketHookProps = {
   actions: [],
   format: (data: any) => data,
   initialLogsFilter: defaultLogPeriod,
+  logQuery: `{eventName=~".+"}`,
 }
