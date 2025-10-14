@@ -185,14 +185,22 @@ export function JobEvents() {
               defaultValue={period}
             />
             <div className="flex gap-2 items-center">
-              <Switch checked={unreadOnly} onCheckedChange={setUnreadOnly} />
-              <span
-                className={cn("text-foreground text-sm transition-colors", {
-                  "text-muted-foreground": !unreadOnly,
-                })}
+              <Switch
+                id={"unreadOnly"}
+                checked={unreadOnly}
+                onCheckedChange={setUnreadOnly}
+              />
+              <label
+                htmlFor={"unreadOnly"}
+                className={cn(
+                  "text-foreground text-sm transition-colors hover:cursor-pointer",
+                  {
+                    "text-muted-foreground": !unreadOnly,
+                  },
+                )}
               >
                 Unread only
-              </span>
+              </label>
             </div>
           </div>
         </CardHeader>
