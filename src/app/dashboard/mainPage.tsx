@@ -35,6 +35,7 @@ import { toast } from "@/hooks/use-toast"
 import DrawerMenuConfigurator from "@/components/custom/DrawerMenuConfigurator"
 import SearchBar from "@/components/custom/SearchBar"
 import JobsStatusCount from "@/components/custom/dashboard/JobsStatusCount"
+import JobEventsCount from "@/components/custom/dashboard/JobEventsCount"
 
 export default function MainPage() {
   const navigate = useNavigate()
@@ -88,6 +89,7 @@ export default function MainPage() {
             </BreadcrumbList>
           </Breadcrumb>
           <div className="ml-auto flex gap-2">
+            <JobEventsCount />
             <JobsStatusCount />
             <SearchBar />
             <ThemeToggle className={"border-border"} />

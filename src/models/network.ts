@@ -40,6 +40,7 @@ export interface JobStartedNotification extends JobNotification {
   runningJobCount: number
   isSingular: boolean
   averageTime: number
+  jobEvents: { [key: string]: any }
 }
 
 export interface useSocketHookProps {

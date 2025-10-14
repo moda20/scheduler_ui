@@ -18,6 +18,7 @@ export function EventLog() {
     initialLogsFilter: period,
     mergeOutputStreams: true,
     logQuery: `{eventName=~".+"}`,
+    setEndToMidnight: true,
   })
 
   const onPeriodFilterChange = useCallback((period?: DateRange) => {

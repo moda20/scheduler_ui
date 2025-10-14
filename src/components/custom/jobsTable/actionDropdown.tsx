@@ -32,11 +32,12 @@ import { jobActions } from "@/features/jobsTable/interfaces"
 import type { DateRange } from "react-day-picker"
 import DrawerJobFiles from "@/components/custom/DrawerJobFiles"
 import type { ReactNode } from "react"
-import React, { useCallback, useEffect } from "react"
+import React, { useCallback } from "react"
 import DropdownMenuItemExtended from "@/components/custom/general/DropdownItemExtended"
 import DrawerLatestRuns from "@/components/custom/DrawerLatestRuns"
 import { CardStackIcon } from "@radix-ui/react-icons"
 import { JobExecutionDialog } from "@/components/job-execution-dialog"
+import DrawerJobEvents from "@/components/custom/DrawerJobEvents"
 
 export interface ActionDropdownProps {
   columnsProps: tableColumnsProps
@@ -230,6 +231,21 @@ export default function ActionDropdown({
           </DropdownMenuItemExtended>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DrawerJobEvents
+            JobDetails={row}
+            trigger={
+              <DropdownMenuItemExtended
+                keyBinding="E"
+                onSelect={handleEventPrevention}
+              >
+                <LogsIcon />
+                <span>Job Events</span>
+                <DropdownMenuShortcut>E</DropdownMenuShortcut>
+              </DropdownMenuItemExtended>
+            }
+          />
+        </DropdownMenuGroup>
         <DropdownMenuGroup>
           <DrawerLokiLogs
             jobName={row.name}

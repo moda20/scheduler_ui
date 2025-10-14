@@ -39,6 +39,7 @@ export default {
         teal: "var(--teal)",
         success: "hsl(var(--success))",
         "success-foreground": "hsl(var(--success-foreground))",
+        "muted-foreground": "hsl(var(--muted-foreground))",
       },
       animationDuration: {
         "2000": "2000ms",

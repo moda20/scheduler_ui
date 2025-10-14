@@ -7,6 +7,7 @@ import {
 } from "@/models/network"
 import { JobNotificationTopics } from "@/models/network"
 import {
+  setJobEvents,
   setJobRunningStatus,
   setRunningJobsCount,
 } from "@/app/reducers/jobsReducer"
@@ -101,6 +102,7 @@ export default class SocketManager {
       }
       case JobNotificationTopics.Status: {
         store.dispatch(setRunningJobsCount(data.runningJobCount))
+        store.dispatch(setJobEvents(data.jobEvents))
         break
       }
     }
@@ -159,12 +161,14 @@ export function useSocketLogs({
   const unsubscribeFromEvents = useCallback(() => {
     socketInstance?.socket?.removeEventListener("message", handler)
     setHandler(null)
-    socketInstance?.socket?.send(
-      JSON.stringify({
-        id: JobNotificationTopics.UnsubscribeFromTopic,
-        message: JSON.stringify(actions),
-      }),
-    )
+    if (actions.length) {
+      socketInstance?.socket?.send(
+        JSON.stringify({
+          id: JobNotificationTopics.UnsubscribeFromTopic,
+          message: JSON.stringify(actions),
+        }),
+      )
+    }
   }, [wsReady, handler])
 
   const getLogs = useCallback(() => {

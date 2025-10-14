@@ -9,6 +9,7 @@ import Proxies from "@/features/network/proxies"
 import ConfigsDashboard from "@/features/system/configs"
 import NotificationServices from "@/features/system/notificationServices"
 import { EventLog } from "@/features/system/eventLog"
+import { JobEvents } from "@/features/system/JobEvents"
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,11 @@ const router = createBrowserRouter([
         path: "/eventLog",
         index: true,
         element: <EventLog />,
+      },
+      {
+        path: "/jobEvents",
+        index: true,
+        element: <JobEvents />,
       },
     ],
   },
