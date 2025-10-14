@@ -1,4 +1,7 @@
 import c from "ansi-colors"
+import { useLocation } from "react-router"
+import React from "react"
+c.enabled = true
 export const debounce = (fn: Function, ms = 300) => {
   let timeoutId: ReturnType<typeof setTimeout>
   return function (this: any, ...args: any[]) {
@@ -127,14 +130,22 @@ export const safeStringCast = (value: any) => {
 }
 
 export const colorLog = (log: string[]) => {
-  log.forEach(lge => {
+  return log.map(lge => {
     switch (true) {
-      case log.includes("error"):
-        lge = c.bgRed(lge)
-        break
+      case lge.toLowerCase().includes("error"):
+        return c.red(lge)
+      case lge.toLowerCase().includes("warn"):
+        return c.yellow(lge)
       default:
+        return lge
         break
     }
   })
-  return log
+}
+
+// a custom hook to parse query params from url
+export function useQuery() {
+  const { search } = useLocation()
+
+  return React.useMemo(() => new URLSearchParams(search), [search])
 }

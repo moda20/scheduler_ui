@@ -10,6 +10,7 @@ interface JobsSliceState {
 const initialState: JobsSliceState = {
   runningJobsData: {
     runningJobsCount: 0,
+    jobEvents: {},
   },
   jobsList: [],
 }
@@ -25,6 +26,12 @@ export const JobsReducerSlice = createAppSlice({
       state.runningJobsData.runningJobsCount = action.payload
     },
 
+    setJobEvents: (
+      state: JobsSliceState,
+      action: PayloadAction<{ [key: string]: any }>,
+    ) => {
+      state.runningJobsData.jobEvents = action.payload
+    },
     setJobRunningStatus: (
       state: JobsSliceState,
       action: PayloadAction<{ jobId: string; isRunning: boolean }>,
@@ -45,7 +52,11 @@ export const JobsReducerSlice = createAppSlice({
   },
 })
 
-export const { setRunningJobsCount, setJobRunningStatus, setJobsList } =
-  JobsReducerSlice.actions
+export const {
+  setRunningJobsCount,
+  setJobRunningStatus,
+  setJobsList,
+  setJobEvents,
+} = JobsReducerSlice.actions
 
 export const { runningJobs, jobsList } = JobsReducerSlice.selectors

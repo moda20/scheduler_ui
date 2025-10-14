@@ -39,6 +39,7 @@ export interface ComboBoxProps {
   onChange: (value?: string | Array<string>) => void
   multiSelect?: boolean
   managed?: boolean
+  maxSelectedItemsToShowOnMainTrigger?: number
 }
 
 const defaultProps: ComboBoxProps = {
@@ -51,6 +52,7 @@ const defaultProps: ComboBoxProps = {
   className: "",
   triggerClassName: "",
   multiSelect: false,
+  maxSelectedItemsToShowOnMainTrigger: 3,
 }
 
 export interface ComboButtonBoxRendererProps {
@@ -58,6 +60,7 @@ export interface ComboButtonBoxRendererProps {
   itemList: ComboBoxItem[]
   defaultInputText?: string
   multiSelect?: boolean
+  maxSelectedItemsToShowOnMainTrigger?: number
   mappedInputList: Record<string, ComboBoxItem>
 }
 
@@ -67,18 +70,22 @@ const ComboButtonBoxRenderer = ({
   defaultInputText,
   multiSelect,
   mappedInputList,
+  maxSelectedItemsToShowOnMainTrigger,
 }: ComboButtonBoxRendererProps) => {
   return multiSelect ? (
     <div className="flex gap-1 items-center justify-between w-full">
       <span className="flex gap-0.5">
-        {(selectedValue as Array<string>).slice(0, 3).map(v => (
-          <span
-            key={v}
-            className="w-[80px] p-1 overflow-clip overflow-ellipsis"
-          >
-            {mappedInputList[v]?.label}
-          </span>
-        ))}
+        {(selectedValue as Array<string>)
+          .slice(0, maxSelectedItemsToShowOnMainTrigger)
+          .map(v => (
+            <span
+              key={v}
+              className="w-[80px] p-1 overflow-clip overflow-ellipsis"
+            >
+              {mappedInputList[v]?.label}
+            </span>
+          ))}
+        {(selectedValue as Array<string>).length === 0 && defaultInputText}
       </span>
       <span className="items-center gap-1 rounded border border-border bg-gray-100 bg-opacity-20 px-1.5 font-mono text-[15px] font-bold">
         {selectedValue?.length}
@@ -113,6 +120,7 @@ export function ComboBox({
   inputFieldsText = defaultProps.inputFieldsText,
   multiSelect,
   managed,
+  maxSelectedItemsToShowOnMainTrigger,
 }: ComboBoxProps = defaultProps) {
   const [value, setValue] = React.useState<string | Array<string>>(
     parseInputSelectedItems(selectedItemValue) ?? (multiSelect ? [] : ""),
@@ -217,6 +225,7 @@ export function ComboBox({
             defaultInputText: inputFieldsText,
             multiSelect,
             mappedInputList,
+            maxSelectedItemsToShowOnMainTrigger,
           })}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>

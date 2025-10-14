@@ -6,14 +6,17 @@ import { jobFilteringSchemaType } from "@/components/custom/jobsTable/advancedJo
 
 const jobsService = {
   getAllJobs(
-    status: string | Array<string> | null,
     sorting: any,
+    status?: string | Array<string>,
+    limit?: number,
+    offset?: number,
   ): Promise<any> {
     return axios.get("/jobs/allJobs", {
       params: {
         status: status ?? ["STOPPED", "STARTED"],
         sorting,
-        limit: 9999999,
+        limit,
+        offset,
       },
     })
   },

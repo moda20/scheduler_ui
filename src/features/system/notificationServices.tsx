@@ -12,7 +12,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import type { NotificationService } from "@/models/notifications"
 import { notificationService } from "@/services/notificationsService"
 
-import Spinner from "@/components/ui/spinner"
+import Spinner from "@/components/custom/LoadingOverlay"
 import moment from "moment"
 import JobItem from "@/components/custom/general/JobItem"
 import HoverScreenComponent from "@/components/custom/general/HoverScreenComponent"
@@ -148,14 +148,16 @@ export default function NotificationServices() {
   }
 
   const getAllJobs = useCallback(() => {
-    return jobsService.getAllJobs(null, null).then((data: any) => {
-      return data.map((item: any) => {
-        return {
-          value: item.id?.toString(),
-          label: item.name,
-        }
+    return jobsService
+      .getAllJobs(null, undefined, 999999, 0)
+      .then((data: any) => {
+        return data.map((item: any) => {
+          return {
+            value: item.id?.toString(),
+            label: item.name,
+          }
+        })
       })
-    })
   }, [])
 
   const getAllServiceEntrypoints = useCallback(() => {

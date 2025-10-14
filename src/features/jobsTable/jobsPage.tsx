@@ -3,7 +3,7 @@ import { DataTable } from "@/features/jobsTable/jobsTable"
 import type { jobsTableData } from "@/features/jobsTable/interfaces"
 import { getTableColumns, jobActions } from "@/features/jobsTable/interfaces"
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import Spinner from "@/components/ui/spinner"
+import Spinner from "@/components/custom/LoadingOverlay"
 import type { ColumnDef, SortingState } from "@tanstack/react-table"
 import type { JobUpdateType } from "@/components/job-update-dialog"
 import { JobUpdateDialog } from "@/components/job-update-dialog"
@@ -58,11 +58,15 @@ export default function JobsPage() {
   async function fetchTableData(inputSorting?: SortingState, avFilters?: any) {
     setFetchingStatus(true)
     setLoading(true)
-    return await (
+    const targetPromise =
       (avFilters ?? advancedFilters)
-        ? jobsService.filterJobs
-        : jobsService.getAllJobs
-    )(null, inputSorting ?? sorting, avFilters ?? advancedFilters)
+        ? jobsService.filterJobs(
+            null,
+            inputSorting ?? sorting,
+            avFilters ?? advancedFilters,
+          )
+        : jobsService.getAllJobs(inputSorting ?? sorting, undefined, 999999, 0)
+    return await targetPromise
       .then(data => {
         dispatch(setJobsList(data))
       })

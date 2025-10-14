@@ -41,14 +41,16 @@ export default function Proxies(props: ProxiesPageProps) {
   }
 
   async function getAllJobs(): Promise<ComboBoxItem[]> {
-    return jobsService.getAllJobs(null, null).then((data: any) => {
-      return data.map((item: any) => {
-        return {
-          value: item.id?.toString(),
-          label: item.name,
-        }
+    return jobsService
+      .getAllJobs(null, undefined, 999999, 0)
+      .then((data: any) => {
+        return data.map((item: any) => {
+          return {
+            value: item.id?.toString(),
+            label: item.name,
+          }
+        })
       })
-    })
   }
 
   const proxyAction = async (
