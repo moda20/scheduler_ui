@@ -10,7 +10,11 @@ export interface ScrollableListProps<T> {
   loadMoreAction?: (offset?: number) => Promise<T[]>
   renderItem?: (item: T, index: number) => ReactNode
   renderNoItems?: () => ReactNode
-  onItemClick?: (item: T, index: number) => void
+  onItemClick?: (
+    item: T,
+    index: number,
+    event?: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  ) => void
   className?: string
   itemClassName?: string | ((item: T, index: number) => string)
   autoFocus?: boolean
@@ -102,7 +106,8 @@ function ScrollableList<T>(
       autoFocus
     ) {
       itemRefs.current[0]?.focus()
-      if (autoClickFocusedItem && onItemClick) onItemClick(items[0], 0)
+      if (autoClickFocusedItem && onItemClick)
+        onItemClick(items[0], 0, undefined)
     }
   }, [items.length])
 
@@ -151,7 +156,7 @@ function ScrollableList<T>(
         newIndex = Math.max(index - 5, 0)
         break
       case "Enter":
-        itemHandlers[index]()
+        itemHandlers[index](e)
         break
       default:
         return // Don't handle other keys
@@ -174,16 +179,19 @@ function ScrollableList<T>(
   }
 
   const handleItemSelection = useCallback(
-    (item: any, index: number) => {
+    (item: any, index: number, event: any) => {
       setCurrentFocusIndex(index)
       itemRefs.current[index]?.focus()
-      onItemClick?.(item, index)
+      onItemClick?.(item, index, event)
     },
     [onItemClick],
   )
 
   const itemHandlers = useMemo(
-    () => items.map((_, index) => () => handleItemSelection(_, index)),
+    () =>
+      items.map(
+        (_, index) => (event: any) => handleItemSelection(_, index, event),
+      ),
     [items, handleItemSelection],
   )
 

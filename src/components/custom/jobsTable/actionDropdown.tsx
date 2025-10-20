@@ -31,7 +31,7 @@ import type {
 import { jobActions } from "@/features/jobsTable/interfaces"
 import type { DateRange } from "react-day-picker"
 import DrawerJobFiles from "@/components/custom/DrawerJobFiles"
-import type { ReactNode } from "react"
+import type { ComponentPropsWithoutRef, ReactNode } from "react"
 import React, { useCallback } from "react"
 import DropdownMenuItemExtended from "@/components/custom/general/DropdownItemExtended"
 import DrawerLatestRuns from "@/components/custom/DrawerLatestRuns"
@@ -46,6 +46,7 @@ export interface ActionDropdownProps {
   inputGroup?: string
   children?: ReactNode
   modal?: boolean
+  dropdownContentProps?: ComponentPropsWithoutRef<typeof DropdownMenuContent>
 }
 export default function ActionDropdown({
   columnsProps,
@@ -54,6 +55,7 @@ export default function ActionDropdown({
   inputGroup,
   children,
   modal,
+  dropdownContentProps,
 }: ActionDropdownProps) {
   const { isDialogOpen, setDialogState } = useDialogueManager({
     inputGroup: inputGroup ?? "JobActions",
@@ -152,6 +154,7 @@ export default function ActionDropdown({
       <DropdownMenuContent
         className="w-56 bg-background"
         onEscapeKeyDown={handleEscapeDirectTrigger}
+        {...dropdownContentProps}
       >
         <DropdownMenuLabel>Config {row.name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
