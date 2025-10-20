@@ -111,6 +111,7 @@ export default function DrawerJobEvents({
           {latestEvents.length > 0 &&
             latestEvents.map(ev => (
               <EventItem
+                key={ev.id}
                 timestamp={ev.created_at}
                 message={ev.event_message}
                 type={ev.type}
@@ -122,6 +123,7 @@ export default function DrawerJobEvents({
           {latestEvents.length > 0 && <Separator />}
           {events.map(ev => (
             <EventItem
+              key={ev.id}
               timestamp={ev.created_at}
               message={ev.event_message}
               type={ev.type}

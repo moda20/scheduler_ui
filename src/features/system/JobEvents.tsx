@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { JobEventTypes } from "@/models/jobs"
+import { eventTypeColors, JobEventTypes } from "@/models/jobs"
 import { useJobEvents } from "@/hooks/useJobEvents"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { DatePickerWithPresets } from "@/components/ui/date-picker-presets"
 import { LiveLogViewer } from "@/components/custom/general/LogViewer"
 import type { DateRange } from "react-day-picker"
+import type { jobsTableData } from "@/features/jobsTable/interfaces"
 import { defaultLogPeriod } from "@/features/jobsTable/interfaces"
 import { ManagedSimpleDropdown } from "@/components/custom/ManagedSimpleDropdown"
 import { Switch } from "@/components/ui/switch"
@@ -21,6 +22,7 @@ import ConfirmationDialogAction, {
 } from "@/components/confirmationDialogAction"
 import { CheckCheckIcon } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
+import { useJobs } from "@/hooks/useJobs"
 
 const selectEventOptions = Object.values(JobEventTypes).map(e => ({
   label: e.toLocaleLowerCase(),
@@ -45,13 +47,18 @@ export function JobEvents() {
     query.get("unreadOnly") === "true",
   )
 
+  const { jobsPerId } = useJobs({
+    limit: 99999,
+    offset: 0,
+    sorting: useMemo(() => [{ id: "name", desc: true }], []),
+  })
+
   useEffect(() => {
     setCardHeight(`${(cardContentRef?.current?.clientHeight ?? 0) - 25}px`)
   }, [])
 
   const {
     events,
-    latestEvents,
     loading,
     setEventsToHandled,
     setAllEventsToHandled,
@@ -222,6 +229,13 @@ export function JobEvents() {
                   </div>
                 </div>
               )}
+              itemClassName={(item: any, index: number) => {
+                const colors =
+                  eventTypeColors[
+                    item.type.toString() as keyof typeof eventTypeColors
+                  ]
+                return `${colors.focus}`
+              }}
               renderItem={(item: any, index: number) => {
                 return (
                   <EventItem
@@ -231,6 +245,7 @@ export function JobEvents() {
                     onHandle={setEventsToRead(item)}
                     handled={item.handled}
                     handleTime={item.handled_on}
+                    job={jobsPerId[item.job_id]}
                   />
                 )
               }}

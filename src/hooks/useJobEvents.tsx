@@ -107,6 +107,7 @@ export function useJobEvents({
           const formattedEvents = data
             .map((e: any) => {
               e.handled = !!e.handled_on
+              e.job_id = e.job_log_id.split("-")[0]
               return e
             })
             .map(format)

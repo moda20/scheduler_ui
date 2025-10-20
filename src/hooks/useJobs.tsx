@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import jobsService from "@/services/JobsService"
 
 export interface useJobsHookProps {
@@ -28,6 +28,13 @@ export function useJobs({ limit, offset, status, sorting }: useJobsHookProps) {
       })
   }, [limit, offset, status, sorting])
 
+  const jobsPerId = useMemo(() => {
+    return jobs.reduce((p: any, c: any) => {
+      p[c.id] = c
+      return p
+    }, {})
+  }, [jobs])
+
   useEffect(() => {
     getAllJobs()
   }, [])
@@ -35,5 +42,6 @@ export function useJobs({ limit, offset, status, sorting }: useJobsHookProps) {
   return {
     jobs,
     jobsItems,
+    jobsPerId,
   }
 }
