@@ -1,4 +1,5 @@
-import { forwardRef, ReactNode, useImperativeHandle } from "react"
+import type { ReactNode } from "react"
+import { forwardRef, useImperativeHandle } from "react"
 import { useMemo } from "react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
@@ -67,7 +68,7 @@ function ScrollableList<T>(
         setLoading(false)
       }
     },
-    [loadMore, loading],
+    [loadMore, loading, loadMoreAction],
   )
 
   const removeItem = useCallback(

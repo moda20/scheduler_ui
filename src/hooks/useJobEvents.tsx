@@ -45,9 +45,10 @@ export function useJobEvents({
   )
   SocketManager.whenCreated(() => setWsReady(true))
 
-  const canGetNextPage = useMemo(() => {
-    return (loffset ?? 0) < total
-  }, [loffset, total, events])
+  const canGetNextPage = useMemo(
+    () => (loffset ?? 0) < total,
+    [loffset, total, events, handled, events],
+  )
 
   const ListenerFn = useCallback(
     (handler: (event: string, data: any) => void) =>
