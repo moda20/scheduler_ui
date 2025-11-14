@@ -10,6 +10,7 @@ const jobsService = {
     status?: string | Array<string>,
     limit?: number,
     offset?: number,
+    jobIds?: Array<number>,
   ): Promise<any> {
     return axios.get("/jobs/allJobs", {
       params: {
@@ -17,6 +18,7 @@ const jobsService = {
         sorting,
         limit,
         offset,
+        jobIds,
       },
     })
   },
