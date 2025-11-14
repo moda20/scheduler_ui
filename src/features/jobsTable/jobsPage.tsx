@@ -55,6 +55,11 @@ export default function JobsPage() {
   const avFilteringRef = useRef<AdvancedJobFilteringDialogHandle>(null)
   const [selectedRowIds, setSelectedRowIds] = useState<any>({})
 
+  const selectedRowIdsArray = useMemo(
+    () => Object.keys(selectedRowIds).map(Number),
+    [selectedRowIds],
+  )
+
   async function fetchTableData(inputSorting?: SortingState, avFilters?: any) {
     setFetchingStatus(true)
     setLoading(true)
@@ -176,12 +181,7 @@ export default function JobsPage() {
 
   const takeBatchJobsAction = useCallback(
     async (action: jobActions) => {
-      await takeJobsAction(
-        JobsList[0],
-        action,
-        undefined,
-        Object.keys(selectedRowIds).map(Number),
-      )
+      await takeJobsAction(JobsList[0], action, undefined, selectedRowIdsArray)
       setSelectedRowIds({})
     },
     [selectedRowIds, JobsList, takeJobsAction],
@@ -336,6 +336,7 @@ export default function JobsPage() {
             <AdvancedJobFilteringDialog
               onSubmit={onAdvancedFilterChange}
               onExecutionSubmit={onAdvancedExecutionSubmission}
+              inputJobIds={selectedRowIdsArray}
               ref={avFilteringRef}
             >
               <Button

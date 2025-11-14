@@ -42,3 +42,35 @@ export const handleEvents = (eventIds?: string[]) => {
 export const handleAllEvents = () => {
   return axios.put("/events/serAllEventsToRead")
 }
+
+export const getEventStats = (
+  period?: number,
+  dateRange?: DateRange,
+): Promise<any> => {
+  return axios.get("/events/eventMetrics", {
+    params: {
+      period,
+      startDate: dateRange?.from,
+      endDate: dateRange?.to,
+    },
+  })
+}
+
+export const getEventsPerJob = (
+  dateRange?: DateRange,
+  jobIds?: Array<any>,
+  limit?: number,
+  offset?: number,
+  sorting?: { id: string; desc: string }[],
+): Promise<any> => {
+  return axios.get("/events/eventsPerJob", {
+    params: {
+      startDate: dateRange?.from,
+      endDate: dateRange?.to,
+      jobIds,
+      limit,
+      offset,
+      sorting,
+    },
+  })
+}
