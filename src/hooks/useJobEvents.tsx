@@ -12,6 +12,7 @@ import type { DateRange } from "react-day-picker"
 export interface useJobEventsProps {
   jobId?: string | string[]
   eventTypes: JobEventTypes[]
+  enableEventViaREST?: boolean
   limit?: number
   offset?: number
   jobLogId?: string
@@ -29,6 +30,7 @@ export function useJobEvents({
   handled,
   format = d => d,
   period,
+  enableEventViaREST = true,
 }: useJobEventsProps) {
   const socketInstance = SocketManager.instance
   const [total, setTotal] = useState(0)
@@ -158,39 +160,53 @@ export function useJobEvents({
     },
     [events, latestEvents],
   )
-  const setAllEventsToHandled = useCallback(() => {
-    setLoading(true)
-    setEvents(prevState => {
-      prevState?.forEach(target => {
-        target.handled = true
+  const setAllEventsToHandled = useCallback(
+    (jobId?: string) => {
+      setLoading(true)
+      setEvents(prevState => {
+        prevState?.forEach(target => {
+          target.handled = true
+        })
+        return prevState
       })
-      return prevState
-    })
-    setLatestEvents(prevState => {
-      prevState?.forEach(target => {
-        target.handled = true
+      setLatestEvents(prevState => {
+        prevState?.forEach(target => {
+          target.handled = true
+        })
+        return prevState
       })
-      return prevState
-    })
-    return handleAllEvents()
-      .then(() => readEvents())
-      .finally(() => {
-        socketInstance.socket!.send(
-          JSON.stringify({
-            id: JobNotificationTopics.Status,
-          }),
-        )
-        setLoading(false)
-        // TODO: check if it's necessary to ask for status via the socket again after reading events
-      })
-  }, [events, latestEvents])
+      return handleAllEvents(jobId)
+        .then(() => readEvents())
+        .finally(() => {
+          socketInstance.socket!.send(
+            JSON.stringify({
+              id: JobNotificationTopics.Status,
+            }),
+          )
+          setLoading(false)
+          // TODO: check if it's necessary to ask for status via the socket again after reading events
+        })
+    },
+    [events, latestEvents],
+  )
 
   useEffect(() => {
     // resetting the offset & limit on input changes
     setOffset(offset)
     setLimit(limit)
-    readEvents(offset, limit)
-  }, [eventTypes, jobId, offset, limit, jobLogId, handled, period])
+    if (enableEventViaREST) {
+      readEvents(offset, limit)
+    }
+  }, [
+    eventTypes,
+    jobId,
+    offset,
+    limit,
+    jobLogId,
+    handled,
+    period,
+    enableEventViaREST,
+  ])
 
   useEffect(() => {
     if (eventTypes.length) {

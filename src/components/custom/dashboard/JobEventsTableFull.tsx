@@ -1,7 +1,7 @@
 import * as React from "react"
 import type { PaginationState } from "@tanstack/react-table"
 import { useJobs } from "@/hooks/useJobs"
-import { useCallback, useMemo } from "react"
+import { useCallback } from "react"
 import { JobEventsTable } from "@/components/custom/dashboard/JobEventsTable"
 
 export function JobEventsTableFull() {
@@ -15,20 +15,13 @@ export function JobEventsTableFull() {
 
   const { eventsPerJobs } = useJobs({
     getJobEvents: true,
-    jobEventsProps: useMemo(
-      () => ({
-        limit: 10,
-        offset: 0,
-        sorting,
-      }),
-      [pagination.pageSize, pagination.pageIndex, sorting],
-    ),
+    jobEventsPagination: pagination,
+    jobEventsSorting: sorting,
   })
 
-  const setSortingProxy = useCallback((inS: any) => {
-    const newSorting = inS(sorting)
-    setSorting(newSorting)
-  }, [])
+  const resetTable = useCallback(() => {
+    setSorting([...sorting]) // we use sorting to reset the table, as it is taken fully into consideration at the useJob hook
+  }, [sorting])
 
   return (
     <JobEventsTable
@@ -37,7 +30,8 @@ export function JobEventsTableFull() {
       pagination={pagination}
       setPagination={setPagination}
       sorting={sorting}
-      setSorting={setSortingProxy}
+      setSorting={setSorting}
+      resetTable={resetTable}
     />
   )
 }
