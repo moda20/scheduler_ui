@@ -59,3 +59,10 @@ export const eventTypeColors = {
     focus: "focus:bg-orange-500/5",
   },
 }
+
+export const eventPeriodUnits: { [key: string]: number } = {
+  min: 1,
+  h: 60,
+  d: 1440,
+  m: 43200,
+}

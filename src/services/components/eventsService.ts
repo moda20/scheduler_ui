@@ -39,8 +39,10 @@ export const handleEvents = (eventIds?: string[]) => {
   })
 }
 
-export const handleAllEvents = () => {
-  return axios.put("/events/serAllEventsToRead")
+export const handleAllEvents = (jobId?: string) => {
+  return axios.put("/events/serAllEventsToRead", {
+    jobId,
+  })
 }
 
 export const getEventStats = (
