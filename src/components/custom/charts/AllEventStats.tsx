@@ -79,8 +79,8 @@ export function AllEventStats(props: AllEventStatsProps) {
     from: defaultDateRange.from,
     to: defaultDateRange.to,
   })
-  const [period, setPeriod] = useState(props.period ?? 60)
-  const [periodUnit, setPeriodUnit] = useState<string>("min")
+  const [period, setPeriod] = useState(props.period ?? 1)
+  const [periodUnit, setPeriodUnit] = useState<string>("d")
 
   const [activeTab, setActiveTab] = useState("chart")
 
