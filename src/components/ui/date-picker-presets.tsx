@@ -53,9 +53,15 @@ const presetDates: DateRangeExtended[] = [
     label: "Last month",
     days: 30,
   },
+  {
+    from: subDays(new Date(), 180),
+    to: new Date(),
+    label: "Last 6 month",
+    days: 180,
+  },
 ]
 
-export const defaultDateRange = presetDates?.slice(-1)[0]
+export const defaultDateRange = presetDates?.slice(-2)[0]
 
 export function DatePickerWithPresets(props: DatePickerWithPresetsProps) {
   const [date, setDate] = React.useState<DateRange | undefined>(

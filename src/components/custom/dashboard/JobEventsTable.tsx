@@ -34,128 +34,112 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { useJobs } from "@/hooks/useJobs"
-import { useCallback, useEffect, useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { Badge } from "@/components/ui/badge"
+import { JobEventsActionDropdown } from "@/components/custom/dashboard/JobEventsActionDropdown"
 
-export const columns: ColumnDef<any, any>[] = [
-  {
-    accessorKey: "job_name",
-    header: "Job",
-    headerName: "Job",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.original.job_name}</div>
-    ),
-  },
-  {
-    accessorKey: "events",
-    id: "events",
-    headerName: "All events",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          All
-          <ArrowUpDown />
-        </Button>
-      )
+export const columns = ({ reset }: { reset?: () => void }) => {
+  return [
+    {
+      accessorKey: "job_name",
+      header: "Job",
+      headerName: "Job",
+      cell: ({ row }) => (
+        <div className="capitalize">{row.original.job_name}</div>
+      ),
     },
-    cell: ({ row }) => (
-      <div className="lowercase mx-4">{row.original.events}</div>
-    ),
-  },
-  {
-    accessorKey: "ERROR",
-    headerName: "Errors",
-    id: "ERROR",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Error evs.
-          <ArrowUpDown />
-        </Button>
-      )
+    {
+      accessorKey: "events",
+      id: "events",
+      headerName: "All events",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            All
+            <ArrowUpDown />
+          </Button>
+        )
+      },
+      cell: ({ row }) => (
+        <div className="lowercase mx-4">{row.original.events}</div>
+      ),
     },
-    cell: ({ row }) => (
-      <Badge variant="destructive" className="lowercase mx-4">
-        {row.original.errors}
-      </Badge>
-    ),
-  },
-  {
-    accessorKey: "WARNING",
-    headerName: "Warnings",
-    id: "WARNING",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Warning evs.
-          <ArrowUpDown />
-        </Button>
-      )
+    {
+      accessorKey: "ERROR",
+      headerName: "Errors",
+      id: "ERROR",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Error evs.
+            <ArrowUpDown />
+          </Button>
+        )
+      },
+      cell: ({ row }) => (
+        <Badge variant="destructive" className="lowercase mx-4">
+          {row.original.errors}
+        </Badge>
+      ),
     },
-    cell: ({ row }) => (
-      <Badge className="lowercase bg-yellow-500 mx-4">
-        {row.original.warnings}
-      </Badge>
-    ),
-  },
-  {
-    accessorKey: "INFO",
-    headerName: "Infos",
-    id: "INFO",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Info evs.
-          <ArrowUpDown />
-        </Button>
-      )
+    {
+      accessorKey: "WARNING",
+      headerName: "Warnings",
+      id: "WARNING",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Warning evs.
+            <ArrowUpDown />
+          </Button>
+        )
+      },
+      cell: ({ row }) => (
+        <Badge className="lowercase bg-yellow-500 mx-4">
+          {row.original.warnings}
+        </Badge>
+      ),
     },
-    cell: ({ row }) => (
-      <Badge className="lowercase bg-blue-500 mx-4">{row.original.info}</Badge>
-    ),
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const payment = row.original
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
-            >
-              Copy payment ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
+    {
+      accessorKey: "INFO",
+      headerName: "Infos",
+      id: "INFO",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Info evs.
+            <ArrowUpDown />
+          </Button>
+        )
+      },
+      cell: ({ row }) => (
+        <Badge className="lowercase bg-blue-500 mx-4">
+          {row.original.info}
+        </Badge>
+      ),
     },
-  },
-] as ColumnDef<any>[]
+    {
+      id: "actions",
+      enableHiding: false,
+      cell: ({ row, table }) => {
+        const job = row.original
+        return <JobEventsActionDropdown row={job} onChange={reset} />
+      },
+    },
+  ] as ColumnDef<any>[]
+}
 
 export interface JobEventsTableProps {
   events: any[]
@@ -164,6 +148,7 @@ export interface JobEventsTableProps {
   setPagination?: OnChangeFn<PaginationState>
   sorting?: { id: string; desc: boolean }[]
   setSorting?: OnChangeFn<{ id: string; desc: boolean }[]>
+  resetTable?: () => void
 }
 export function JobEventsTable({
   pagination,
@@ -172,6 +157,7 @@ export function JobEventsTable({
   totalCount,
   sorting,
   setSorting,
+  resetTable,
 }: JobEventsTableProps) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -180,19 +166,24 @@ export function JobEventsTable({
     React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
 
+  const reset = useCallback(() => {
+    resetTable?.()
+  }, [resetTable])
+
+  const memoizedColumns = React.useMemo(() => columns({ reset }), [reset])
+
   const table = useReactTable({
     data: events,
-    columns: columns,
+    columns: memoizedColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
     manualSorting: true,
+    manualPagination: true,
+    rowCount: totalCount,
     state: {
       sorting,
       columnFilters,
@@ -309,7 +300,7 @@ export function JobEventsTable({
               </Button>
             </div>
           )
-        }, [table, pagination])}
+        }, [table, pagination, totalCount])}
       </div>
     </div>
   )

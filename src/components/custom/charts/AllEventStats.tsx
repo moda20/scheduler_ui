@@ -40,6 +40,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { JobEventsTableFull } from "@/components/custom/dashboard/JobEventsTableFull"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { eventPeriodUnits } from "@/models/jobs"
 const chartConfig = {
   events: {
     label: "All events count",
@@ -71,7 +79,8 @@ export function AllEventStats(props: AllEventStatsProps) {
     from: defaultDateRange.from,
     to: defaultDateRange.to,
   })
-  const [period, setPeriod] = useState(props.period ?? 60)
+  const [period, setPeriod] = useState(props.period ?? 1)
+  const [periodUnit, setPeriodUnit] = useState<string>("d")
 
   const [activeTab, setActiveTab] = useState("chart")
 
@@ -97,7 +106,8 @@ export function AllEventStats(props: AllEventStatsProps) {
   ))
 
   const getStats = () => {
-    getEventStats(period, dateRange)
+    const calculatedPeriod = eventPeriodUnits[periodUnit] * period
+    getEventStats(calculatedPeriod, dateRange)
       .then(data => {
         setStats(data as Array<any>)
       })
@@ -122,6 +132,13 @@ export function AllEventStats(props: AllEventStatsProps) {
       }
     },
     [period],
+  )
+
+  const setPeriodUnitProxy = useCallback(
+    (unit: any) => {
+      setPeriodUnit(unit)
+    },
+    [setPeriodUnit],
   )
 
   const setActiveTabProxy = useCallback((tab: string) => {
@@ -164,6 +181,30 @@ export function AllEventStats(props: AllEventStatsProps) {
           </ButtonGroup>
           <InputGroup>
             <InputGroupAddon>Period (min)</InputGroupAddon>
+            <InputGroupAddon>
+              <Select
+                value={periodUnit}
+                onValueChange={setPeriodUnitProxy}
+                data-active={activeTab === "chart"}
+              >
+                <SelectTrigger className="w-[100px] focus:ring-0 shadow-sm border-0">
+                  <SelectValue
+                    placeholder="Period Unit"
+                    defaultValue={periodUnit}
+                  ></SelectValue>
+                </SelectTrigger>
+                <SelectContent
+                  className={
+                    "bg-background text-foreground border-border outline-none "
+                  }
+                >
+                  <SelectItem value={"min"}>Minute</SelectItem>
+                  <SelectItem value={"h"}>Hour</SelectItem>
+                  <SelectItem value={"d"}>Day</SelectItem>
+                  <SelectItem value={"m"}>Month</SelectItem>
+                </SelectContent>
+              </Select>
+            </InputGroupAddon>
             <InputGroupInput
               placeholder={"set graph x axis period"}
               value={period}
@@ -194,7 +235,7 @@ export function AllEventStats(props: AllEventStatsProps) {
           />
         </div>
       </CardHeader>
-      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6 relative">
+      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6 relative overflow-hidden transition-transform duration-100 ease-in">
         <div
           className={`transition-opacity duration-300 ease-in-out ${
             activeTab === "chart"
