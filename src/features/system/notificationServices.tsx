@@ -4,6 +4,7 @@ import {
   FileX2,
   LoaderPinwheelIcon,
   Plus,
+  PlusIcon,
   Unlock,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -215,179 +216,184 @@ export default function NotificationServices() {
           Manage Notification services and attach them to be used on jobs
         </p>
       </div>
-      <div className="">
-        <Card className="border-border ">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2 text-foreground bg-background border-border rounded-t-xl"></CardHeader>
-          <CardContent className="p-4 pt-0">
-            <div className={"flex gap-2 h-full"}>
-              <div className="flex flex-col gap-2">
-                <NotificationConfigDialog
-                  JobsList={getAllJobs}
-                  serviceFileList={getAllServiceEntrypoints}
-                  onChange={createNotificationService}
-                  isCreateDialog={true}
+      <Card className="border-0">
+        <CardContent className="p-2 pt-0">
+          <div className={"flex gap-2 h-full"}>
+            <div className="flex flex-col gap-2">
+              <NotificationConfigDialog
+                JobsList={getAllJobs}
+                serviceFileList={getAllServiceEntrypoints}
+                onChange={createNotificationService}
+                isCreateDialog={true}
+              >
+                <Button
+                  variant="ghost"
+                  className="w-full gap-2 border-dashed border-2 border-border hover:border-solid hover:bg-transparent"
                 >
-                  <Button
-                    variant="ghost"
-                    className="w-full gap-2 border-dashed border-2 border-border hover:border-solid hover:bg-transparent"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Add service
-                  </Button>
-                </NotificationConfigDialog>
-                <ScrollableList
-                  className="min-w-[230px]"
-                  originalList={getAllServices}
-                  autoFocus={true}
-                  loadMore={
-                    (notificationServices.offset ?? 0) <
-                    notificationServices.total
-                  }
-                  autoClickFocusedItem={true}
-                  renderNoItems={() => (
-                    <div className="flex flex-col gap-2 items-center justify-center p-2 border-border border rounded-md">
-                      <FileX2 />
-                      <div className="text-muted-foreground text-sm">
-                        No services found
+                  <Plus className="h-4 w-4" />
+                  Add service
+                </Button>
+              </NotificationConfigDialog>
+              <ScrollableList
+                className="min-w-[230px] sm:min-w-[260px] md:min-w-[290px]"
+                originalList={getAllServices}
+                autoFocus={true}
+                loadMore={
+                  (notificationServices.offset ?? 0) <
+                  notificationServices.total
+                }
+                autoClickFocusedItem={true}
+                renderNoItems={() => (
+                  <div className="flex flex-col gap-2 items-center justify-center p-2 border-border border rounded-md">
+                    <FileX2 />
+                    <div className="text-muted-foreground text-sm">
+                      No services found
+                    </div>
+                  </div>
+                )}
+                onItemClick={onItemSelect}
+                loadMoreAction={loadMoreServices}
+                itemClassName={item =>
+                  `hover:border-blue-500 focus:border-blue-500 border border-border rounded-xl hover:cursor-pointer hover:shadow-md`
+                }
+                renderItem={(item: NotificationService, index) => {
+                  return (
+                    <div className="flex flex-row gap-3 items-center rounded-xl p-2 bg-sidebar sm:min-w-[260px] md:min-w-[280px]">
+                      <BImage
+                        className="rounded-md w-12 h-12 aspect-square"
+                        src={item.image}
+                        alt="NoImg"
+                      />
+                      <div className="flex flex-col gap-1 min-w-0">
+                        <div className="text-sm font-bold text-ellipsis overflow-hidden max-w-[200px] truncate">
+                          {item.name}
+                        </div>
+                        <div className="text-xs text-[--muted-foreground] text-ellipsis truncate min-w-0">
+                          {item.description}
+                        </div>
                       </div>
                     </div>
-                  )}
-                  onItemClick={onItemSelect}
-                  loadMoreAction={loadMoreServices}
-                  itemClassName={item =>
-                    `hover:border-blue-500 focus:border-blue-500 border border-border rounded-xl hover:cursor-pointer hover:shadow-md`
-                  }
-                  renderItem={(item: NotificationService, index) => {
-                    return (
-                      <div className="flex flex-row gap-3 items-center rounded-xl p-2 bg-sidebar max-w-[230px]">
-                        <BImage
-                          className="rounded-md w-10 h-10 aspect-square"
-                          src={item.image}
-                          alt="NoImg"
-                        />
-                        <div className="flex flex-col gap-1 min-w-0">
-                          <div className="text-sm font-bold text-ellipsis overflow-hidden max-w-[200px] truncate">
-                            {item.name}
-                          </div>
-                          <div className="text-xs text-[--muted-foreground] text-ellipsis truncate min-w-0">
-                            {item.description}
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  }}
-                />
-              </div>
-              <div className="flex flex-col gap-2 border border-border rounded-xl w-full p-2">
-                <Spinner
-                  isLoading={infoLoading}
-                  icon={LoaderPinwheelIcon}
-                  className="h-full w-full block"
-                >
-                  {notificationServices.data.length && (
-                    <div className="flex flex-col gap-2 ">
-                      <div className="text-l font-bold tracking-tight italic flex gap-2 items-center">
-                        <span>Basic info</span>
-                        {selectedService && (
-                          <NotificationConfigDialog
-                            JobsList={getAllJobs}
-                            serviceFileList={getAllServiceEntrypoints}
-                            onChange={createNotificationService}
-                            triggerClassName={"gap-2"}
-                            notificationServiceDetails={selectedService}
-                            onDeletion={deleteService}
-                          >
-                            <Button
-                              variant={"ghost"}
-                              size={"icon"}
-                              title="Edit the notification info"
-                            >
-                              <EditIcon />
-                            </Button>
-                          </NotificationConfigDialog>
-                        )}
-                      </div>
-                      <div className="flex flex-col gap-1 pl-3 border-l-4 border-sidebar-border border-1-2">
-                        <div className="flex gap-2 ">
-                          <span className="m-w-[120px] font-bold">Name :</span>
-                          <div className="font-medium w-auto capitalize">
-                            {selectedService?.name}
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <span className="m-w-[120px] font-bold">
-                            description :
-                          </span>
-                          <div className="font-medium w-auto ">
-                            {selectedService?.description}
-                          </div>
-                        </div>
-                        <div className="flex gap-2 ">
-                          <span className="m-w-[120px] font-bold">
-                            Creation Date :
-                          </span>
-                          <div className="font-medium w-auto">
-                            {moment(selectedService?.created_at).format(
-                              "YYYY-MM-DD HH:mm:ss",
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-l font-bold italic tracking-tight mt-2 flex gap-2 items-center">
-                        <span>
-                          Attached jobs ({selectedServicesAttachedJobs?.length})
-                        </span>
-                        <NotificationLinkDialog
+                  )
+                }}
+              />
+            </div>
+            <div className="flex flex-col gap-2 border border-border rounded-xl w-full p-2">
+              <Spinner
+                isLoading={infoLoading}
+                icon={LoaderPinwheelIcon}
+                className="h-full w-full block"
+              >
+                {notificationServices.data.length && (
+                  <div className="flex flex-col gap-2 ">
+                    <div className="text-l font-bold tracking-tight italic flex gap-2 items-center">
+                      <span>Basic info</span>
+                      {selectedService && (
+                        <NotificationConfigDialog
                           JobsList={getAllJobs}
-                          notificationDetails={selectedService}
-                          onChange={attachJobsToNotificationService}
+                          serviceFileList={getAllServiceEntrypoints}
+                          onChange={createNotificationService}
+                          triggerClassName={"gap-2"}
+                          notificationServiceDetails={selectedService}
+                          onDeletion={deleteService}
                         >
                           <Button
                             variant={"ghost"}
                             size={"icon"}
-                            title="Edit attached jobs"
+                            title="Edit the notification info"
                           >
                             <EditIcon />
                           </Button>
-                        </NotificationLinkDialog>
+                        </NotificationConfigDialog>
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-1 pl-3 border-l-4 border-sidebar-border border-1-2">
+                      <div className="flex gap-2 ">
+                        <span className="m-w-[120px] font-bold">Name :</span>
+                        <div className="font-medium w-auto capitalize">
+                          {selectedService?.name}
+                        </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-2 flex-wrap max-h-[350px] overflow-y-auto">
-                        {selectedServicesAttachedJobs.map(e => {
-                          return (
-                            <HoverScreenComponent
-                              key={e.id}
-                              hoverComponent={
-                                <ConfirmationDialogAction
-                                  title={`Detach ${e.name} Job ?`}
-                                  description={
-                                    "This will detach this service from the job making it not available on th next run of the job"
-                                  }
-                                  takeAction={handleConfirmationDialogAction}
-                                  confirmText="Detach Job"
-                                  extraTakeActionArgs={[
-                                    e,
-                                    Number(selectedService?.id),
-                                  ]}
-                                >
-                                  <Button variant="destructive" size={"sm"}>
-                                    <Unlock /> Detach Job
-                                  </Button>
-                                </ConfirmationDialogAction>
-                              }
-                            >
-                              <JobItem className="w-full bg-sidebar" job={e} />
-                            </HoverScreenComponent>
-                          )
-                        })}
+                      <div className="flex gap-2">
+                        <span className="m-w-[120px] font-bold">
+                          description :
+                        </span>
+                        <div className="font-medium w-auto ">
+                          {selectedService?.description}
+                        </div>
+                      </div>
+                      <div className="flex gap-2 ">
+                        <span className="m-w-[120px] font-bold">
+                          Creation Date :
+                        </span>
+                        <div className="font-medium w-auto">
+                          {moment(selectedService?.created_at).format(
+                            "YYYY-MM-DD HH:mm:ss",
+                          )}
+                        </div>
                       </div>
                     </div>
-                  )}
-                </Spinner>
-              </div>
+                    <div className="text-l font-bold italic tracking-tight mt-2 flex gap-2 items-center">
+                      <span>
+                        Attached jobs ({selectedServicesAttachedJobs?.length})
+                      </span>
+                      <NotificationLinkDialog
+                        JobsList={getAllJobs}
+                        notificationDetails={selectedService}
+                        onChange={attachJobsToNotificationService}
+                      >
+                        <Button
+                          variant={"ghost"}
+                          size={"icon"}
+                          title={
+                            selectedServicesAttachedJobs?.length
+                              ? "Edit attached jobs"
+                              : "Attach new Jobs"
+                          }
+                        >
+                          {selectedServicesAttachedJobs?.length ? (
+                            <EditIcon />
+                          ) : (
+                            <PlusIcon />
+                          )}
+                        </Button>
+                      </NotificationLinkDialog>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 flex-wrap max-h-[350px] overflow-y-auto">
+                      {selectedServicesAttachedJobs.map(e => {
+                        return (
+                          <HoverScreenComponent
+                            key={e.id}
+                            hoverComponent={
+                              <ConfirmationDialogAction
+                                title={`Detach ${e.name} Job ?`}
+                                description={
+                                  "This will detach this service from the job making it not available on th next run of the job"
+                                }
+                                takeAction={handleConfirmationDialogAction}
+                                confirmText="Detach Job"
+                                extraTakeActionArgs={[
+                                  e,
+                                  Number(selectedService?.id),
+                                ]}
+                              >
+                                <Button variant="destructive" size={"sm"}>
+                                  <Unlock /> Detach Job
+                                </Button>
+                              </ConfirmationDialogAction>
+                            }
+                          >
+                            <JobItem className="w-full bg-sidebar" job={e} />
+                          </HoverScreenComponent>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </Spinner>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
