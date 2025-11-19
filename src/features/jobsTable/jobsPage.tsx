@@ -41,6 +41,7 @@ import { SelectIcon } from "@radix-ui/react-select"
 import ConfirmationDialogAction from "@/components/confirmationDialogAction"
 import { cn } from "@/lib/utils"
 import { BatchImportDialog } from "@/components/custom/jobsTable/batchImportDialog"
+import { useInView } from "@/hooks/useInView"
 
 export const defaultSortingState = [{ id: "cronSetting", desc: true }]
 
@@ -54,6 +55,7 @@ export default function JobsPage() {
   const dispatch = useAppDispatch()
   const avFilteringRef = useRef<AdvancedJobFilteringDialogHandle>(null)
   const [selectedRowIds, setSelectedRowIds] = useState<any>({})
+  const { ref, inView } = useInView()
 
   const selectedRowIdsArray = useMemo(
     () => Object.keys(selectedRowIds).map(Number),
@@ -224,8 +226,13 @@ export default function JobsPage() {
   }, [])
 
   return (
-    <div className="">
-      <div className={"table-header flex items-center py-4 justify-between"}>
+    <div className="h-full">
+      <div ref={ref} className="h-1"></div>
+      <div
+        className={`table-header flex items-center py-4 justify-between sticky  z-10 transition-all duration-100 ${
+          !inView ? "bg-background/95 backdrop-blur-sm shadow-md top-16" : ""
+        }`}
+      >
         <ButtonGroup>
           <JobUpdateDialog
             jobDetails={undefined}
