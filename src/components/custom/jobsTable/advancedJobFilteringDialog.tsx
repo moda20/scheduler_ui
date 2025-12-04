@@ -146,7 +146,8 @@ export const AdvancedJobFilteringDialog = forwardRef<
     )
 
     useEffect(() => {
-      if (isDialogOpen && inputJobIds) {
+      if (isDialogOpen && inputJobIds?.length) {
+        console.log("inputJobIds", inputJobIds)
         jobsService
           .getAllJobs(null, undefined, undefined, undefined, inputJobIds)
           .then(d => {
