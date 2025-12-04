@@ -1,23 +1,22 @@
 import {
   CommandDialog,
   CommandEmpty,
-  CommandInput,
-  CommandList,
   CommandGroup,
+  CommandInput,
   CommandItem,
+  CommandList,
 } from "@/components/ui/command"
 import useDialogueManager from "@/hooks/useDialogManager"
 import { useHotkeys } from "react-hotkeys-hook"
 import type { ReactNode } from "react"
-import { useRef } from "react"
-import { useCallback, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import jobsService from "@/services/JobsService"
 import { ItemSkeleton } from "@/components/custom/general/Skeletons"
 import { debounce } from "@/utils/generalUtils"
 import ActionDropdown from "@/components/custom/jobsTable/actionDropdown"
 import type { jobsTableData } from "@/features/jobsTable/interfaces"
-import { defaultLogPeriod } from "@/features/jobsTable/interfaces"
+import { defaultLogPeriod, jobActions } from "@/features/jobsTable/interfaces"
 import { getConsumersCBox, takeAction } from "@/features/jobsTable/jobsUtils"
 import { Clock, FileArchive, LoaderIcon } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
@@ -59,6 +58,27 @@ export default function SearchBar({ trigger }: SearchBarProps) {
     setSearchKey("")
     setJobsList([])
   }, [])
+
+  const extendedTakeAction = useCallback(
+    async (
+      row: jobsTableData | null,
+      action: jobActions,
+      data?: any,
+      batchProcessIds?: number[],
+    ) => {
+      await takeAction(row, action, data, batchProcessIds)
+      switch (action) {
+        case jobActions.UPDATE:
+        case jobActions.UNSCHEDULE:
+        case jobActions.SCHEDULE:
+          await searchForJobs(searchKey)
+          break
+        default:
+          break
+      }
+    },
+    [searchForJobs, searchKey],
+  )
 
   return (
     <>
@@ -107,7 +127,7 @@ export default function SearchBar({ trigger }: SearchBarProps) {
               <ActionDropdown
                 key={index}
                 columnsProps={{
-                  takeAction,
+                  takeAction: extendedTakeAction,
                   getAvailableConsumers: getConsumersCBox,
                 }}
                 row={job}
