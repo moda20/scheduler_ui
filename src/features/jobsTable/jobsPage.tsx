@@ -141,9 +141,9 @@ export default function JobsPage() {
           : defaultSortingState
       setSorting(targetSorting)
       setLoading(true)
-      await updateTableData(targetSorting)
+      await updateTableData(targetSorting, advancedFilters)
     },
-    [],
+    [advancedFilters],
   )
 
   const tableEventsMemoized = useMemo(
