@@ -135,7 +135,13 @@ export default function SearchBar({ trigger }: SearchBarProps) {
                 inputGroup="commandActions"
                 modal={true}
               >
-                <CommandItem asChild className="rounded">
+                <CommandItem
+                  asChild
+                  className="rounded"
+                  onSelect={e => {
+                    console.log("select", e)
+                  }}
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-1">
                       <span>{job.name}</span>

@@ -57,13 +57,18 @@ export default function ActionDropdown({
   modal,
   dropdownContentProps,
 }: ActionDropdownProps) {
-  const { isDialogOpen, setDialogState } = useDialogueManager({
+  const { isDialogOpen, setDialogState, isTopOfTheStack } = useDialogueManager({
     inputGroup: inputGroup ?? "JobActions",
   })
 
-  const handleMenuTriggerClick = useCallback(() => {
-    setDialogState(true)
-  }, [setDialogState])
+  const handleMenuTriggerClick = useCallback(
+    (e: any) => {
+      if (!isDialogOpen) {
+        setDialogState(true)
+      }
+    },
+    [setDialogState, isTopOfTheStack],
+  )
 
   const handleEscapeKeyTrigger = useCallback(
     (v: any) => {
@@ -172,7 +177,10 @@ export default function ActionDropdown({
             confirmText={row.status === "STARTED" ? "Un-schedule" : "Schedule"}
             autoFocus={true}
           >
-            <DropdownMenuItemExtended keyBinding="S">
+            <DropdownMenuItemExtended
+              keyBinding="S"
+              disabled={!isTopOfTheStack}
+            >
               <Settings />
               <span>
                 {row.status === "STARTED" ? "deSchedule" : "Schedule"}
@@ -190,9 +198,11 @@ export default function ActionDropdown({
             <DropdownMenuItemExtended
               keyBinding="u"
               onSelect={handleEventPrevention}
+              disabled={!isTopOfTheStack}
             >
               <Edit2Icon />
               <span>Update config</span>
+              <DropdownMenuShortcut>⌘U</DropdownMenuShortcut>
             </DropdownMenuItemExtended>
           </JobUpdateDialog>
         </DropdownMenuGroup>
@@ -203,7 +213,9 @@ export default function ActionDropdown({
           <DropdownMenuItemExtended
             keyBinding="meta+e"
             onClick={handleJobExecutionAction}
-            disabled={!row.initialized && row.status === "STARTED"}
+            disabled={
+              !isTopOfTheStack || (!row.initialized && row.status === "STARTED")
+            }
           >
             <DockIcon />
             <span>Run now</span>
@@ -213,10 +225,12 @@ export default function ActionDropdown({
             jobDetails={row}
             onChange={handleCustomJobExecution}
             triggerClassName="w-full"
+            //freezeDialog={!isTopOfTheStack}
           >
             <DropdownMenuItemExtended
               keyBinding="meta+shift+e"
               onSelect={handleEventPrevention}
+              //disabled={!isTopOfTheStack}
             >
               <DockIcon />
               <span>Custom run</span>
@@ -226,7 +240,9 @@ export default function ActionDropdown({
           <DropdownMenuItemExtended
             keyBinding="R"
             onClick={handleJobRefresh}
-            disabled={!row.initialized && row.status === "STARTED"}
+            disabled={
+              !isTopOfTheStack || (!row.initialized && row.status === "STARTED")
+            }
           >
             <DockIcon />
             <span>Refresh Task File</span>
@@ -241,6 +257,7 @@ export default function ActionDropdown({
               <DropdownMenuItemExtended
                 keyBinding="E"
                 onSelect={handleEventPrevention}
+                disabled={!isTopOfTheStack}
               >
                 <LogsIcon />
                 <span>Job Events</span>
@@ -258,6 +275,7 @@ export default function ActionDropdown({
               <DropdownMenuItemExtended
                 keyBinding="L"
                 onSelect={handleEventPrevention}
+                disabled={!isTopOfTheStack}
               >
                 <LogsIcon />
                 <span>Latest Logs</span>
@@ -273,6 +291,7 @@ export default function ActionDropdown({
               <DropdownMenuItemExtended
                 keyBinding="O"
                 onSelect={handleEventPrevention}
+                disabled={!isTopOfTheStack}
               >
                 <FileSliders />
                 <span>Output Files</span>
@@ -288,6 +307,7 @@ export default function ActionDropdown({
               <DropdownMenuItemExtended
                 keyBinding="P"
                 onSelect={handleEventPrevention}
+                disabled={!isTopOfTheStack}
               >
                 <CardStackIcon />
                 <span>Previous Runs</span>
@@ -309,6 +329,7 @@ export default function ActionDropdown({
             <DropdownMenuItem
               className={"bg-destructive"}
               onSelect={handleEventPrevention}
+              disabled={!isTopOfTheStack}
             >
               <Trash2Icon />
               <span>Delete job</span>

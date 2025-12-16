@@ -29,10 +29,8 @@ import type { ComboBoxItem } from "@/components/ui/combo-box"
 import { ComboBox } from "@/components/ui/combo-box"
 import { cn, parseCron } from "@/lib/utils"
 import useDialogueManager from "@/hooks/useDialogManager"
-import { useHotkeys } from "react-hotkeys-hook"
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useMemo } from "react"
 import MonacoFileViewer from "@/components/custom/MonacoFileViewer"
-import ExpandableCard from "@/components/custom/general/ExpandableCard"
 
 export interface JobExecutionDialogProps {
   children: React.ReactNode
@@ -59,6 +57,12 @@ export function JobExecutionDialog({
     },
   })
   const { isDialogOpen, setDialogState } = useDialogueManager()
+
+  const stopPropagation = useCallback((e: any) => {
+    if (e.key === "Enter") {
+      e.stopPropagation()
+    }
+  }, [])
 
   const resetState = useCallback(
     (finalState: boolean) => {
@@ -119,7 +123,10 @@ export function JobExecutionDialog({
                 control={form.control}
                 name="param"
                 render={({ field }) => (
-                  <FormItem className="h-[400px] flex flex-col gap-2 w-full">
+                  <FormItem
+                    className="h-[400px] flex flex-col gap-2 w-full"
+                    onKeyDownCapture={stopPropagation}
+                  >
                     <FormLabel>JSON Params</FormLabel>
                     {isDialogOpen && (
                       <MonacoFileViewer
