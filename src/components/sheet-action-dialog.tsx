@@ -1,6 +1,5 @@
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -8,13 +7,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { Button } from "@/components/ui/button"
-import { SidebarCloseIcon } from "lucide-react"
 import type { ReactNode } from "react"
+import { useEffect, useRef } from "react"
 import type React from "react"
 import { cn } from "@/lib/utils"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { useId, useState } from "react"
 import useDialogueManager from "@/hooks/useDialogManager"
 
 export interface SheetActionDialogProps
@@ -44,8 +40,14 @@ const defaultSheetActionDialogProps: SheetActionDialogProps = {
 export default function SheetActionDialog(
   props: SheetActionDialogProps = defaultSheetActionDialogProps,
 ) {
+  const ref = useRef<HTMLDivElement>(null)
   const { isDialogOpen, setDialogState } = useDialogueManager()
 
+  useEffect(() => {
+    setTimeout(() => {
+      ref.current?.focus()
+    }, 100)
+  }, [])
   return (
     <Sheet
       key={props.side}
@@ -60,6 +62,7 @@ export default function SheetActionDialog(
         {props.trigger}
       </SheetTrigger>
       <SheetContent
+        ref={ref}
         onEscapeKeyDown={v => setDialogState(false, props.onOpenChange)}
         side={props.side}
         className={cn("text-foreground bg-background", props.contentClassName)}

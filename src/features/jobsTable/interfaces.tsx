@@ -9,6 +9,7 @@ import type { ComboBoxItem } from "@/components/ui/combo-box"
 import ActionDropdown from "@/components/custom/jobsTable/actionDropdown"
 import HeaderSortButton from "@/components/custom/jobsTable/headerSortButton"
 import { FileArchive, LucideFileWarning } from "lucide-react"
+import type { MouseEventHandler } from "react"
 import React, { useCallback } from "react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { CheckedState } from "@radix-ui/react-checkbox"
@@ -50,6 +51,10 @@ export const defaultLogPeriod: DateRange = {
 export interface tableColumnsProps {
   getAvailableConsumers: () => Promise<ComboBoxItem[]>
   takeAction: (row: jobsTableData, action: jobActions, jobData?: any) => void
+  selectFunction?: (
+    table: Table<jobsTableData>,
+    Row: Row<jobsTableData>,
+  ) => MouseEventHandler<HTMLButtonElement>
 }
 
 export const getTableColumns = (
@@ -67,10 +72,11 @@ export const getTableColumns = (
         aria-label="Select all"
       />
     ),
-    cell: ({ row }) => (
+    cell: ({ row, table }) => (
       <Checkbox
         checked={row.getIsSelected() || row.getIsSomeSelected()}
-        onCheckedChange={value => row.toggleSelected(!!value)}
+        //onCheckedChange={value => row.toggleSelected(!!value)}
+        onClick={props?.selectFunction?.(table, row)}
         aria-label={`Select row ${row.original.name}`}
       />
     ),
