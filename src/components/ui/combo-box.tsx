@@ -72,6 +72,9 @@ const ComboButtonBoxRenderer = ({
   mappedInputList,
   maxSelectedItemsToShowOnMainTrigger,
 }: ComboButtonBoxRendererProps) => {
+  const targetValue = selectedValue
+    ? itemList.find(item => item?.value === selectedValue)?.label
+    : defaultInputText
   return multiSelect ? (
     <div className="flex gap-1 items-center justify-between w-full">
       <span className="flex gap-0.5">
@@ -92,10 +95,8 @@ const ComboButtonBoxRenderer = ({
       </span>
     </div>
   ) : (
-    <span>
-      {selectedValue
-        ? itemList.find(item => item?.value === selectedValue)?.label
-        : defaultInputText}
+    <span className="overflow-hidden text-ellipsis" title={targetValue}>
+      {targetValue}
     </span>
   )
 }

@@ -123,7 +123,7 @@ export function JobUpdateDialog({
               : `Edit the ${jobDetails?.name} job`}
           </DialogDescription>
         </DialogHeader>
-        <div className={cn("flex transition-all duration-200")}>
+        <div className={cn("flex transition-all duration-200 min-w-0")}>
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(
@@ -135,11 +135,11 @@ export function JobUpdateDialog({
                 },
                 err => {},
               )}
-              className="space-y-8"
+              className="space-y-8 w-full"
             >
               <ExpandableCard
                 className="gap-2"
-                mainContentClassName="gap-4"
+                mainContentClassName="gap-4 min-w-0"
                 onExpandedChange={expanded => setParamsShown(expanded)}
                 expandedContent={
                   <div className="max-w-[400px] flex-grow w-full">
@@ -167,7 +167,7 @@ export function JobUpdateDialog({
                   </div>
                 }
               >
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 min-w-0">
                   <FormField
                     control={form.control}
                     name="cronSetting"
@@ -230,7 +230,7 @@ export function JobUpdateDialog({
                               }
                               inputFieldsText={"Select consumer script..."}
                               className="w-[--radix-popover-trigger-width]"
-                              triggerClassName={"w-full"}
+                              triggerClassName={"w-full "}
                             />
                           </FormControl>
                           <FormDescription>
