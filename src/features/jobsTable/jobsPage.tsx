@@ -32,7 +32,9 @@ import { ButtonGroup } from "@/components/ui/buttonGroup"
 import { toast } from "@/hooks/use-toast"
 import { ButtonWithTooltip } from "@/components/custom/general/ButtonWithTooltip"
 import { GearIcon, StopIcon } from "@radix-ui/react-icons"
-import ConfirmationDialogAction from "@/components/confirmationDialogAction"
+import ConfirmationDialogAction, {
+  ConfirmationDialogActionType,
+} from "@/components/confirmationDialogAction"
 import { cn } from "@/lib/utils"
 import { BatchImportDialog } from "@/components/custom/jobsTable/batchImportDialog"
 import { useInView } from "@/hooks/useInView"
@@ -184,6 +186,15 @@ export default function JobsPage() {
     [selectedRowIds, JobsList, takeJobsAction],
   )
 
+  const confirmBatchJobAction = useCallback(
+    (action: jobActions) =>
+      async (dialogAction: ConfirmationDialogActionType) => {
+        if (dialogAction === ConfirmationDialogActionType.CANCEL) return
+        return takeBatchJobsAction(action)
+      },
+    [selectedRowIds, JobsList, takeJobsAction],
+  )
+
   const getRowRange = (
     rows: Row<jobsTableData>[],
     currentID: number,
@@ -313,7 +324,7 @@ export default function JobsPage() {
               <ConfirmationDialogAction
                 title={"Run all Jobs"}
                 description={`This will Run all the ${Object.keys(selectedRowIds).length} selected jobs Simultaneously, if you are looking for queuing check, the advanced filtering modal`}
-                takeAction={() => takeBatchJobsAction(jobActions.EXECUTE)}
+                takeAction={confirmBatchJobAction(jobActions.EXECUTE)}
                 confirmText={"Run all"}
               >
                 <ButtonWithTooltip
@@ -328,7 +339,7 @@ export default function JobsPage() {
               <ConfirmationDialogAction
                 title={"Schedule all Jobs"}
                 description={`This will Schedule all the ${Object.keys(selectedRowIds).length} selected jobs`}
-                takeAction={() => takeBatchJobsAction(jobActions.SCHEDULE)}
+                takeAction={confirmBatchJobAction(jobActions.SCHEDULE)}
                 confirmText={"Schedule all"}
               >
                 <ButtonWithTooltip
@@ -344,7 +355,7 @@ export default function JobsPage() {
               <ConfirmationDialogAction
                 title={"Un-schedule all Jobs"}
                 description={`This will un-schedule all the ${Object.keys(selectedRowIds).length} selected jobs`}
-                takeAction={() => takeBatchJobsAction(jobActions.UNSCHEDULE)}
+                takeAction={confirmBatchJobAction(jobActions.UNSCHEDULE)}
                 confirmText={"Un-schedule all"}
                 confirmVariant={"destructive"}
               >
