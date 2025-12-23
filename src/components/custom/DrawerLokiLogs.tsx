@@ -48,6 +48,7 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
     logInterval: dialogOpen && watch ? 10000 : undefined,
     mergeOutputStreams: false,
     logQuery: `{job="${props.jobName}"}`,
+    setEndToMidnight: true,
   })
 
   const fetchLogs = (open?: boolean) => {

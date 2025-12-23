@@ -15,6 +15,9 @@ const DropdownMenuItemExtended = React.forwardRef<
   const newRef = useRef<HTMLDivElement>(null)
   useImperativeHandle(ref, () => newRef.current as HTMLInputElement)
   useHotkeys(keyBinding ?? "", ev => {
+    if (props.disabled) {
+      return
+    }
     if (onAction) {
       onAction(ev)
     }

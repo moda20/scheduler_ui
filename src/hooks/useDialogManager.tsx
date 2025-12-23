@@ -1,4 +1,4 @@
-import { useState, useCallback, useId, useContext } from "react"
+import { useState, useCallback, useId, useContext, useMemo } from "react"
 import { useAppDispatch, useAppSelector } from "@/app/hooks"
 import {
   closeAllGroupedDialogs,
@@ -80,9 +80,17 @@ function useDialogueManager({
     [updateDialogState, isDialogOpen],
   )
 
+  const isTopOfTheStack = useMemo(() => {
+    return (
+      currentStack.length === 0 ||
+      currentStack[currentStack.length - 1] === cptId
+    )
+  }, [currentStack, isDialogOpen])
+
   return {
     setDialogState,
     isDialogOpen,
+    isTopOfTheStack,
   }
 }
 

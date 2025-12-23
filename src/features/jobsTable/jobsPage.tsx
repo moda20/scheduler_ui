@@ -2,9 +2,10 @@ import jobsService from "@/services/JobsService"
 import { DataTable } from "@/features/jobsTable/jobsTable"
 import type { jobsTableData } from "@/features/jobsTable/interfaces"
 import { getTableColumns, jobActions } from "@/features/jobsTable/interfaces"
+import type { MouseEventHandler } from "react"
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Spinner from "@/components/custom/LoadingOverlay"
-import type { ColumnDef, SortingState } from "@tanstack/react-table"
+import type { ColumnDef, Row, SortingState, Table } from "@tanstack/react-table"
 import type { JobUpdateType } from "@/components/job-update-dialog"
 import { JobUpdateDialog } from "@/components/job-update-dialog"
 import { Button } from "@/components/ui/button"
@@ -14,12 +15,6 @@ import {
   FilterIcon,
   Trash2Icon,
   DockIcon,
-  CogIcon,
-  CrossIcon,
-  DropletIcon,
-  ServerCog,
-  Play,
-  BoxSelectIcon,
   TextSelectIcon,
   DownloadIcon,
 } from "lucide-react"
@@ -37,14 +32,16 @@ import { ButtonGroup } from "@/components/ui/buttonGroup"
 import { toast } from "@/hooks/use-toast"
 import { ButtonWithTooltip } from "@/components/custom/general/ButtonWithTooltip"
 import { GearIcon, StopIcon } from "@radix-ui/react-icons"
-import { SelectIcon } from "@radix-ui/react-select"
-import ConfirmationDialogAction from "@/components/confirmationDialogAction"
+import ConfirmationDialogAction, {
+  ConfirmationDialogActionType,
+} from "@/components/confirmationDialogAction"
 import { cn } from "@/lib/utils"
 import { BatchImportDialog } from "@/components/custom/jobsTable/batchImportDialog"
 import { useInView } from "@/hooks/useInView"
 
 export const defaultSortingState = [{ id: "cronSetting", desc: true }]
 
+let lastSelectedID = 0
 export default function JobsPage() {
   const [loading, setLoading] = useState(true)
   const [fetchingData, setFetchingStatus] = useState(false)
@@ -146,9 +143,9 @@ export default function JobsPage() {
           : defaultSortingState
       setSorting(targetSorting)
       setLoading(true)
-      await updateTableData(targetSorting)
+      await updateTableData(targetSorting, advancedFilters)
     },
-    [],
+    [advancedFilters],
   )
 
   const tableEventsMemoized = useMemo(
@@ -189,10 +186,54 @@ export default function JobsPage() {
     [selectedRowIds, JobsList, takeJobsAction],
   )
 
+  const confirmBatchJobAction = useCallback(
+    (action: jobActions) =>
+      async (dialogAction: ConfirmationDialogActionType) => {
+        if (dialogAction === ConfirmationDialogActionType.CANCEL) return
+        return takeBatchJobsAction(action)
+      },
+    [selectedRowIds, JobsList, takeJobsAction],
+  )
+
+  const getRowRange = (
+    rows: Row<jobsTableData>[],
+    currentID: number,
+    selectedID: number,
+  ): Row<jobsTableData>[] => {
+    const rangeStart = selectedID > currentID ? currentID : selectedID
+    const rangeEnd = rangeStart === currentID ? selectedID : currentID
+    return rows.slice(rangeStart, rangeEnd + 1)
+  }
+
+  const shiftEnabledSelectFunction = useCallback(
+    (
+      table: Table<jobsTableData>,
+      row: Row<jobsTableData>,
+    ): MouseEventHandler => {
+      return (event: any) => {
+        if (event.shiftKey) {
+          const { rows, rowsById } = table.getRowModel()
+          const rowsToToggle = getRowRange(
+            rows,
+            Number(row.index),
+            Number(lastSelectedID),
+          )
+          const isCellSelected = rowsById[row.id].getIsSelected()
+          rowsToToggle.forEach(_row => _row.toggleSelected(!isCellSelected))
+        } else {
+          row.toggleSelected()
+        }
+        lastSelectedID = row.index
+      }
+    },
+    [],
+  )
+
   const columns: ColumnDef<jobsTableData, any>[] = useMemo(() => {
     return getTableColumns({
       takeAction: takeJobsAction,
       getAvailableConsumers: getConsumersCBox,
+      selectFunction: shiftEnabledSelectFunction,
     })
   }, [sorting])
 
@@ -283,7 +324,7 @@ export default function JobsPage() {
               <ConfirmationDialogAction
                 title={"Run all Jobs"}
                 description={`This will Run all the ${Object.keys(selectedRowIds).length} selected jobs Simultaneously, if you are looking for queuing check, the advanced filtering modal`}
-                takeAction={() => takeBatchJobsAction(jobActions.EXECUTE)}
+                takeAction={confirmBatchJobAction(jobActions.EXECUTE)}
                 confirmText={"Run all"}
               >
                 <ButtonWithTooltip
@@ -298,7 +339,7 @@ export default function JobsPage() {
               <ConfirmationDialogAction
                 title={"Schedule all Jobs"}
                 description={`This will Schedule all the ${Object.keys(selectedRowIds).length} selected jobs`}
-                takeAction={() => takeBatchJobsAction(jobActions.SCHEDULE)}
+                takeAction={confirmBatchJobAction(jobActions.SCHEDULE)}
                 confirmText={"Schedule all"}
               >
                 <ButtonWithTooltip
@@ -314,7 +355,7 @@ export default function JobsPage() {
               <ConfirmationDialogAction
                 title={"Un-schedule all Jobs"}
                 description={`This will un-schedule all the ${Object.keys(selectedRowIds).length} selected jobs`}
-                takeAction={() => takeBatchJobsAction(jobActions.UNSCHEDULE)}
+                takeAction={confirmBatchJobAction(jobActions.UNSCHEDULE)}
                 confirmText={"Un-schedule all"}
                 confirmVariant={"destructive"}
               >
