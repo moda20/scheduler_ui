@@ -1,67 +1,169 @@
-# Scheduler_ui
+<div align="center">
 
-This is the repo for the scheduler_ui, It plugs into the Scheduler_backend's API and helps manage tasks
-server authentication, proxies, and more.
+# Scheduler UI
 
-The scheduler_ui offers localstorage saves for target servers allowing for runtime server changes, so you can host multiple backends 
-and manage them using a single instance of the UI, more on that below. 
+**A modern web interface for managing scheduled tasks, proxies, and more**
 
+![Project Status](https://img.shields.io/badge/status-pre--alpha-orange)
+![License](https://img.shields.io/badge/license-TBD-blue)
 
-## Features
+[![Features](#-features)]
+[•]
+[Deployment](#-deployment)
+[•]
+[Development](#-development)
+[•]
+[Contributing](#-contributing)
 
-- Authenticating to backend server
-- Managing Tasks (Aka Jobs)
-- Managing Proxies
-- Managing Databases
-- ...
+</div>
 
-## 📦 Deployment
+---
 
-- Deploying The UI is done best when using Docker, a `DOCKERFILE` is provided with an nginx Reverse Proxy serving the built UI.
-- A `compose.yml` file is also provided just for reference, some environment variables are accepted during build time,
+## 📖 Overview
 
-### Build Time Environment Variables
+Scheduler UI is a modern React-based web application that provides a clean, intuitive interface for managing the [Scheduler Backend](#). It enables seamless management of tasks, authentication, proxies, databases, and other system configurations.
 
-| Variable Name                | Description                                                                          | Default Value     |
-|------------------------------|--------------------------------------------------------------------------------------|-------------------|
-| SERVER_ENDPOINT              | The endpoint of the target server                                                     | /                 |
+### Key Features
 
-## 🛠 Usage
+- **Multi-Server Support**: Connect and manage multiple backend instances through a single UI using localStorage for server configuration
+- **Task Management**: Create, monitor, and control scheduled jobs with detailed execution history
+- **Proxy Management**: Configure and manage proxy servers for task execution
+- **Database Management**: Handle database connections and configurations
+- **Event Logging**: View detailed execution logs and event streams
+- **Real-time Updates**: WebSocket integration for live status updates
 
-Using the UI is as simple as running docker with the compose file.
+---
 
-```sh
+## ✨ Features
+
+| Feature                 | Description                                                   |
+| ----------------------- | ------------------------------------------------------------- |
+| **Authentication**      | Secure login and session management for backend servers       |
+| **Task Management**     | Full CRUD operations for scheduled jobs with cron expressions |
+| **Proxy Configuration** | Add, edit, and manage proxy servers                           |
+| **Database Management** | Manage database connections and settings                      |
+| **Event Monitoring**    | Real-time event logs and execution history                    |
+| **File Preview**        | Built-in file viewer for job artifacts and outputs            |
+| **Dashboard**           | Visual overview of system status and task performance         |
+
+---
+
+## 🚀 Deployment
+
+### Docker (Recommended)
+
+The recommended deployment method uses Docker with nginx as a reverse proxy.
+
+```bash
+# Using Docker Compose
 docker compose up
-```
 
-to run the container in command line you can use the followign command :
-
-```sh
+# Or run the container directly
 docker run -p 80:80 ghcr.io/moda20/scheduler_ui:latest
 ```
 
-The best way to use the scheduler_ui is to deploy it alongside an instance of the scheduler_backend. (see the starter repo)
+### Environment Variables
 
+The following environment variable can be set at build time:
 
-## Development
+| Variable          | Description                               | Default |
+| ----------------- |-------------------------------------------| ------- |
+| `SERVER_ENDPOINT` | The default endpoint of the target server | `/`     |
 
-The frontend is built using [vite](https://vite.dev/) and [react](https://react.dev/), [redux](https://redux.js.org/)/[react-redux](https://react-redux.js.org/), and [shadcn](https://ui.shadcn.com/), and [tailwindcss](https://tailwindcss.com/) are used for components and styling.
+### Example Docker Compose
 
-To run the frontend app locally :
-- Clone the repo : `git clone https://github.com/moda20/scheduler_ui.git`
-- Install the dependencies : `npm install`
-- Run the app : `npm start`
-- to build the app run : `npm run build`
+A `compose.yml` file is included in the repository for reference. The recommended setup is to deploy the UI alongside an instance of the scheduler backend (see the [starter repo](#)).
 
-The app is self contained and will **not need** any extra configurations
+---
 
+## 🛠 Development
+
+### Tech Stack
+
+- **Framework**: React 18 + Vite
+- **State Management**: Redux Toolkit + React Redux
+- **Routing**: React Router v6
+- **UI Components**: shadcn/ui (Radix UI primitives) + Tailwind CSS
+- **Testing**: Vitest + React Testing Library
+- **Language**: TypeScript
+
+### Getting Started
+
+```bash
+# Clone the repository
+git clone https://github.com/moda20/scheduler_ui.git
+
+# Navigate to the project directory
+cd scheduler_ui
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm start
+
+# Build for production
+npm run build
+```
+
+### Project Structure
+
+```
+src/
+├── app/              # Redux slices and store configuration
+├── assets/           # Static assets (fonts, etc.)
+├── components/       # React components
+│   ├── custom/       # Custom business logic components
+│   └── ui/           # shadcn/ui components
+├── features/         # Feature modules (auth, dashboard, jobs, etc.)
+├── hooks/            # Custom React hooks
+├── lib/              # Utility libraries
+├── models/           # TypeScript interfaces and types
+├── router/           # Routing configuration
+├── services/         # API services
+└── styles/           # Global styles and SCSS
+```
+
+### Configuration
+
+The application is self-contained and doesn't require additional configuration. All backend connections can be configured through the UI interface.
+
+---
 
 ## 📝 License
 
 TBD
 
+---
+
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to open an issue or submit a pull request.
-Please take the time to debug your issues and test your pull request changes if they need to, adding runnable tests
-would be much appreciated. 
+Contributions are welcome! Please follow these guidelines:
+
+1. **Fork the repository** and create a feature branch
+2. **Make your changes** following the existing code style
+3. **Test thoroughly** - debug issues and ensure functionality
+4. **Add tests** for new features when applicable
+5. **Commit** with clear, descriptive messages
+6. **Push** to your branch and create a pull request
+
+Please ensure your pull requests:
+
+- Pass all linting checks (`npm run lint`)
+- Pass all tests (`npm test`)
+- Have no TypeScript errors (`npm run type-check`)
+- Follow the project's code style
+
+---
+
+## 📞 Support
+
+For issues, questions, or suggestions, please open an issue on GitHub.
+
+---
+
+<div align="center">
+
+**Built with ❤️ using React, TypeScript, and shadcn/ui**
+
+</div>
