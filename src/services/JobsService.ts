@@ -199,6 +199,19 @@ const jobsService = {
     })
   },
 
+  readConsumerFile(id: string, filePath: string): Promise<any> {
+    return axios.get(`/jobs/readConsumerFile`, {
+      params: {
+        filePath,
+        id: id,
+      },
+      fetchOptions: {
+        onlyJSON: false,
+        fullResponse: true,
+      },
+    })
+  },
+
   searchJobs(search: string, limit: number, offset: number): Promise<any> {
     return axios.get(`/jobs/allJobs`, {
       params: {

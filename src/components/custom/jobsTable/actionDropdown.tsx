@@ -14,6 +14,7 @@ import {
   DockIcon,
   Edit2Icon,
   EllipsisVertical,
+  EyeIcon,
   FileSliders,
   LogsIcon,
   Settings,
@@ -38,6 +39,7 @@ import DrawerLatestRuns from "@/components/custom/DrawerLatestRuns"
 import { CardStackIcon } from "@radix-ui/react-icons"
 import { JobExecutionDialog } from "@/components/job-execution-dialog"
 import DrawerJobEvents from "@/components/custom/DrawerJobEvents"
+import DrawerFilePreview from "@/components/custom/DrawerFilePreview"
 
 export interface ActionDropdownProps {
   columnsProps: tableColumnsProps
@@ -298,6 +300,24 @@ export default function ActionDropdown({
                 <DropdownMenuShortcut>O</DropdownMenuShortcut>
               </DropdownMenuItemExtended>
             }
+          />
+          <DrawerFilePreview
+            trigger={
+              <DropdownMenuItemExtended
+                keyBinding="V"
+                onSelect={handleEventPrevention}
+                disabled={!isTopOfTheStack}
+              >
+                <EyeIcon />
+                <span>Preview Consumer</span>
+                <DropdownMenuShortcut>V</DropdownMenuShortcut>
+              </DropdownMenuItemExtended>
+            }
+            id={row.id}
+            fileName={row.consumer ?? ""}
+            fileType="tsc"
+            fileNature="consumer"
+            readOnly={true}
           />
         </DropdownMenuGroup>
         <DropdownMenuGroup>

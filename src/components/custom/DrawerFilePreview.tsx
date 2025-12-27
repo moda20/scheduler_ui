@@ -1,5 +1,5 @@
 import SheetActionDialog from "@/components/sheet-action-dialog"
-import { ReactNode, useCallback, useState } from "react"
+import { ReactNode, useCallback, useMemo, useState } from "react"
 import jobsService from "@/services/JobsService"
 import MonacoFileViewer from "@/components/custom/MonacoFileViewer"
 import { jobFileTypes } from "@/models/cacheFiles"
@@ -11,6 +11,7 @@ export interface DrawerFilePreviewProps {
   fileName: string
   fileType: string
   fileNature: string
+  readOnly?: boolean
 }
 
 export default function DrawerFilePreview({
@@ -19,6 +20,7 @@ export default function DrawerFilePreview({
   fileName,
   fileType,
   fileNature,
+  readOnly,
 }: DrawerFilePreviewProps) {
   const [fileContent, setFileContent] = useState<any>("")
 
@@ -35,6 +37,14 @@ export default function DrawerFilePreview({
       case "output":
         return jobsService.readOutputFile(id, fileName).then(res => {
           const sentFileType = res.headers["content-type"]
+          console.log(sentFileType, fileType, mimeType)
+          if (sentFileType?.includes(getMimeTypeFromExtension(fileType))) {
+            setFileContent(res.data)
+          }
+        })
+      case "consumer":
+        return jobsService.readConsumerFile(id, fileName).then(res => {
+          const sentFileType = res.headers["content-type"]
           if (sentFileType?.includes(getMimeTypeFromExtension(fileType))) {
             setFileContent(res.data)
           }
@@ -43,6 +53,15 @@ export default function DrawerFilePreview({
         break
     }
   }, [fileName, fileType, id])
+
+  const mimeType = useMemo(() => {
+    switch (fileNature) {
+      case "consumer":
+        return getMimeTypeFromExtension(fileType)
+      default:
+        return fileType
+    }
+  }, [fileType, fileNature])
 
   return (
     <SheetActionDialog
@@ -63,8 +82,9 @@ export default function DrawerFilePreview({
       {fileContent && (
         <MonacoFileViewer
           fileName={fileName}
-          fileType={fileType}
+          fileType={mimeType}
           fileContent={fileContent}
+          readOnly={readOnly}
         />
       )}
     </SheetActionDialog>
