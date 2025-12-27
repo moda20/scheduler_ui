@@ -1,12 +1,13 @@
 import type { OnChange } from "@monaco-editor/react"
 import Editor from "@monaco-editor/react"
-import React from "react"
+import React, { useMemo } from "react"
 
 export interface MonacoFileViewerProps {
   fileName: string
   fileContent: string
   fileType: string
   onChange?: OnChange
+  readOnly?: boolean
 }
 
 export default function MonacoFileViewer({
@@ -14,6 +15,7 @@ export default function MonacoFileViewer({
   fileContent,
   fileType,
   onChange,
+  readOnly,
 }: MonacoFileViewerProps) {
   const convertedFileContent = React.useMemo(() => {
     switch (fileType) {
@@ -24,6 +26,13 @@ export default function MonacoFileViewer({
     }
   }, [fileContent, fileType])
 
+  const editorOptions = useMemo(
+    () => ({
+      readOnly: readOnly ?? false,
+    }),
+    [readOnly],
+  )
+
   return (
     <Editor
       theme={"vs-dark"}
@@ -31,6 +40,7 @@ export default function MonacoFileViewer({
       defaultLanguage={fileType}
       value={convertedFileContent}
       onChange={onChange}
+      options={editorOptions}
     />
   )
 }

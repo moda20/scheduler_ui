@@ -74,6 +74,7 @@ export const getMimeTypeFromExtension = (extension = "txt") => {
       tif: "image/tiff",
       tiff: "image/tiff",
       ts: "video/mp2t",
+      tsc: "text/typescript",
       ttf: "font/ttf",
       txt: "text/plain",
       vsd: "application/vnd.visio",
