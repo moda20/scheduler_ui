@@ -273,6 +273,7 @@ export default function ActionDropdown({
             jobName={row.name}
             start={defaultLogPeriod.from}
             end={defaultLogPeriod.to}
+            jobId={row.id}
             trigger={
               <DropdownMenuItemExtended
                 keyBinding="L"

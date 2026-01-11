@@ -1,5 +1,7 @@
 import jobsService from "@/services/JobsService"
 import moment from "moment/moment"
+import axios from "@/lib/httpUtils"
+import { downloadFile } from "@/utils/serviceUtils"
 
 export const getLokiLogs = (
   query: string,
@@ -47,4 +49,47 @@ export const getLokiLogs = (
           }
         })
     })
+}
+
+export const getJobLogs = (jobId: number) => {
+  return axios.get("/files/logs/jobLogFiles", {
+    params: {
+      jobId,
+    },
+  })
+}
+
+export const readLogfile = (
+  fileName: string,
+  limit: number,
+  offset: number,
+  jobId?: number,
+): Promise<{ data: any; nextOffset: number }> => {
+  return axios.get("/files/logs/readLogFile", {
+    params: {
+      filePath: fileName,
+      limit,
+      offset,
+      jobId,
+    },
+  })
+}
+
+export const downloadLogfile = (
+  fileName: string,
+  jobId?: number,
+): Promise<any> => {
+  return axios
+    .get("/files/logs/downloadLogFile", {
+      params: {
+        filePath: fileName,
+        jobId,
+      },
+      responseType: "arraybuffer",
+      fetchOptions: {
+        fullResponse: true,
+        onlyJSON: false,
+      },
+    })
+    .then(downloadFile)
 }

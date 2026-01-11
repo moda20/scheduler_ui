@@ -27,6 +27,7 @@ export interface DatePickerWithPresetsProps {
   onChange: (date: DateRange | undefined) => void
   defaultValue?: DateRange
   selectRangeList?: Array<DateRangeExtended>
+  disabled?: boolean
 }
 const presetDates: DateRangeExtended[] = [
   {
@@ -119,6 +120,7 @@ export function DatePickerWithPresets(props: DatePickerWithPresetsProps) {
               setDialogState(false)
             }
           }}
+          disabled={props.disabled}
         >
           <CalendarIcon />
           {date?.from ? (
