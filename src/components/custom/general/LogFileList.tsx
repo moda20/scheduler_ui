@@ -1,0 +1,60 @@
+import type { FileItemProps } from "@/components/custom/general/FileItem"
+import FileItem from "@/components/custom/general/FileItem"
+import { useMemo, useRef } from "react"
+import type { LogFileMetadata, LogsStructure } from "@/models/logs"
+import { humanFileSize } from "@/utils/numberUtils"
+import { useVirtualizer } from "@tanstack/react-virtual"
+import { cn } from "@/lib/utils"
+
+export interface LogfileListProps {
+  logFiles: LogFileMetadata[]
+  readLogFile: (fileName: string) => Promise<LogsStructure>
+  downloadLogFile?: (fileName: string) => Promise<any>
+  originName?: string
+}
+
+export default function LogFileList(props: LogfileListProps) {
+  const parentRef = useRef(null)
+
+  const rowVirtualizer = useVirtualizer({
+    count: props.logFiles.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 35,
+    overscan: 5,
+  })
+
+  const FileList: FileItemProps[] = useMemo(() => {
+    return props.logFiles.map((logFile, i) => {
+      return {
+        item: {
+          fileId: logFile.hash,
+          fileName: logFile.name,
+          fileSize: humanFileSize(logFile.fileStats?.size!),
+          index: i,
+          createAt: logFile.date,
+          originName: props.originName,
+          deletionDate: logFile.deletionDate,
+        },
+        canPreview: true,
+        canDelete: false,
+        readLogFile: props.readLogFile,
+        downloadFile: props.downloadLogFile,
+      } as FileItemProps
+    })
+  }, [props.logFiles, props.readLogFile])
+
+  return (
+    <div ref={parentRef} className="List overflow-auto w-full">
+      <div
+        className={cn("w-full relative")}
+        style={{
+          height: `${rowVirtualizer.getTotalSize()}px`,
+        }}
+      >
+        {rowVirtualizer.getVirtualItems().map(virtualRow => (
+          <FileItem {...FileList[virtualRow.index]} className="mb-2" />
+        ))}
+      </div>
+    </div>
+  )
+}

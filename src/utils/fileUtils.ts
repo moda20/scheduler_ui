@@ -1,4 +1,4 @@
-import { JsonValidationError } from "@/components/custom/general/FileUploadBox"
+import type { JsonValidationError } from "@/components/custom/general/FileUploadBox"
 
 export const validateJsonContent = (
   content?: string,
