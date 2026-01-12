@@ -4,6 +4,7 @@ import moment from "moment"
 import type { FileItemModel, LogsStructure } from "@/models/logs"
 import { cn } from "@/lib/utils"
 import DrawerLogFilePreview from "@/components/custom/DrawerLogFilePreview"
+import { useMemo } from "react"
 
 export interface FileItemProps {
   item: FileItemModel
@@ -27,6 +28,9 @@ export default function FileItem({
   className,
 }: FileItemProps) {
   const titleName = item.fileName.split("/").pop()
+  const parsedCreatedAt = useMemo(() => {
+    return `${moment(item.createAt).format("YYYY-MM-DD HH")}h`
+  }, [item])
   return (
     <div key={index} className={cn("flex flex-col gap-2 w-full", className)}>
       {item.blockId && item.index === 0 && (
@@ -59,6 +63,7 @@ export default function FileItem({
               fileName={item.fileName}
               titleName={titleName}
               readLogs={readLogFile}
+              createdAt={parsedCreatedAt}
               originName={item.originName}
             />
           </span>
@@ -72,9 +77,7 @@ export default function FileItem({
           </div>
           <div className="text-xs text-[--muted-foreground]">
             <span className="font-semibold">Created at: </span>
-            <span title={item.createAt}>
-              {moment(item.createAt).format("YYYY-MM-DD HH")}h
-            </span>{" "}
+            <span title={item.createAt}>{parsedCreatedAt}</span>{" "}
             {item.deletionDate && (
               <>
                 <span className="font-semibold">Deletion : </span>

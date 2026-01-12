@@ -10,6 +10,7 @@ export interface DrawerLogFilePreviewProps {
   fileName: string
   titleName?: string
   originName?: string
+  createdAt?: string
   readLogs?: (fileName: string) => Promise<LogsStructure>
 }
 
@@ -20,6 +21,7 @@ export default function DrawerLogFilePreview({
   titleName,
   originName,
   readLogs,
+  createdAt,
 }: DrawerLogFilePreviewProps) {
   const [isFetching, setIsFetching] = useState(false)
   const [lineCount, setLineCount] = useState(0)
@@ -48,7 +50,6 @@ export default function DrawerLogFilePreview({
       logStructure.nextPage ? logStructure.nextPage() : readLogs?.(fileName)
     )
       ?.then(data => {
-        console.log("data", data)
         setLogStructure(data)
         setLineCount(lineCount + data.data.lines.length)
       })
@@ -66,9 +67,20 @@ export default function DrawerLogFilePreview({
         </span>
       }
       description={
-        <span>
-          Origin : <i>{originName}</i>
-        </span>
+        <>
+          <p>
+            Origin :{" "}
+            <b>
+              <i>{originName}</i>
+            </b>
+          </p>
+          <p>
+            Created at :{" "}
+            <b>
+              <i>{createdAt}</i>
+            </b>
+          </p>
+        </>
       }
       contentClassName="w-[600px] sm:w-[800px] sm:max-w-[800px] h-full flex flex-col"
       innerContainerClassName={"pb-0"}
