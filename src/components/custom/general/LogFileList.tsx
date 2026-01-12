@@ -19,8 +19,10 @@ export default function LogFileList(props: LogfileListProps) {
   const rowVirtualizer = useVirtualizer({
     count: props.logFiles.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 35,
-    overscan: 5,
+    estimateSize: () => 68.5,
+    overscan: 68.5,
+    gap: 8,
+    lanes: 1,
   })
 
   const FileList: FileItemProps[] = useMemo(() => {
@@ -44,7 +46,10 @@ export default function LogFileList(props: LogfileListProps) {
   }, [props.logFiles, props.readLogFile])
 
   return (
-    <div ref={parentRef} className="List overflow-auto w-full">
+    <div
+      ref={parentRef}
+      className="List overflow-auto w-full h-[calc(100%-3rem)]"
+    >
       <div
         className={cn("w-full relative")}
         style={{
@@ -52,7 +57,7 @@ export default function LogFileList(props: LogfileListProps) {
         }}
       >
         {rowVirtualizer.getVirtualItems().map(virtualRow => (
-          <FileItem {...FileList[virtualRow.index]} className="mb-2" />
+          <FileItem className="mb-2" {...FileList[virtualRow.index]} />
         ))}
       </div>
     </div>

@@ -119,7 +119,13 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
             disabled={!lokiTabActive}
           />
         </div>
-        <div className="flex ml-auto items-center">
+
+        <div className="flex ml-auto items-center gap-2">
+          {!lokiTabActive && (
+            <span className="flex ml-auto items-center text-sm font-bold text-foreground">
+              {logFiles.length} files
+            </span>
+          )}
           <TabButtonGroup
             tabList={tabList}
             setActiveTab={setActiveLogTypeTab}
