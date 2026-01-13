@@ -1,30 +1,31 @@
 import { Label } from "@/components/ui/label"
 import SheetActionDialog from "@/components/sheet-action-dialog"
 import type { ReactNode } from "react"
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 import { useState } from "react"
-import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Checkbox } from "@/components/ui/checkbox"
 import { DatePickerWithPresets } from "@/components/ui/date-picker-presets"
 import type { DateRange } from "react-day-picker"
 import type { CheckedState } from "@radix-ui/react-checkbox"
-import useInterval from "@/hooks/useInterval"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { LoaderPinwheelIcon, LogsIcon } from "lucide-react"
-import { getLokiLogs } from "@/services/components/logsService"
 import TabCarousel from "@/components/custom/general/TabCarousel"
 import Spinner from "@/components/custom/LoadingOverlay"
 import { useSocketLogs } from "@/lib/socketUtils"
-import { MiscNotificationTopics } from "@/models/network"
 import { LiveLogViewer } from "@/components/custom/general/LogViewer"
+import TabButtonGroup from "@/components/custom/general/TabButtonGroup"
+import { useJobLogs } from "@/hooks/useLogs"
+import LogFileList from "@/components/custom/general/LogFileList"
 
 export interface DrawerLokiLogsProps {
   start?: Date
   end?: Date
   jobName: string
   trigger?: ReactNode
+  jobId?: string
 }
+
+const tabList = ["Loki", "Files"]
 
 export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
   const [watch, setWatch] = useState<CheckedState>(true)
@@ -34,7 +35,12 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
     to: props.end,
   })
   const [activeTab, setActiveTab] = useState<string>("")
+  const [activeLogTypeTab, setActiveLogTypeTab] = useState<string>(tabList[0])
   const [loading, setLoading] = useState(false)
+  const lokiTabActive = useMemo(
+    () => activeLogTypeTab === "Loki",
+    [activeLogTypeTab],
+  )
 
   const { logs } = useSocketLogs({
     actions: [],
@@ -45,11 +51,26 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
       return stream
     },
     initialLogsFilter: period,
-    logInterval: dialogOpen && watch ? 10000 : undefined,
+    logInterval: lokiTabActive && dialogOpen && watch ? 10000 : undefined,
     mergeOutputStreams: false,
     logQuery: `{job="${props.jobName}"}`,
     setEndToMidnight: true,
   })
+
+  const {
+    logFiles,
+    loading: logFileLoading,
+    readLogFile,
+    downloadLogFile,
+  } = useJobLogs({
+    jobId: props.jobId,
+  })
+
+  useEffect(() => {
+    return () => {
+      console.log("logFiles change")
+    }
+  }, [logFiles])
 
   const fetchLogs = (open?: boolean) => {
     setDialogOpen(!!open)
@@ -87,6 +108,7 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
                 v.preventDefault()
               }
             }}
+            disabled={!lokiTabActive}
           />
           <Label htmlFor="watchLogs">Watch</Label>
         </div>
@@ -94,59 +116,86 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
           <DatePickerWithPresets
             onChange={updatePeriod}
             defaultValue={period}
+            disabled={!lokiTabActive}
+          />
+        </div>
+
+        <div className="flex ml-auto items-center gap-2">
+          {!lokiTabActive && (
+            <span className="flex ml-auto items-center text-sm font-bold text-foreground">
+              {logFiles.length} files
+            </span>
+          )}
+          <TabButtonGroup
+            tabList={tabList}
+            setActiveTab={setActiveLogTypeTab}
+            activeTab={activeLogTypeTab}
           />
         </div>
       </div>
-      {logs.length === 0 && (
-        <div className="flex flex-col gap-2 items-center justify-center p-2 border-border border rounded-md">
-          <LogsIcon />
-          <div className="text-muted-foreground text-sm">
-            No Logs for {props.jobName} found
-          </div>
-        </div>
-      )}
       <Spinner
-        isLoading={loading}
+        isLoading={loading || logFileLoading}
         icon={LoaderPinwheelIcon}
         className="h-[calc(100%-3rem)] w-full"
       >
-        {logs.length > 0 && (
-          <Tabs value={activeTab} className="w-full h-full">
-            <TabCarousel>
-              <TabsList className="px-0">
+        {lokiTabActive ? (
+          <div className="w-full">
+            {lokiTabActive && logs.length === 0 && (
+              <div className="flex flex-col gap-2 items-center justify-center p-2 border-border border rounded-md w-full">
+                <LogsIcon />
+                <div className="text-muted-foreground text-sm">
+                  No Logs for {props.jobName} found
+                </div>
+              </div>
+            )}
+            {logs.length > 0 && (
+              <Tabs value={activeTab} className="w-full h-full">
+                <TabCarousel>
+                  <TabsList className="px-0">
+                    {logs.map((stream: any, index) => {
+                      return (
+                        <TabsTrigger
+                          className="data-[state=active]:bg-sidebar"
+                          key={stream.uniqueId}
+                          value={stream.uniqueId}
+                          onClick={() => setActiveTab(stream.uniqueId)}
+                          title={stream.uniqueId}
+                        >
+                          {stream.title}
+                        </TabsTrigger>
+                      )
+                    })}
+                  </TabsList>
+                </TabCarousel>
                 {logs.map((stream: any, index) => {
                   return (
-                    <TabsTrigger
-                      className="data-[state=active]:bg-sidebar"
-                      key={stream.uniqueId}
+                    <TabsContent
+                      key={"t" + stream.uniqueId}
                       value={stream.uniqueId}
-                      onClick={() => setActiveTab(stream.uniqueId)}
-                      title={stream.uniqueId}
+                      className="h-[inherit]"
+                      title={stream.title}
                     >
-                      {stream.title}
-                    </TabsTrigger>
+                      <LiveLogViewer
+                        initialLogs={stream.values.map(
+                          (e: any) => e.fullMessage,
+                        )}
+                        wrapLines={false}
+                        scrollToLine={1}
+                        extraLines={4}
+                      />
+                    </TabsContent>
                   )
                 })}
-              </TabsList>
-            </TabCarousel>
-            {logs.map((stream: any, index) => {
-              return (
-                <TabsContent
-                  key={"t" + stream.uniqueId}
-                  value={stream.uniqueId}
-                  className="h-[inherit]"
-                  title={stream.title}
-                >
-                  <LiveLogViewer
-                    initialLogs={stream.values.map((e: any) => e.fullMessage)}
-                    wrapLines={false}
-                    scrollToLine={1}
-                    extraLines={4}
-                  />
-                </TabsContent>
-              )
-            })}
-          </Tabs>
+              </Tabs>
+            )}
+          </div>
+        ) : (
+          <LogFileList
+            logFiles={logFiles}
+            readLogFile={readLogFile}
+            originName={props.jobName}
+            downloadLogFile={downloadLogFile}
+          />
         )}
       </Spinner>
     </SheetActionDialog>

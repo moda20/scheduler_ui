@@ -16,9 +16,9 @@ import useDialogueManager from "@/hooks/useDialogManager"
 export interface SheetActionDialogProps
   extends React.ComponentProps<typeof Sheet> {
   side: "left" | "right"
-  title: string
-  description?: string | null
-  trigger: ReactNode
+  title: string | ReactNode
+  description?: string | ReactNode
+  trigger?: ReactNode
   children?: ReactNode
   contentClassName?: string
   innerContainerClassName?: string
@@ -29,10 +29,6 @@ export interface SheetActionDialogProps
 const defaultSheetActionDialogProps: SheetActionDialogProps = {
   side: "right",
   title: "",
-  description: null,
-  trigger: null,
-  children: null,
-  contentClassName: "",
   onOpenChange: () => {},
   modal: false,
 }
