@@ -54,9 +54,13 @@ export const LiveLogViewer: React.FC<LiveLogViewerProps> = ({
           !askForLogs
         )
           return onScroll
+        const listRef = internalRef.current.listRef.current
         if (
           fetchedCountRef.current < buffer.length &&
-          internalRef.current.listRef.current.findEndIndex() + 50 >
+          internalRef.current.listRef.current.findItemIndex(
+            listRef.scrollOffset + listRef.viewportSize,
+          ) +
+            50 >
             buffer.length
         ) {
           fetchedCountRef.current = buffer.length
