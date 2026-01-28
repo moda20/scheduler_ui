@@ -57,9 +57,7 @@ export const LiveLogViewer: React.FC<LiveLogViewerProps> = ({
         const listRef = internalRef.current.listRef.current
         if (
           fetchedCountRef.current < buffer.length &&
-          internalRef.current.listRef.current.findItemIndex(
-            listRef.scrollOffset + listRef.viewportSize,
-          ) +
+          listRef.findItemIndex(listRef.scrollOffset + listRef.viewportSize) +
             50 >
             buffer.length
         ) {
