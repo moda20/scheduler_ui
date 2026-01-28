@@ -75,7 +75,6 @@ export default function SheetActionDialog(
         >
           {props.children}
         </div>
-        <SheetFooter></SheetFooter>
       </SheetContent>
     </Sheet>
   )
