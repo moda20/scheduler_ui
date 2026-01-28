@@ -180,8 +180,10 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
                           (e: any) => e.fullMessage,
                         )}
                         wrapLines={false}
+                        follow={false}
                         scrollToLine={1}
                         extraLines={4}
+                        enableLinks={true}
                       />
                     </TabsContent>
                   )
