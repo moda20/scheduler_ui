@@ -15,6 +15,7 @@ export interface FileItemProps {
   canPreview?: boolean
   className?: string
   index?: number
+  style?: React.CSSProperties
 }
 
 export default function FileItem({
@@ -26,13 +27,18 @@ export default function FileItem({
   canDelete,
   canPreview,
   className,
+  style,
 }: FileItemProps) {
   const titleName = item.fileName.split("/").pop()
   const parsedCreatedAt = useMemo(() => {
     return `${moment(item.createAt).format("YYYY-MM-DD HH")}h`
   }, [item])
   return (
-    <div key={index} className={cn("flex flex-col gap-2 w-full", className)}>
+    <div
+      key={index}
+      className={cn("flex flex-col gap-2 w-full", className)}
+      style={style}
+    >
       {item.blockId && item.index === 0 && (
         <div className="flex flex-row gap-1.5 items-center">
           <div className="separator h-[0.1px] bg-foreground opacity-50 w-1/6"></div>

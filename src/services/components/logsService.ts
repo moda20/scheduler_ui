@@ -59,6 +59,9 @@ export const getJobLogs = (jobId: number) => {
   })
 }
 
+export const getSystemLogFiles = (): Promise<any> => {
+  return axios.get("/files/logs/systemLogfiles")
+}
 export const readLogfile = (
   fileName: string,
   limit: number,

@@ -20,7 +20,7 @@ export default function LogFileList(props: LogfileListProps) {
     count: props.logFiles.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => 68.5,
-    overscan: 68.5,
+    overscan: 24,
     gap: 8,
     lanes: 1,
   })
@@ -56,8 +56,14 @@ export default function LogFileList(props: LogfileListProps) {
           height: `${rowVirtualizer.getTotalSize()}px`,
         }}
       >
-        {rowVirtualizer.getVirtualItems().map(virtualRow => (
-          <FileItem className="mb-2" {...FileList[virtualRow.index]} />
+        {rowVirtualizer.getVirtualItems().map((virtualRow, index) => (
+          <FileItem
+            className="mb-2 absolute"
+            style={{
+              transform: `translateY(${virtualRow.start}px)`,
+            }}
+            {...FileList[virtualRow?.index ?? index]}
+          />
         ))}
       </div>
     </div>
