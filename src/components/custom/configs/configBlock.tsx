@@ -20,10 +20,8 @@ export interface ConfigBlockProps {
   updateGroupTitle: (id: string, title: string) => void
   updateConfigItem: (
     target: string,
-
-    itemId: string,
     value: string | boolean,
-    parentId?: string,
+    path?: string[],
   ) => void
   removeConfigItem: (
     itemId: string,
@@ -107,19 +105,48 @@ export default function ConfigBlock({
         <CardContent className="space-y-6 text-foreground bg-background rounded-xl">
           <div className="grid gap-4">
             {group.subGroups ? (
-              group.subGroups.map((sg: any) => (
-                <ConfigInputCombo
-                  key={sg.id}
-                  item={sg}
-                  editMode={editMode}
-                  removeConfigItem={(itemId, setValue) =>
-                    removeConfigItem(itemId, group.id, setValue)
-                  }
-                  updateConfigItem={(...args) =>
-                    updateConfigItem(...args, group.id)
-                  }
-                />
-              ))
+              group.subGroups.map((sg: any) =>
+                sg.subGroups ? (
+                  <ConfigBlock
+                    key={sg.id}
+                    className="border-none"
+                    group={sg}
+                    editMode={editMode}
+                    addConfigItem={addConfigItem}
+                    removeConfigItem={(itemId, pid, setValue) =>
+                      removeConfigItem(itemId, group.id, setValue)
+                    }
+                    updateConfigItem={(
+                      target: string,
+                      value: string | boolean,
+                      path?: string[],
+                    ) => {
+                      updateConfigItem(target, value, [
+                        group.id,
+                        ...(path ?? []),
+                      ])
+                    }}
+                    updateGroupTitle={updateGroupTitle}
+                    undoGroupRemoval={id =>
+                      removeConfigItem(id, undefined, false)
+                    }
+                  />
+                ) : (
+                  <ConfigInputCombo
+                    key={sg.id}
+                    item={sg}
+                    editMode={editMode}
+                    removeConfigItem={(itemId, setValue) =>
+                      removeConfigItem(itemId, group.id, setValue)
+                    }
+                    updateConfigItem={(
+                      target: string,
+                      itemId: string,
+                      value: string | boolean,
+                    ) => updateConfigItem(target, value, [group.id, itemId])}
+                  />
+                ),
+              )
             ) : (
               <ConfigInputCombo
                 item={group}
@@ -127,7 +154,11 @@ export default function ConfigBlock({
                 removeConfigItem={(id, setValue) =>
                   removeConfigItem(id, undefined, setValue)
                 }
-                updateConfigItem={updateConfigItem}
+                updateConfigItem={(
+                  target: string,
+                  itemId: string,
+                  value: string | boolean,
+                ) => updateConfigItem(target, value, [group.id, itemId])}
               />
             )}
 

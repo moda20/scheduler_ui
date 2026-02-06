@@ -199,7 +199,6 @@ export function NotificationConfigDialog({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Service name*</FormLabel>
-                      <div>{field.value}</div>
                       <FormControl>
                         <Input
                           placeholder="input the name of ther service*"
