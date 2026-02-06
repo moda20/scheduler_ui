@@ -35,6 +35,7 @@ import { PasswordInput } from "@/components/ui/password-input"
 import ManagedSelect from "@/components/custom/ManagedSelect"
 import ConfirmationDialogAction from "@/components/confirmationDialogAction"
 import { MinusIcon } from "@radix-ui/react-icons"
+import { Separator } from "@/components/ui/separator"
 
 export interface ProxyLinkDialogProps {
   children: React.ReactNode
@@ -132,7 +133,7 @@ export function ProxyLinkDialog({
                 </CardContent>
               </Card>
             </div>
-            <div className={"border-b"}></div>
+            <Separator orientation="horizontal" className="mr-2 h-1" />
             <div>
               <Card className="border-transparent">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 p-0 pb-2 text-foreground bg-background border-transparent rounded-t-xl">
@@ -184,6 +185,7 @@ export function ProxyLinkDialog({
                               triggerClassName={"w-full"}
                               multiSelect={true}
                               managed={true}
+                              maxSelectedItemsToShowOnMainTrigger={3}
                             />
                           </FormControl>
                           <FormDescription>

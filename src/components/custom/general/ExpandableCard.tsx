@@ -33,7 +33,7 @@ export default function ExpandableCard({
   return (
     <div
       className={cn(
-        "relative transition-all duration-200 ease-in-out flex  gap-0",
+        "relative transition-all duration-200 ease-out flex  gap-0",
         isExpanded ? "w-full" : "",
         className,
       )}

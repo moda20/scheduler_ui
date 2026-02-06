@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
+    "@icons-pack/react-simple-icons": "^13.8.0",
     "@melloware/react-logviewer": "^6.3.5",
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-alert-dialog": "^1.1.2",
