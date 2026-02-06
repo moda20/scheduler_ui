@@ -26,7 +26,7 @@ const ButtonWithStrCut = React.forwardRef<
       newRef.current.dispatchEvent(new MouseEvent("click", { bubbles: true }))
     }
   })
-  return <Button ref={ref} {...props} />
+  return <Button ref={newRef} {...props} />
 })
 
 export default ButtonWithStrCut

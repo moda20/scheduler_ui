@@ -215,27 +215,36 @@ export default function NotificationServices() {
   const updateNotificationServiceConfig = useCallback(
     async (updatedConfig: any) => {
       if (!selectedService) return
-      const constUpdateResult =
-        await notificationService.updateNotificationServiceConfig(
-          selectedService?.name,
-          updatedConfig,
-        )
-      if (constUpdateResult.skipped.length) {
-        toast({
-          title: `Config update skipped for ${constUpdateResult.skipped.join(", ")} 
+      try {
+        const constUpdateResult =
+          await notificationService.updateNotificationServiceConfig(
+            selectedService?.name,
+            updatedConfig,
+          )
+        if (constUpdateResult.skipped.length) {
+          toast({
+            title: `Config update skipped for ${constUpdateResult.skipped.join(", ")} 
           Config update passed for ${constUpdateResult.updated.join(", ")}
           `,
+            duration: 2000,
+            variant: "destructive",
+          })
+        } else {
+          const successToastMessage =
+            !constUpdateResult.updated.length &&
+            !constUpdateResult.skipped.length
+              ? `No configuration was updated`
+              : `Config update successfully`
+          toast({
+            title: successToastMessage,
+            duration: 2000,
+          })
+        }
+      } catch (e: any) {
+        toast({
+          title: `Error updating config: ${e.message}`,
           duration: 2000,
           variant: "destructive",
-        })
-      } else {
-        const successToastMessage =
-          !constUpdateResult.updated.length && !constUpdateResult.skipped.length
-            ? `No configuration was updated`
-            : `Config update successfully`
-        toast({
-          title: successToastMessage,
-          duration: 2000,
         })
       }
     },
@@ -365,7 +374,7 @@ export default function NotificationServices() {
                       alt={selectedService?.name}
                       className="sm:w-3/12 md:w-2/12 rounded-md"
                     />
-                    <div className="flex flex-col gap-2 pl-3 border-l-4 border-border border-1-2">
+                    <div className="flex flex-col gap-2 pl-3 border-l-4 border-border">
                       <div className="flex gap-2 ">
                         <span className="min-w-[120px] font-bold">Name :</span>
                         <div className="font-medium w-auto capitalize">
@@ -435,7 +444,7 @@ export default function NotificationServices() {
                             <ConfirmationDialogAction
                               title={`Detach ${e.name} Job ?`}
                               description={
-                                "This will detach this service from the job making it not available on th next run of the job"
+                                "This will detach this service from the job making it not available on the next run of the job"
                               }
                               takeAction={handleConfirmationDialogAction}
                               confirmText="Detach Job"

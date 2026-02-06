@@ -126,7 +126,7 @@ export function NotificationConfigUpdateDialog({
         setDialogState(false)
       }
     },
-    [onChange],
+    [onChange, submitFormData, setDialogState],
   )
 
   return (
