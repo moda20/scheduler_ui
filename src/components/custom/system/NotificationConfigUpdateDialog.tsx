@@ -21,13 +21,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { CrossIcon, LoaderPinwheelIcon, SaveIcon } from "lucide-react"
+import { LoaderPinwheelIcon, SaveIcon } from "lucide-react"
 import useDialogueManager from "@/hooks/useDialogManager"
 import { cn } from "@/lib/utils"
 import { notificationService } from "@/services/notificationsService"
 import { useState, useEffect, useCallback } from "react"
 import Spinner from "@/components/custom/LoadingOverlay"
-import { Cross2Icon, CrossCircledIcon } from "@radix-ui/react-icons"
+import { CrossCircledIcon } from "@radix-ui/react-icons"
 
 export interface NotificationConfigUpdateDialogProps {
   children: React.ReactNode
@@ -36,7 +36,7 @@ export interface NotificationConfigUpdateDialogProps {
   triggerClassName?: string
 }
 
-const ConfigSchema = z.record(z.string(), z.string())
+const ConfigSchema = z.record(z.string(), z.string().optional().default(""))
 
 export type ConfigUpdateType = z.infer<typeof ConfigSchema>
 

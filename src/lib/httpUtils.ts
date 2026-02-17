@@ -19,16 +19,11 @@ service.defaults.withCredentials = true
 
 // Config
 const ENTRY_ROUTE = "/auth/login"
-const TOKEN_PAYLOAD_KEY = "authorization"
 const services = [service]
 // API Request interceptor
 services.forEach(s =>
   s.interceptors.request.use(config => {
-    const jwtToken = localStorage.getItem("AUTH_TOKEN")
     const targetUrl = store.getState().ui.config.targetServer
-    if (jwtToken) {
-      config.headers[TOKEN_PAYLOAD_KEY] = jwtToken
-    }
     if (targetUrl) {
       config.baseURL = targetUrl
     }
