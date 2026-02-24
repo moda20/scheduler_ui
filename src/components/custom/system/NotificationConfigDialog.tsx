@@ -79,7 +79,7 @@ export function NotificationConfigDialog({
         url: notificationServiceDetails?.image,
         fileName: notificationServiceDetails?.image,
       },
-      jobs: notificationServiceDetails?.jobs?.map(toString),
+      jobs: notificationServiceDetails?.jobs?.map(String),
     },
     resetOptions: {
       keepValues: false,
@@ -101,7 +101,9 @@ export function NotificationConfigDialog({
       formData.append("name", inputData.name)
       formData.append("description", inputData.description ?? "")
       formData.append("entryPoint", inputData.entryPoint)
-      formData.append("jobs", inputData.jobs?.toString() ?? "[]")
+      if (inputData.jobs?.toString()) {
+        formData.append("jobs", inputData.jobs?.toString())
+      }
       return formData
     },
     [isDialogOpen],
@@ -199,7 +201,6 @@ export function NotificationConfigDialog({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Service name*</FormLabel>
-                      <div>{field.value}</div>
                       <FormControl>
                         <Input
                           placeholder="input the name of ther service*"

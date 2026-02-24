@@ -16,7 +16,7 @@ import {
   Plus,
   SaveIcon,
 } from "lucide-react"
-import { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import systemService from "@/services/SystemService"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/hooks/use-toast"
@@ -26,12 +26,15 @@ import ConfigBlock from "@/components/custom/configs/configBlock"
 import configService from "@/services/configs"
 import ConfirmationDialogAction from "@/components/confirmationDialogAction"
 import { genUID, isEqual } from "@/utils/generalUtils"
+import { useInView } from "@/hooks/useInView"
+import { cn } from "@/lib/utils"
 
 export default function ConfigsDashboard() {
   const [editMode, setEditMode] = useState(false)
   const [config, setConfig] = useState<Array<ConfigItem>>([])
   const [shadowConfig, setShadowConfig] = useState<Array<ConfigItem>>([])
   const [configChanged, setConfigStatus] = useState<Boolean>(false)
+  const { ref, inView } = useInView()
 
   const convertConfigStructure = useCallback((config: ConfigType) => {
     const recParse = (parentKey: string, input: ConfigType): any => {
@@ -154,19 +157,17 @@ export default function ConfigsDashboard() {
   )
 
   const updateConfigItem = useCallback(
-    (
-      target: string,
-      itemId: string,
-      value: string | boolean,
-      parentId?: string,
-    ) => {
-      const targetConfig = parentId
-        ? config
-            .find(e => e.id === parentId)
-            ?.subGroups?.find(e => e.id === itemId)
-        : config.find(e => e.id === itemId)
-      if (targetConfig) {
-        targetConfig[target] = value
+    (target: string, value: string | boolean, path?: string[]) => {
+      const targetConfigUsingPath = config.reduce(
+        (p: any, c: any, index: number) => {
+          return p.subGroups?.find((e: any) => e.id === path?.[index]) ?? p
+        },
+        {
+          subGroups: config,
+        },
+      )
+      if (targetConfigUsingPath) {
+        targetConfigUsingPath[target] = value
       }
       setConfig([...config])
     },
@@ -222,7 +223,9 @@ export default function ConfigsDashboard() {
     const recConvert = (parentKey: string, input: any): any => {
       const combinedKey = `${parentKey ? parentKey + "." : ""}${input.key ?? input.title}`
       if (input.subGroups) {
-        return input.subGroups.map((sg: any) => recConvert(combinedKey, sg))
+        return input.subGroups
+          .map((sg: any) => recConvert(combinedKey, sg))
+          .flat()
       } else {
         return [
           {
@@ -237,64 +240,73 @@ export default function ConfigsDashboard() {
     return config.map(e => recConvert("", e).flat()).flat()
   }, [])
   return (
-    <div className="flex flex-col gap-4">
-      <div className={"flex items-center justify-between"}>
-        <div className={"flex flex-col gap-1 mb-4"}>
-          <h2 className="text-2xl font-bold tracking-tight">
-            System configuration
-          </h2>
-          <p className="text-md font-light">
-            Manage basic configurations and secrets.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          {!configChanged && (
-            <ConfirmationDialogAction
-              title={"Save configuration Changes"}
-              description={`This will update the server configuration, only new running jobs (instance) will be affected`}
-              takeAction={() => saveDiffConfig()}
-              confirmText={"Save configuration"}
-              confirmVariant={"default"}
-            >
-              <Button
-                size="sm"
-                variant="destructive"
-                className="border-none focus:ring-0 outline-none"
-              >
-                <SaveIcon />
-                <span className="text-sm">Save</span>
-              </Button>
-            </ConfirmationDialogAction>
-          )}
+    <div className="h-full">
+      <div ref={ref} className="h-1"></div>
+      <div
+        className={cn(
+          "z-10 transition-all duration-100 sticky pt-4",
+          !inView ? "bg-background/95 backdrop-blur-sm shadow-md top-16" : "",
+          editMode ? "pb-4" : "",
+        )}
+      >
+        <div className={"flex items-center justify-between"}>
+          <div className={"flex flex-col gap-1 mb-4"}>
+            <h2 className="text-2xl font-bold tracking-tight">
+              System configuration
+            </h2>
+            <p className="text-md font-light">
+              Manage basic configurations and secrets.
+            </p>
+          </div>
           <div className="flex items-center gap-2">
-            <Eye className="h-4 w-4" />
-            <span className="text-sm">View</span>
-            <Switch checked={editMode} onCheckedChange={setEditMode} />
-            <span className="text-sm">Edit</span>
-            <Edit3 className="h-4 w-4" />
+            {!configChanged && (
+              <ConfirmationDialogAction
+                title={"Save configuration Changes"}
+                description={`This will update the server configuration, only new running jobs (instance) will be affected`}
+                takeAction={() => saveDiffConfig()}
+                confirmText={"Save configuration"}
+                confirmVariant={"default"}
+              >
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  className="border-none focus:ring-0 outline-none"
+                >
+                  <SaveIcon />
+                  <span className="text-sm">Save</span>
+                </Button>
+              </ConfirmationDialogAction>
+            )}
+            <div className="flex items-center gap-2">
+              <Eye className="h-4 w-4" />
+              <span className="text-sm">View</span>
+              <Switch checked={editMode} onCheckedChange={setEditMode} />
+              <span className="text-sm">Edit</span>
+              <Edit3 className="h-4 w-4" />
+            </div>
           </div>
         </div>
+        {editMode && (
+          <div className="flex gap-4 items-center">
+            <Button
+              variant="ghost"
+              onClick={() => addConfigItem(undefined, "item")}
+              className="w-full gap-2 border-dashed border-2 border-border hover:border-solid hover:bg-transparent"
+            >
+              <Plus className="h-4 w-4" />
+              Add single config Item
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => addConfigItem(undefined, "block")}
+              className="w-full gap-2 border-dashed border-2 border-border hover:border-solid hover:bg-transparent"
+            >
+              <Plus className="h-4 w-4" />
+              Add a config block
+            </Button>
+          </div>
+        )}
       </div>
-      {editMode && (
-        <div className="flex gap-4 items-center">
-          <Button
-            variant="ghost"
-            onClick={() => addConfigItem(undefined, "item")}
-            className="w-full gap-2 border-dashed border-2 border-border hover:border-solid hover:bg-transparent"
-          >
-            <Plus className="h-4 w-4" />
-            Add single config Item
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => addConfigItem(undefined, "block")}
-            className="w-full gap-2 border-dashed border-2 border-border hover:border-solid hover:bg-transparent"
-          >
-            <Plus className="h-4 w-4" />
-            Add a config block
-          </Button>
-        </div>
-      )}
 
       <div className="space-y-6">
         {config?.map(snf => {

@@ -40,4 +40,20 @@ export const notificationService = {
   getAllServiceEntryPoints() {
     return axios.get("/notifications/allExternalFiles")
   },
+  getNotificationServiceConfigurations(name: string): Promise<any> {
+    return axios.get("/notifications/getNotificationServiceConfigurations", {
+      params: {
+        name,
+      },
+    })
+  },
+  updateNotificationServiceConfig(
+    name: string,
+    config: Record<string, { value: string }>,
+  ): Promise<any> {
+    return axios.put("/notifications/updateNotificationServiceConfig", {
+      name,
+      config,
+    })
+  },
 }

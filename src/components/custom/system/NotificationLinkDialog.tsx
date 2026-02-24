@@ -32,6 +32,8 @@ import ConfirmationDialogAction, {
   ConfirmationDialogActionType,
 } from "@/components/confirmationDialogAction"
 import { MinusIcon } from "@radix-ui/react-icons"
+import BImage from "@/components/custom/general/PublicBackendImage"
+import { Separator } from "@/components/ui/separator"
 
 export interface NotificationLinkDialogProps {
   children: React.ReactNode
@@ -105,105 +107,89 @@ export function NotificationLinkDialog({
                 console.log(err)
               },
             )}
-            className="space-y-8"
+            className="space-y-6"
           >
-            <div>
-              <Card className="border-transparent">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 p-0 pb-2 text-foreground bg-background border-transparent rounded-t-xl">
-                  <CardTitle className="text-lg font-bold">
-                    Notification Service
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0 pt-0 flex flex-col gap-2">
-                  <div className={"flex gap-2"}>
-                    <h2 className="w-2/6 mt-10 scroll-m-20 font-semibold tracking-tight transition-colors first:mt-0">
-                      Name
-                    </h2>
-                    <p className="w-4/6 transition-colors font-mono text-sm">
-                      {notificationDetails?.name}
-                    </p>
-                  </div>
-                  <div className={"flex gap-2"}>
-                    <h2 className="w-2/6 mt-10 scroll-m-20 font-semibold tracking-tight transition-colors first:mt-0">
-                      Description
-                    </h2>
-                    <p className="w-4/6 transition-colors font-mono text-sm">
-                      {notificationDetails?.description}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            <div className={"border-b"}></div>
-            <div>
-              <Card className="border-transparent">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 p-0 pb-2 text-foreground bg-background border-transparent rounded-t-xl">
-                  <CardTitle className="text-lg font-bold">Jobs</CardTitle>
-                  <ConfirmationDialogAction
-                    title={"Detach all jobs"}
-                    description={
-                      "Detach all jobs from this notification service"
-                    }
-                    takeAction={action => {
-                      if (action === ConfirmationDialogActionType.CANCEL) return
-                      form.setValue("jobs", [], {
-                        shouldTouch: true,
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      })
-                    }}
-                    confirmText={"Detach all jobs"}
+            <Card className="border-transparent border-0">
+              <CardContent className="p-0 pt-0 flex gap-5 ">
+                <BImage
+                  src={notificationDetails?.image}
+                  alt={notificationDetails?.name}
+                  className="w-3/12 rounded-md overflow-hidden break-all"
+                />
+                <div className="flex flex-col gap-2 w-7/12">
+                  <h2 className="w-full mt-10 scroll-m-20 font-semibold tracking-tight transition-colors first:mt-0">
+                    {notificationDetails?.name}
+                  </h2>
+                  <p className="w-full transition-colors font-mono text-sm">
+                    {notificationDetails?.description}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            <Separator orientation="horizontal" className="mr-2 h-1" />
+            <Card className="border-transparent">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 p-0 pb-2 text-foreground bg-background border-transparent rounded-t-xl">
+                <CardTitle className="text-lg font-bold">Jobs</CardTitle>
+                <ConfirmationDialogAction
+                  title={"Detach all jobs"}
+                  description={"Detach all jobs from this notification service"}
+                  takeAction={action => {
+                    if (action === ConfirmationDialogActionType.CANCEL) return
+                    form.setValue("jobs", [], {
+                      shouldTouch: true,
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }}
+                  confirmText={"Detach all jobs"}
+                >
+                  <Button
+                    variant={"destructive"}
+                    size="sm"
+                    className="btn-rounded"
                   >
-                    <Button
-                      variant={"destructive"}
-                      size="sm"
-                      className="btn-rounded"
-                    >
-                      <MinusIcon />
-                      Detach all
-                    </Button>
-                  </ConfirmationDialogAction>
-                </CardHeader>
-                <CardContent className="p-0 pt-0 flex flex-col gap-2">
-                  <FormField
-                    control={form.control}
-                    name="jobs"
-                    render={({ field }) => (
-                      <div>
-                        <FormItem>
-                          <FormLabel>
-                            Select the jobs that can use this notification
-                            service
-                          </FormLabel>
-                          <br />
-                          <FormControl ref={field.ref}>
-                            <ComboBox
-                              selectedItemValue={field.value}
-                              itemList={JobsList}
-                              {...field}
-                              noFieldsFoundText={"No Jobs found"}
-                              searchFieldPlaceholder={
-                                "Search registered Jobs..."
-                              }
-                              inputFieldsText={"Select job to link to..."}
-                              className="w-[--radix-popover-trigger-width]"
-                              triggerClassName={"w-full"}
-                              multiSelect={true}
-                              managed={true}
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            The selected job will have the notification service
-                            injected to it and used for notifications
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      </div>
-                    )}
-                  />
-                </CardContent>
-              </Card>
-            </div>
+                    <MinusIcon />
+                    Detach all
+                  </Button>
+                </ConfirmationDialogAction>
+              </CardHeader>
+              <CardContent className="p-0 pt-0 flex flex-col gap-2">
+                <FormField
+                  control={form.control}
+                  name="jobs"
+                  render={({ field }) => (
+                    <div>
+                      <FormItem>
+                        <FormLabel>
+                          Select the jobs that can use this notification service
+                        </FormLabel>
+                        <br />
+                        <FormControl ref={field.ref}>
+                          <ComboBox
+                            selectedItemValue={field.value}
+                            itemList={JobsList}
+                            {...field}
+                            noFieldsFoundText={"No Jobs found"}
+                            searchFieldPlaceholder={"Search registered Jobs..."}
+                            inputFieldsText={"Select job to link to..."}
+                            className="w-[--radix-popover-trigger-width]"
+                            triggerClassName={"w-full"}
+                            multiSelect={true}
+                            managed={true}
+                            maxSelectedItemsToShowOnMainTrigger={3}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          The selected job will have the notification service
+                          injected to it and used for notifications
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    </div>
+                  )}
+                />
+              </CardContent>
+            </Card>
             <DialogFooter>
               <Button variant={"default"} type="submit">
                 <LinkIcon />
