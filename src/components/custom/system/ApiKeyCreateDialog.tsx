@@ -38,9 +38,17 @@ const ApiKeyCreateSchema = z.object({
 const KeyWarningComponent = ({ inputKey }: { inputKey: string }) => {
   const [copied, setCopied] = useState(false)
   const handleCopy = () => {
-    navigator.clipboard.writeText(inputKey)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    try {
+      navigator.clipboard.writeText(inputKey)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      toast({
+        title: "Failed to copy API key",
+        variant: "destructive",
+        duration: 1000,
+      })
+    }
   }
 
   return (
@@ -110,7 +118,6 @@ export function ApiKeyCreateDialog({
     setIsCreating(true)
     try {
       const apiKey = await onChange(values.name)
-      console.log("apiKey", apiKey)
       setCreatedKey(apiKey)
     } catch (error) {
       toast({

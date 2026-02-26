@@ -14,11 +14,9 @@ import { Button } from "@/components/ui/button"
 import Spinner from "@/components/custom/LoadingOverlay"
 import { ConfirmationDialogActionType } from "@/components/confirmationDialogAction"
 
-export interface ApiKeysPageProps {}
-
 export const apiKeysDefaultSortingState = [{ id: "created_at", desc: true }]
 
-export default function ApiKeys(props: ApiKeysPageProps) {
+export default function ApiKeys() {
   const [tableData, setTableData] = useState<ApiKeyTableData[]>([])
   const [sorting, setSorting] = useState<SortingState>(
     apiKeysDefaultSortingState,
@@ -30,8 +28,19 @@ export default function ApiKeys(props: ApiKeysPageProps) {
   }, [])
 
   const getAllApiKeys = async () => {
-    const data = await apiKeysService.getAllApiKeys()
-    setTableData(data)
+    apiKeysService
+      .getAllApiKeys()
+      .then(data => {
+        setTableData(data)
+      })
+      .catch(err => {
+        console.error(err)
+        toast({
+          title: "Failed to fetch API keys",
+          variant: "destructive",
+          duration: 1000,
+        })
+      })
   }
 
   const onPageChange = ({ sorting }: { sorting: SortingState }) => {
@@ -44,44 +53,49 @@ export default function ApiKeys(props: ApiKeysPageProps) {
   ) => {
     if (acton === ConfirmationDialogActionType.CANCEL) return
     setLoading(true)
-    try {
-      await apiKeysService.deleteApikey(keyId)
-      toast({
-        title: "API key deleted",
-        duration: 2000,
+    apiKeysService
+      .deleteApikey(keyId)
+      .then(() => {
+        toast({
+          title: "API key deleted",
+          duration: 2000,
+        })
       })
-    } catch (error) {
-      toast({
-        title: "Failed to delete API key",
-        variant: "destructive",
-        duration: 2000,
+      .catch(err => {
+        toast({
+          title: "Failed to delete API key",
+          variant: "destructive",
+          duration: 2000,
+        })
       })
-    } finally {
-      setLoading(false)
-      await getAllApiKeys()
-    }
+      .finally(() => {
+        setLoading(false)
+        getAllApiKeys()
+      })
   }
 
   const handleCreateApiKey = async (name: string) => {
     setLoading(true)
-    try {
-      const response = await apiKeysService.createApiKey(name)
-      toast({
-        title: "API key created",
-        duration: 2000,
+    return apiKeysService
+      .createApiKey(name)
+      .then(response => {
+        toast({
+          title: "API key created",
+          duration: 2000,
+        })
+        return response
       })
-      await getAllApiKeys()
-      return response
-    } catch (error) {
-      toast({
-        title: "Failed to create API key",
-        variant: "destructive",
-        duration: 2000,
+      .catch(err => {
+        toast({
+          title: "Failed to create API key",
+          variant: "destructive",
+          duration: 1000,
+        })
       })
-      return undefined
-    } finally {
-      setLoading(false)
-    }
+      .finally(() => {
+        setLoading(false)
+        getAllApiKeys()
+      })
   }
 
   const columns = apiKeyTableInterfaces({

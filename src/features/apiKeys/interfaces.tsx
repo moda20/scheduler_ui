@@ -28,6 +28,7 @@ export default function apiKeyTableInterfaces(
       accessorKey: "created_at",
       header: "Created at",
       cell: ({ row }) => {
+        if (!row.original?.created_at) return <div> unknown </div>
         return (
           <div
             className="text-left"
@@ -44,6 +45,7 @@ export default function apiKeyTableInterfaces(
       accessorKey: "lastUsedAt",
       header: "Last used",
       cell: ({ row }) => {
+        if (!row.original?.lastUsedAt) return <div> Never </div>
         return (
           <div
             className="text-left"
@@ -70,7 +72,7 @@ export default function apiKeyTableInterfaces(
             confirmText={"Delete API Key"}
             confirmVariant={"destructive"}
           >
-            <Button variant="destructive" size="icon">
+            <Button variant="destructive" size="icon" title="Delete API Key">
               <Trash2 className="h-4 w-4" />
             </Button>
           </ConfirmationDialogAction>
