@@ -10,6 +10,7 @@ import ConfigsDashboard from "@/features/system/configs"
 import NotificationServices from "@/features/system/notificationServices"
 import { EventLog } from "@/features/system/eventLog"
 import { JobEvents } from "@/features/system/JobEvents"
+import ApiKeys from "@/features/apiKeys/apiKeys"
 
 const router = createBrowserRouter([
   {
@@ -54,6 +55,11 @@ const router = createBrowserRouter([
         path: "/jobEvents",
         index: true,
         element: <JobEvents />,
+      },
+      {
+        path: "/apiKeys",
+        index: true,
+        element: <ApiKeys />,
       },
     ],
   },
