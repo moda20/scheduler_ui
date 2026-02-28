@@ -20,7 +20,7 @@ export const routesList = [
   },
   {
     id: "setting-pages",
-    title: "Settings",
+    title: "System settings",
     url: "#",
     items: [
       {
@@ -52,6 +52,18 @@ export const routesList = [
         id: "jobEvents",
         title: "Job Events",
         url: "/jobEvents",
+      },
+    ],
+  },
+  {
+    id: "auth-section",
+    title: "Authentication",
+    url: "#",
+    items: [
+      {
+        id: "apiKeys",
+        title: "API Keys",
+        url: "/apiKeys",
       },
     ],
   },
