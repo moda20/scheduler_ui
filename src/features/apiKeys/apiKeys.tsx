@@ -51,7 +51,7 @@ export default function ApiKeys() {
     acton: ConfirmationDialogActionType,
     keyId: string,
   ) => {
-    if (acton === ConfirmationDialogActionType.CANCEL) return
+    if (acton === ConfirmationDialogActionType.CANCEL || !keyId) return
     setLoading(true)
     apiKeysService
       .deleteApikey(keyId)
