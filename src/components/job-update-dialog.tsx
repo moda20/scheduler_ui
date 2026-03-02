@@ -167,7 +167,7 @@ export function JobUpdateDialog({
                   </div>
                 }
               >
-                <div className="flex flex-col gap-1 min-w-0">
+                <div className="flex flex-col gap-2 min-w-0">
                   <FormField
                     control={form.control}
                     name="cronSetting"

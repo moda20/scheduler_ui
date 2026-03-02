@@ -123,11 +123,8 @@ export default function Proxies(props: ProxiesPageProps) {
   })
   return (
     <BasicPage title={"Proxies"} description={"Manage your proxies"}>
-      <Card className="border-border">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2 text-foreground bg-background border-border rounded-t-xl">
-          <CardTitle className="text-md font-medium">All Proxies</CardTitle>
-        </CardHeader>
-        <CardContent className="p-4 pb-4">
+      <Card className="border-border border-none">
+        <CardContent className="p-0">
           <div className={"flex flex-col gap-4"}>
             <div className={"flex flex-row gap-2"}>
               <ProxyConfigDialog
