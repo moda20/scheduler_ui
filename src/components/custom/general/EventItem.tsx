@@ -58,12 +58,12 @@ const EventItem = ({
       )}
     >
       <div className="flex items-center justify-between w-full">
-        <div className="flex flex-col gap-1 font-mono text-sm flex-grow-1">
+        <div className="flex flex-col gap-1 font-mono text-sm flex-1">
           <time className="text-muted-foreground text-xs">{timestamp}</time>
           <p className="text-muted-foreground text-xs italic">{job?.name}</p>
           <p className="leading-relaxed">{message}</p>
         </div>
-        <div className="flex gap-2 items-center flex-grow-1">
+        <div className="flex gap-2 items-center flex-1">
           {handled && (
             <time
               className="text-muted-foreground text-xs"
