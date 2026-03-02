@@ -7,7 +7,9 @@ RUN npm config set maxsockets=5 # this is to avoid issues with slow unreliable i
 #COPY package-lock.json ./
 RUN npm i --no-package-lock
 COPY . ./
-RUN npm run build
+RUN tsc -b
+RUN vite build
+#RUN npm run build
 
 # production environment
 FROM nginx:1.29.3-alpine
