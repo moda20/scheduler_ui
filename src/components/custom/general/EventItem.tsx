@@ -9,6 +9,8 @@ import React, { useMemo } from "react"
 import { getConsumersCBox, takeAction } from "@/features/jobsTable/jobsUtils"
 import { defaultLogPeriod } from "@/features/jobsTable/interfaces"
 import ActionDropdown from "@/components/custom/jobsTable/actionDropdown"
+import { DotsHorizontalIcon } from "@radix-ui/react-icons"
+import { Button } from "@/components/ui/button"
 
 const EventItem = ({
   timestamp,
@@ -47,50 +49,53 @@ const EventItem = ({
   }, [job])
 
   return (
-    <TargetAction>
-      <div
-        className={cn(
-          "group relative flex gap-3 border-l-2 pl-3 py-2 transition-colors duration-200",
-          colors.border,
-          colors.bg,
-          className,
-        )}
-      >
-        <div className="flex items-center justify-between w-full">
-          <div className="flex flex-col gap-1 font-mono text-sm flex-grow-1">
-            <time className="text-muted-foreground text-xs">{timestamp}</time>
-            <p className="text-muted-foreground text-xs italic">{job?.name}</p>
-            <p className="leading-relaxed">{message}</p>
-          </div>
-          <div className="flex gap-2 items-center flex-grow-1">
-            {handled && (
-              <time
-                className="text-muted-foreground text-xs"
-                title={`Handled on ${handleTime}`}
-              >
-                {moment(handleTime).fromNow()}
-              </time>
-            )}
-            <ButtonWithTooltip
-              variant="ghost"
-              size="icon"
-              tooltipContent={
-                handled ? `Handled on ${handleTime}` : "Set this event to read"
-              }
-              tooltipContentClassName="text-foreground bg-background border-border border-2"
-              onClick={onHandle}
-              disabled={handled}
+    <div
+      className={cn(
+        "group relative flex gap-3 border-l-2 pl-3 py-2 transition-colors duration-200",
+        colors.border,
+        colors.bg,
+        className,
+      )}
+    >
+      <div className="flex items-center justify-between w-full">
+        <div className="flex flex-col gap-1 font-mono text-sm flex-grow-1">
+          <time className="text-muted-foreground text-xs">{timestamp}</time>
+          <p className="text-muted-foreground text-xs italic">{job?.name}</p>
+          <p className="leading-relaxed">{message}</p>
+        </div>
+        <div className="flex gap-2 items-center flex-grow-1">
+          {handled && (
+            <time
+              className="text-muted-foreground text-xs"
+              title={`Handled on ${handleTime}`}
             >
-              {handled ? (
-                <CheckCheckIcon className="text-success !h-5 !w-5" />
-              ) : (
-                <CheckSquareIcon />
-              )}
-            </ButtonWithTooltip>
-          </div>
+              {moment(handleTime).fromNow()}
+            </time>
+          )}
+          <TargetAction>
+            <Button variant="ghost" size="icon">
+              <DotsHorizontalIcon className="h-4 w-4" />
+            </Button>
+          </TargetAction>
+          <ButtonWithTooltip
+            variant="ghost"
+            size="icon"
+            tooltipContent={
+              handled ? `Handled on ${handleTime}` : "Set this event to read"
+            }
+            tooltipContentClassName="text-foreground bg-background border-border border-2"
+            onClick={onHandle}
+            disabled={handled}
+          >
+            {handled ? (
+              <CheckCheckIcon className="text-success !h-5 !w-5" />
+            ) : (
+              <CheckSquareIcon />
+            )}
+          </ButtonWithTooltip>
         </div>
       </div>
-    </TargetAction>
+    </div>
   )
 }
 
