@@ -42,8 +42,8 @@ export default function DrawerJobFiles({
     data: jobLog[]
     offset?: number
   }>({ total: 0, data: [] })
-  const cacheFilesListRef = useRef<any>()
-  const outputFilesListRef = useRef<any>()
+  const cacheFilesListRef = useRef<any>(null)
+  const outputFilesListRef = useRef<any>(null)
   const getCacheFiles = (offset?: number) => {
     return jobsService
       .getJobCacheFiles(JobDetails.id.toString(), offset, 10)
