@@ -213,7 +213,9 @@ function ScrollableList<T>(
               itemClassNameString(item, index),
             )}
             role="option"
-            ref={el => (itemRefs.current[index] = el)}
+            ref={el => {
+              itemRefs.current[index] = el
+            }}
             aria-selected={currentFocusIndex === index}
             tabIndex={currentFocusIndex === index ? 0 : -1}
             onKeyDown={e => handleKeyDown(e, index)}
