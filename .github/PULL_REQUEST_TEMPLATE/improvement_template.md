@@ -19,11 +19,20 @@ ai agent instructions:
 ## **Improvements:**
 - [Improvement] (refactoring, performance optimization, code quality, etc.) : Describe your improvements
 
+[//]: # (<-- ONLY AS Example : [Improvement] : Adding a new endpint to manage X !>)
+[//]: # (<-- ONLY AS Example : [refactoring] : Refactored the X components to be used in A,B,C components !>)
+[//]: # (<-- ONLY AS Example : [optimization] : Introduced a new library that will better handle our X feature !>)
+
+
 ## **Notes**
 
 any notes, opinions, mention, impact :
 
 - [Note] (notes, opinions, mention, impact, dependency) : describe your note
+
+[//]: # (<-- ONLY AS Example : [Note] : The new feature is only available for such use cases !>)
+[//]: # (<-- ONLY AS Example : [Mention] : A new library X is also being eyed as a replacement for our Y implementation !>)
+[//]: # (<-- ONLY AS Example : [impact] : This update will impact the Y of X !>)
 
 
 ## **How Has This Been Tested?**

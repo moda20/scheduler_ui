@@ -42,10 +42,10 @@ export default function SearchBar({ trigger }: SearchBarProps) {
   const [listLoading, setListLoadingStatus] = useState(false)
 
   const searchForJobs = useCallback(
-    async (searchKey: string) => {
+    async (inputSearchKey: string) => {
       debounce(() => {
-        setSearchKey(searchKey)
-        jobsService.searchJobs(searchKey, 10, 0).then(jobs => {
+        setSearchKey(inputSearchKey)
+        jobsService.searchJobs(inputSearchKey, 10, 0).then(jobs => {
           setJobsList(jobs)
           setListLoadingStatus(false)
         })
@@ -71,6 +71,8 @@ export default function SearchBar({ trigger }: SearchBarProps) {
         case jobActions.UPDATE:
         case jobActions.UNSCHEDULE:
         case jobActions.SCHEDULE:
+        case jobActions.UPDATE_EVENT_HANDLER:
+        case jobActions.DELETE_EVENT_HANDLER:
           await searchForJobs(searchKey)
           break
         default:
@@ -135,13 +137,7 @@ export default function SearchBar({ trigger }: SearchBarProps) {
                 inputGroup="commandActions"
                 modal={true}
               >
-                <CommandItem
-                  asChild
-                  className="rounded"
-                  onSelect={e => {
-                    console.log("select", e)
-                  }}
-                >
+                <CommandItem asChild className="rounded">
                   <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-1">
                       <span>{job.name}</span>

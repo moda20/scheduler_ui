@@ -1,11 +1,16 @@
 import axios from "@/lib/httpUtils"
 
 export const notificationService = {
-  getAllNotificationServices(offset?: number, limit?: number) {
+  getAllNotificationServices(
+    offset?: number,
+    limit?: number,
+    inputIds?: number[],
+  ) {
     return axios.get("/notifications/allNotifications", {
       params: {
         limit,
         offset,
+        inputIds,
       },
     })
   },
@@ -54,6 +59,26 @@ export const notificationService = {
     return axios.put("/notifications/updateNotificationServiceConfig", {
       name,
       config,
+    })
+  },
+  cloneNotificationService(serviceId: number, name: string) {
+    return axios.post("/notifications/cloneNotificationService", {
+      serviceId,
+      name,
+    })
+  },
+  updateEventHandler(jobId: number, handler: any) {
+    return axios.post(`/notifications/updateJobEventHandlers`, {
+      handler,
+      jobId,
+    })
+  },
+  deleteEventHandler(jobId: number, configId: string) {
+    return axios.delete(`/notifications/deleteJobEventHandler`, {
+      params: {
+        jobId,
+        configId,
+      },
     })
   },
 }
