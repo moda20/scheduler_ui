@@ -13,11 +13,17 @@
     display: flex;
     gap: 0.5rem;
   }
+  flex-wrap: wrap;
+
+  .react-js-cron-field {
+    align-items: center;
+  }
 
   .ant-select {
     .ant-select-selector {
       color: hsl(var(--sidebar-foreground)) !important;
       background-color: hsl(var(--sidebar-background)) !important;
+      border-color: hsl(var(--border)) !important;
        * {
          color: hsl(var(--sidebar-foreground)) !important;
          background-color: hsl(var(--sidebar-background)) !important;

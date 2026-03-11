@@ -79,7 +79,7 @@ export default function UserDropdown() {
         </SidebarMenuButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+        className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg border-border border-2"
         side="right"
         align="end"
         sideOffset={4}

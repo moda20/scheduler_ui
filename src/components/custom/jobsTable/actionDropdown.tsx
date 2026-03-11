@@ -159,7 +159,7 @@ export default function ActionDropdown({
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="w-56 bg-background"
+        className="bg-background w-auto"
         onEscapeKeyDown={handleEscapeDirectTrigger}
         {...dropdownContentProps}
       >

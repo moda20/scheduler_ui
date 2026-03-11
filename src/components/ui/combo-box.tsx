@@ -242,15 +242,16 @@ export function ComboBox({
             }}
             placeholder={searchFieldPlaceholder}
           />
-          <CommandList>
+          <CommandList className="w-full">
             <CommandEmpty>{noFieldsFoundText}</CommandEmpty>
-            <CommandGroup>
+            <CommandGroup className="overflow-x-auto">
               {sortItemForCommandList(currentItemList).map(item => (
                 <CommandItem
                   key={item.value}
                   keywords={[item.label, item.value]}
                   value={item?.value}
                   onSelect={currentValue => setSelectedValue(currentValue)}
+                  className="w-full"
                 >
                   <Check
                     className={cn(
