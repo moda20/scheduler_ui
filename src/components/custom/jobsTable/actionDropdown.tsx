@@ -42,8 +42,6 @@ import { JobExecutionDialog } from "@/components/job-execution-dialog"
 import DrawerJobEvents from "@/components/custom/DrawerJobEvents"
 import DrawerFilePreview from "@/components/custom/DrawerFilePreview"
 import JobEventNotificationsDrawer from "@/components/custom/jobsTable/JobEvents/JobEventNotificationsDrawer"
-import EventHandlerModal from "@/components/custom/jobsTable/JobEvents/EventHandlerModal"
-import type { JobEventHandlerConfig } from "@/models/jobs"
 
 export interface ActionDropdownProps {
   columnsProps: tableColumnsProps
@@ -139,12 +137,11 @@ export default function ActionDropdown({
 
   const handleJobEventHandlerDelete = useCallback(
     async (configId: string) => {
-      return columnsProps
-        .takeAction(row, jobActions.DELETE_EVENT_HANDLER, configId)
-        .then(d => {
-          refreshJob?.()
-          return d
-        })
+      return columnsProps.takeAction(
+        row,
+        jobActions.DELETE_EVENT_HANDLER,
+        configId,
+      )
     },
     [row],
   )

@@ -4,32 +4,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import {
-  AlertCircle,
-  AlertTriangle,
-  Bell,
-  Briefcase,
-  Clock,
-  Edit,
-  Info,
-  Plus,
-  RegexIcon,
-  Save,
-  Search,
-  Shield,
-  Tag,
-  Timer,
-} from "lucide-react"
-import type { ReactNode } from "react"
+import { Bell, Briefcase, Edit, Plus, Search, Tag } from "lucide-react"
 import { EmptyState } from "@/components/custom/general/EmptyState"
 import { notificationService } from "@/services/notificationsService"
 import type { NotificationService } from "@/models/notifications"
 import {
-  JNTriggerNames,
   JNTypesNames,
   JobEventHandlerConfig,
   JobNotificationTriggers,
-  JobNotificationTypes,
 } from "@/models/jobs"
 import { useCallback, useEffect, useState } from "react"
 import { Badge } from "@/components/ui/badge"
@@ -39,13 +21,12 @@ import { cn } from "@/lib/utils"
 import LoadingOverlay from "@/components/custom/LoadingOverlay"
 import { Button } from "@/components/ui/button"
 import EventHandlerModal from "@/components/custom/jobsTable/JobEvents/EventHandlerModal"
-import jobsService from "@/services/JobsService"
-import { toast } from "@/hooks/use-toast"
 import { jobsTableData } from "@/features/jobsTable/interfaces"
 import EventHandlerTitle, {
   getNotificationTypeIcon,
   getTriggerIcon,
 } from "@/components/custom/jobsTable/JobEvents/EventHandlerTitle"
+import { toast } from "@/hooks/use-toast"
 
 interface JobEventNotificationsDrawerProps {
   eventHandlers: JobEventHandlerConfig[]
@@ -83,6 +64,10 @@ export default function JobEventNotificationsList({
       })
       .catch(err => {
         console.log(err)
+        toast({
+          title: err.message,
+          variant: "destructive",
+        })
       })
       .finally(() => {
         setLoading(false)
@@ -91,7 +76,7 @@ export default function JobEventNotificationsList({
 
   useEffect(() => {
     fetchServices()
-  }, [eventHandlers])
+  }, [eventHandlers, fetchServices])
 
   const handleUpdateEventHandler = useCallback(
     async (updatedHandler: JobEventHandlerConfig) => {

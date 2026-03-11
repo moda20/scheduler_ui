@@ -62,7 +62,8 @@ export default function SheetActionDialog(
         onEscapeKeyDown={v => setDialogState(false, props.onOpenChange)}
         side={props.side}
         className={cn(
-          "text-foreground bg-background border-border border-l-2",
+          "text-foreground bg-background border-border",
+          props.side === "right" ? "border-l-2" : "border-r-2",
           props.contentClassName,
         )}
       >

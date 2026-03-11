@@ -43,6 +43,8 @@ export function getTriggerIcon(trigger: JobNotificationTriggers): ReactNode {
       return <Clock className="h-5 w-5" />
     case JobNotificationTriggers.DURATION_DELTA:
       return <Shield className="h-5 w-5" />
+    default:
+      return <Bell className="h-5 w-5" />
   }
 }
 
@@ -53,9 +55,7 @@ export default function EventHandlerTitle({
   eventHandler: JobEventHandlerConfig
   notificationService?: NotificationService
 }) {
-  const notificationTypes = Array.isArray(eventHandler.notification_type)
-    ? eventHandler.notification_type
-    : [eventHandler.notification_type]
+  const notificationTypes = eventHandler.notification_type
   return (
     <div className="flex items-center gap-2 text-left flex-1">
       <div className="flex items-center gap-1.5 text-muted-foreground">

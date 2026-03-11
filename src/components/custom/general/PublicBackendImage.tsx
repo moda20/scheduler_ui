@@ -6,5 +6,5 @@ export interface PublicBackendImageProps extends React.ComponentProps<"img"> {}
 export default function BImage(props: PublicBackendImageProps) {
   const savedConfig = useAppSelector(config)
   const src = new URL(props.src || "", savedConfig.targetServer)
-  return <img {...props} src={src.toString()} />
+  return <img {...props} src={src.toString()} title={props.alt} />
 }

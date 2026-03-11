@@ -8,8 +8,6 @@ interface JobEventNotificationsSheetProps {
   eventHandlers: JobEventHandlerConfig[]
   trigger: ReactNode
   JobDetails: jobsTableData
-  title?: string
-  description?: string
   modal?: boolean
   onNotificationChange: (handlerData: any) => Promise<void>
   onNotificationDelete?: (configId: string) => Promise<void>

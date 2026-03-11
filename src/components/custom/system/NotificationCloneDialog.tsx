@@ -28,7 +28,7 @@ import { cn } from "@/lib/utils"
 import useDialogueManager from "@/hooks/useDialogManager"
 import BImage from "@/components/custom/general/PublicBackendImage"
 import { Separator } from "@/components/ui/separator"
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import Spinner from "@/components/custom/LoadingOverlay"
 
 export interface NotificationCloneDialogProps {
@@ -63,6 +63,20 @@ export function NotificationCloneDialog({
       form.reset()
     }
   }
+
+  const submitCloneForm = useCallback(
+    (formValues: any) => {
+      setIsLoading(true)
+      return onChange(
+        Number(notificationServiceDetails.id),
+        formValues.name,
+      ).then(() => {
+        setIsLoading(false)
+        setDialogState(false, resetState)
+      })
+    },
+    [onChange, notificationServiceDetails],
+  )
 
   return (
     <Dialog
@@ -128,17 +142,7 @@ export function NotificationCloneDialog({
 
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(async values => {
-                  try {
-                    setIsLoading(true)
-                    await onChange(
-                      Number(notificationServiceDetails.id),
-                      values.name,
-                    )
-                    setIsLoading(false)
-                    setDialogState(false, resetState)
-                  } catch (error) {}
-                })}
+                onSubmit={form.handleSubmit(submitCloneForm)}
                 className="space-y-4"
               >
                 <FormField

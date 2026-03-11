@@ -51,7 +51,7 @@ export interface EventHandlerModalProps {
   eventHandler?: JobEventHandlerConfig
   jobId?: string
   onSave: (eventHandler: JobEventHandlerConfig) => void
-  onDelete?: (configId) => Promise<void>
+  onDelete?: (configId: string) => Promise<void>
   onOpenChange?: (open: boolean) => void
 }
 
@@ -73,7 +73,6 @@ export default function EventHandlerModal({
   children,
   isCreateMode,
   eventHandler,
-  jobId,
   onSave,
   onOpenChange,
   onDelete,
@@ -98,6 +97,7 @@ export default function EventHandlerModal({
   const [loadingServices, setLoadingServices] = useState(false)
 
   useEffect(() => {
+    if (!isDialogOpen) return
     setLoadingServices(true)
     notificationService
       .getAllNotificationServices()
@@ -110,7 +110,7 @@ export default function EventHandlerModal({
       .finally(() => {
         setLoadingServices(false)
       })
-  }, [])
+  }, [isDialogOpen])
 
   const notificationServiceOptions =
     useMemo((): NotificationServiceDropdownItem[] => {
@@ -122,24 +122,20 @@ export default function EventHandlerModal({
       }))
     }, [notificationServices])
 
+  const serviceId = form.watch("notification_service_id")
+
   const selectedNotificationServiceOption = useMemo(() => {
-    const serviceId = form.watch("notification_service_id")
     return notificationServiceOptions.find(s => s.value === serviceId)
-  }, [notificationServices, form])
+  }, [notificationServices, serviceId])
 
   const selectedNotificationService = useMemo(() => {
-    const serviceId = form.watch("notification_service_id")
     return notificationServices.find(s => s.id === serviceId)
-  }, [notificationServices, form])
+  }, [notificationServices, serviceId])
 
   const triggerType = form.watch("trigger")
 
   const isRegexTrigger =
     triggerType === JobNotificationTriggers.REGEX_MESSAGE_MATCH
-
-  const isDurationTrigger =
-    triggerType === JobNotificationTriggers.DURATION_THRESHOLD ||
-    triggerType === JobNotificationTriggers.DURATION_DELTA
 
   const isDurationThresholdTrigger =
     triggerType === JobNotificationTriggers.DURATION_THRESHOLD
@@ -192,10 +188,7 @@ export default function EventHandlerModal({
     [isCreateMode, eventHandler, onDelete],
   )
 
-  const toggleConditionType = (
-    type: JobNotificationTriggers,
-    checked: boolean,
-  ) => {
+  const toggleConditionType = (type: JobNotificationTriggers) => {
     form.setValue("trigger", type)
   }
 
@@ -220,15 +213,6 @@ export default function EventHandlerModal({
     return AvailableTypesPerTrigger[triggerType]
   }, [triggerType])
 
-  const resetState = useCallback(
-    (finalState: boolean) => {
-      if (!finalState) {
-        form.reset()
-      }
-    },
-    [form],
-  )
-
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleClose}>
       <DialogTrigger
@@ -245,7 +229,7 @@ export default function EventHandlerModal({
         className="max-w-2xl max-h-[90vh] flex flex-col text-foreground bg-background"
         onEscapeKeyDown={e => {
           e.preventDefault()
-          setDialogState(false, resetState)
+          handleClose(false)
         }}
       >
         <DialogHeader>
