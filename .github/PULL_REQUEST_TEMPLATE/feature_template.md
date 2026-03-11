@@ -27,6 +27,10 @@ any notes, opinions, mention, impact :
 
 - [Note] (notes, opinions, mention, impact, dependency) : describe your note
 
+[//]: # (<-- ONLY AS Example : [Note] : The new feature is only available for such use cases !>)
+[//]: # (<-- ONLY AS Example : [Mention] : A new library X is also being eyed as a replacement for our Y implementation !>)
+[//]: # (<-- ONLY AS Example : [impact] : This update will impact the Y of X !>)
+
 
 ## **Motivation and Context**
 

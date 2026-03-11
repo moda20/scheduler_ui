@@ -3,6 +3,7 @@ import type { JobUpdateType } from "@/components/job-update-dialog"
 import jobsService from "@/services/JobsService"
 import { toast } from "@/hooks/use-toast"
 import type { ComboBoxItem } from "@/components/ui/combo-box"
+import { notificationService } from "@/services/notificationsService"
 
 export const takeAction = (
   row: jobsTableData | null,
@@ -76,9 +77,6 @@ export const takeAction = (
       }
       return jobsService
         .executeActionWithUpdate("UPDATE", data, row!.id)
-        .then(d => {
-          return jobsService.executeAction(row!.id, "START")
-        })
         .then(() => {
           toast({
             title: `Service ${row!.name} Updated`,
@@ -141,6 +139,41 @@ export const takeAction = (
           toast({
             title: err.message,
             variant: "destructive",
+          })
+        })
+
+    case jobActions.UPDATE_EVENT_HANDLER:
+      return notificationService
+        .updateEventHandler(Number(row.id), data)
+        .then(() => {
+          toast({
+            title: "Event handler updated successfully",
+            duration: 1000,
+          })
+        })
+        .catch(err => {
+          toast({
+            title: "Failed to update event handler",
+            description: err.message || "An error occurred",
+            variant: "destructive",
+            duration: 2000,
+          })
+        })
+    case jobActions.DELETE_EVENT_HANDLER:
+      return notificationService
+        .deleteEventHandler(Number(row.id), data)
+        .then(() => {
+          toast({
+            title: "Event handler deleted successfully",
+            duration: 1000,
+          })
+        })
+        .catch(err => {
+          toast({
+            title: "Failed to delete event handler",
+            description: err.message || "An error occurred",
+            variant: "destructive",
+            duration: 2000,
           })
         })
   }

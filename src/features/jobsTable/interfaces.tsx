@@ -41,6 +41,8 @@ export enum jobActions {
   STOP,
   EXECUTE_WITH_PARAMS,
   EXPORT,
+  UPDATE_EVENT_HANDLER,
+  DELETE_EVENT_HANDLER,
 }
 
 export const defaultLogPeriod: DateRange = {
@@ -50,7 +52,11 @@ export const defaultLogPeriod: DateRange = {
 
 export interface tableColumnsProps {
   getAvailableConsumers: () => Promise<ComboBoxItem[]>
-  takeAction: (row: jobsTableData, action: jobActions, jobData?: any) => void
+  takeAction: (
+    row: jobsTableData,
+    action: jobActions,
+    jobData?: any,
+  ) => Promise<void>
   selectFunction?: (
     table: Table<jobsTableData>,
     Row: Row<jobsTableData>,
