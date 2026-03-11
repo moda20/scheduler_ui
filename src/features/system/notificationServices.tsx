@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import {
   CogIcon,
+  CopyIcon,
   EditIcon,
   FileX2,
   LoaderPinwheelIcon,
@@ -31,6 +32,7 @@ import { Separator } from "@/components/ui/separator"
 import { CardStackIcon, Cross2Icon } from "@radix-ui/react-icons"
 import { NotificationConfigUpdateDialog } from "@/components/custom/system/NotificationConfigUpdateDialog"
 import ButtonWithStrCut from "@/components/custom/general/ButtonWithStrCut"
+import { NotificationCloneDialog } from "@/components/custom/system/NotificationCloneDialog"
 
 export default function NotificationServices() {
   const [notificationServices, setNotificationServices] = useState<{
@@ -223,7 +225,7 @@ export default function NotificationServices() {
           )
         if (constUpdateResult.skipped.length) {
           toast({
-            title: `Config update skipped for ${constUpdateResult.skipped.join(", ")} 
+            title: `Config update skipped for ${constUpdateResult.skipped.join(", ")}
           Config update passed for ${constUpdateResult.updated.join(", ")}
           `,
             duration: 2000,
@@ -249,6 +251,29 @@ export default function NotificationServices() {
       }
     },
     [selectedService],
+  )
+
+  const cloneNotificationService = useCallback(
+    async (serviceId: number, name: string) => {
+      try {
+        await notificationService.cloneNotificationService(serviceId, name)
+        toast({
+          title: `Service "${name}" created successfully`,
+          duration: 2000,
+        })
+        return initializeServices()
+      } catch (e: any) {
+        const errorMessage =
+          e.response?.data?.message || e.message || "Failed to clone service"
+        toast({
+          title: `Error cloning service: ${errorMessage}`,
+          duration: 2000,
+          variant: "destructive",
+        })
+        throw e
+      }
+    },
+    [selectedService, selectedServicesAttachedJobs],
   )
 
   return (
@@ -336,37 +361,52 @@ export default function NotificationServices() {
                   <div className="text-l font-bold tracking-tight italic flex gap-2 items-center">
                     <span>Basic info</span>
                     {selectedService && (
-                      <NotificationConfigDialog
-                        JobsList={getAllJobs}
-                        serviceFileList={getAllServiceEntrypoints}
-                        onChange={createNotificationService}
-                        triggerClassName={"gap-2"}
-                        notificationServiceDetails={selectedService}
-                        onDeletion={deleteService}
-                      >
-                        <Button
-                          variant={"ghost"}
-                          size={"icon"}
-                          title="Edit the notification info"
+                      <>
+                        <NotificationConfigDialog
+                          JobsList={getAllJobs}
+                          serviceFileList={getAllServiceEntrypoints}
+                          onChange={createNotificationService}
+                          triggerClassName={"gap-2"}
+                          notificationServiceDetails={selectedService}
+                          onDeletion={deleteService}
                         >
-                          <EditIcon />
-                        </Button>
-                      </NotificationConfigDialog>
+                          <Button
+                            variant={"ghost"}
+                            size={"icon"}
+                            title="Edit the notification info"
+                          >
+                            <EditIcon />
+                          </Button>
+                        </NotificationConfigDialog>
+
+                        <div className="ml-auto flex gap-2">
+                          <NotificationCloneDialog
+                            notificationServiceDetails={selectedService}
+                            onChange={cloneNotificationService}
+                          >
+                            <ButtonWithStrCut
+                              variant={"outline"}
+                              title="Clone this notification service"
+                            >
+                              <CopyIcon />
+                              Clone
+                            </ButtonWithStrCut>
+                          </NotificationCloneDialog>
+                          <NotificationConfigUpdateDialog
+                            serviceName={selectedService?.name}
+                            onChange={updateNotificationServiceConfig}
+                          >
+                            <ButtonWithStrCut
+                              variant={"outline"}
+                              title="Edit the notification info"
+                            >
+                              <CogIcon />
+                              Config
+                            </ButtonWithStrCut>
+                          </NotificationConfigUpdateDialog>
+                        </div>
+                      </>
                     )}
-                    <div className="ml-auto">
-                      <NotificationConfigUpdateDialog
-                        serviceName={selectedService?.name}
-                        onChange={updateNotificationServiceConfig}
-                      >
-                        <ButtonWithStrCut
-                          variant={"outline"}
-                          title="Edit the notification info"
-                        >
-                          <CogIcon />
-                          Config
-                        </ButtonWithStrCut>
-                      </NotificationConfigUpdateDialog>
-                    </div>
                   </div>
                   <div className="flex gap-4 w-full">
                     <BImage

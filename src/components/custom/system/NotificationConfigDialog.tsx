@@ -42,7 +42,7 @@ export interface NotificationConfigDialogProps {
   JobsList: ComboBoxItem[] | (() => Promise<ComboBoxItem[]>)
   serviceFileList: ComboBoxItem[] | (() => Promise<ComboBoxItem[]>)
   onChange: (value: FormData) => void
-  onDeletion?: (serviceId: number) => void
+  onDeletion?: (serviceId: number) => Promise<void>
   triggerClassName?: string
 }
 
@@ -120,12 +120,10 @@ export function NotificationConfigDialog({
   )
 
   const deleteService = useCallback(
-    (action: ConfirmationDialogActionType) => {
+    async (action: ConfirmationDialogActionType) => {
       if (action === ConfirmationDialogActionType.CANCEL || !onDeletion) return
+      await onDeletion(Number(notificationServiceDetails?.id))
       dialogChange(false)
-      setTimeout(() => {
-        onDeletion(Number(notificationServiceDetails?.id))
-      }, 150)
     },
     [notificationServiceDetails, onDeletion],
   )
