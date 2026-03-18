@@ -49,7 +49,6 @@ export interface EventHandlerModalProps {
   children: React.ReactNode
   isCreateMode: boolean
   eventHandler?: JobEventHandlerConfig
-  jobId?: string
   onSave: (eventHandler: JobEventHandlerConfig) => void
   onDelete?: (configId: string) => Promise<void>
   onOpenChange?: (open: boolean) => void

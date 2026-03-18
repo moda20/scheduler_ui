@@ -8,10 +8,15 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
+import ButtonWithStrCut, {
+  ButtonWithStrCutProps,
+} from "@/components/custom/general/ButtonWithStrCut"
 
-interface ButtonWithTooltipProps extends ButtonProps {
+interface ButtonWithTooltipProps extends ButtonWithStrCutProps {
   tooltipContent: React.ReactNode
   tooltipContentClassName?: string
+  tooltipSide?: "top" | "right" | "bottom" | "left"
+  tooltipDelay?: number
 }
 
 const ButtonWithTooltip = React.forwardRef<
@@ -26,15 +31,17 @@ const ButtonWithTooltip = React.forwardRef<
       tooltipContentClassName,
       variant,
       type,
+      tooltipSide = "top",
+      tooltipDelay = 700,
       ...props
     },
     ref,
   ) => {
     return (
       <TooltipProvider>
-        <Tooltip>
+        <Tooltip delayDuration={tooltipDelay}>
           <TooltipTrigger asChild>
-            <Button
+            <ButtonWithStrCut
               ref={ref}
               className={cn(className)}
               variant={variant}
@@ -42,9 +49,12 @@ const ButtonWithTooltip = React.forwardRef<
               {...props}
             >
               {children}
-            </Button>
+            </ButtonWithStrCut>
           </TooltipTrigger>
-          <TooltipContent className={cn(tooltipContentClassName)}>
+          <TooltipContent
+            className={cn(tooltipContentClassName)}
+            side={tooltipSide}
+          >
             {tooltipContent}
           </TooltipContent>
         </Tooltip>

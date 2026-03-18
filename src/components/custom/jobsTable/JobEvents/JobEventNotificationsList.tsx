@@ -99,7 +99,6 @@ export default function JobEventNotificationsList({
         />
         <EventHandlerModal
           isCreateMode={true}
-          jobId={JobDetails.id}
           onSave={handleUpdateEventHandler}
         >
           <Button size="sm" variant="outline" className="gap-2">
@@ -118,7 +117,6 @@ export default function JobEventNotificationsList({
           <div className="flex w-full items-center justify-end px-1">
             <EventHandlerModal
               isCreateMode={true}
-              jobId={JobDetails.id}
               onSave={handleUpdateEventHandler}
             >
               <Button size="sm" variant="outline" className="gap-2 ml-auto">
@@ -243,7 +241,6 @@ export default function JobEventNotificationsList({
                         <EventHandlerModal
                           isCreateMode={false}
                           eventHandler={handler}
-                          jobId={JobDetails.id}
                           onSave={handleUpdateEventHandler}
                           onDelete={onDelete}
                         >

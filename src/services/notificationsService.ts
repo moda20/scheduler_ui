@@ -1,11 +1,12 @@
 import axios from "@/lib/httpUtils"
+import { JobEventHandlerConfig } from "@/models/jobs"
 
 export const notificationService = {
   getAllNotificationServices(
     offset?: number,
     limit?: number,
     inputIds?: number[],
-  ) {
+  ): Promise<any> {
     return axios.get("/notifications/allNotifications", {
       params: {
         limit,
@@ -77,6 +78,23 @@ export const notificationService = {
     return axios.delete(`/notifications/deleteJobEventHandler`, {
       params: {
         jobId,
+        configId,
+      },
+    })
+  },
+
+  getGlobalEventHandlers(): Promise<JobEventHandlerConfig[]> {
+    return axios.get("/notifications/globalEventHandlers")
+  },
+  updateGlobalHandler(handler: any, configId?: string): Promise<any> {
+    return axios.put("/notifications/updateGlobalHandlers", {
+      handler,
+      configId,
+    })
+  },
+  deleteGlobalEventHandler(configId: string): Promise<any> {
+    return axios.delete("/notifications/deleteGlobalHandlers", {
+      params: {
         configId,
       },
     })
