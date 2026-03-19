@@ -24,20 +24,25 @@ export default function GlobalEventHandlersPanel() {
   const { isLoading: servicesLoading, data: services } = useQuery({
     queryKey: ["notificationServices"],
     placeholderData: {},
-    queryFn: () =>
-      notificationService.getAllNotificationServices().then(d =>
-        d.data?.reduce(
-          (p, c) => {
-            p[c.id] = c
-            return p
-          },
-          {} as Record<string, any>,
-        ),
+    queryFn: () => notificationService.getAllNotificationServices(),
+    select: (d: any) =>
+      d.data?.reduce(
+        (p, c) => {
+          p[c.id] = c
+          return p
+        },
+        {} as Record<string, any>,
       ),
   })
 
   const createOrUpdateGlobalHandler = useCallback(
-    async (handler: JobEventHandlerConfig) => {
+    async ({
+      handler,
+      cb,
+    }: {
+      handler: JobEventHandlerConfig
+      cb?: () => Promise<void>
+    }) => {
       return notificationService.updateGlobalHandler(handler, handler.config_id)
     },
     [],
@@ -51,18 +56,29 @@ export default function GlobalEventHandlersPanel() {
         variant: "destructive",
       })
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       toast({
         title: "Event handler updated",
         duration: 1500,
       })
-      queryClient.invalidateQueries({ queryKey: ["globalEventHandlers"] })
+      variables.cb?.().then(() => {
+        queryClient.invalidateQueries({ queryKey: ["globalEventHandlers"] })
+      })
     },
   })
 
-  const deleteGlobalHandler = useCallback(async (configId: string) => {
-    return notificationService.deleteGlobalEventHandler(configId)
-  }, [])
+  const deleteGlobalHandler = useCallback(
+    async ({
+      configId,
+      cb,
+    }: {
+      configId: string
+      cb?: () => Promise<void>
+    }) => {
+      return notificationService.deleteGlobalEventHandler(configId)
+    },
+    [],
+  )
 
   const deleteGlobalHandlerMutation = useMutation({
     mutationFn: deleteGlobalHandler,
@@ -72,12 +88,14 @@ export default function GlobalEventHandlersPanel() {
         variant: "destructive",
       })
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       toast({
         title: "Event handler deleted",
         duration: 1500,
       })
-      queryClient.invalidateQueries({ queryKey: ["globalEventHandlers"] })
+      variables.cb?.().then(() => {
+        queryClient.invalidateQueries({ queryKey: ["globalEventHandlers"] })
+      })
     },
   })
 

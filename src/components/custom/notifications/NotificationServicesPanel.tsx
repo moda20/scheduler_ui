@@ -356,7 +356,7 @@ export default function NotificationServicesPanel() {
               icon={LoaderPinwheelIcon}
               className="h-full w-full block"
             >
-              {notificationServices.data.length && (
+              {notificationServices.data.length > 0 && (
                 <div className="flex flex-col gap-2 ">
                   <div className="text-l font-bold tracking-tight italic flex gap-2 items-center">
                     <span>Basic info</span>

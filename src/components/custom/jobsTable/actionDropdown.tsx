@@ -136,7 +136,7 @@ export default function ActionDropdown({
   )
 
   const handleJobEventHandlerDelete = useCallback(
-    async (configId: string) => {
+    async ({ configId }: { configId: string; cb?: () => Promise<void> }) => {
       return columnsProps.takeAction(
         row,
         jobActions.DELETE_EVENT_HANDLER,

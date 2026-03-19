@@ -13,7 +13,7 @@ import {
   JobEventHandlerConfig,
   JobNotificationTriggers,
 } from "@/models/jobs"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import BImage from "@/components/custom/general/PublicBackendImage"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -27,12 +27,20 @@ import EventHandlerTitle, {
   getTriggerIcon,
 } from "@/components/custom/jobsTable/JobEvents/EventHandlerTitle"
 import { toast } from "@/hooks/use-toast"
+import { useQuery } from "@tanstack/react-query"
 
 interface JobEventNotificationsDrawerProps {
   eventHandlers: JobEventHandlerConfig[]
   JobDetails: jobsTableData
+  notificationServices: Map<number, NotificationService>
   onUpdate: (handlerData: any) => Promise<void>
-  onDelete?: (configId: string) => Promise<void>
+  onDelete?: ({
+    configId,
+    cb,
+  }: {
+    configId: string
+    cb?: () => Promise<void>
+  }) => Promise<void>
 }
 
 export default function JobEventNotificationsList({
@@ -40,48 +48,19 @@ export default function JobEventNotificationsList({
   onUpdate,
   JobDetails,
   onDelete,
+  notificationServices,
 }: JobEventNotificationsDrawerProps) {
-  const [notificationServices, setNotificationServices] = useState<
-    Map<number, NotificationService>
-  >(new Map())
-  const [loading, setLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
-  const fetchServices = async () => {
-    if (eventHandlers.length === 0) return
-
-    setLoading(true)
-    const serviceIds = eventHandlers.map(h => h.notification_service_id)
-    notificationService
-      .getAllNotificationServices(0, serviceIds.length, serviceIds)
-      .then((response: any) => {
-        const servicesMap = new Map<number, NotificationService>()
-        response.data.forEach((service: NotificationService, index: number) => {
-          servicesMap.set(service.id as number, service)
-        })
-
-        setNotificationServices(servicesMap)
-      })
-      .catch(err => {
-        console.log(err)
-        toast({
-          title: err.message,
-          variant: "destructive",
-        })
-      })
-      .finally(() => {
-        setLoading(false)
-      })
-  }
-
-  useEffect(() => {
-    fetchServices()
-  }, [eventHandlers, fetchServices])
-
   const handleUpdateEventHandler = useCallback(
-    async (updatedHandler: JobEventHandlerConfig) => {
+    async ({
+      handler,
+    }: {
+      handler: JobEventHandlerConfig
+      cb?: () => Promise<void>
+    }) => {
       setIsSaving(true)
-      return onUpdate(updatedHandler).finally(() => {
+      return onUpdate(handler).finally(() => {
         setIsSaving(false)
       })
     },
@@ -156,7 +135,7 @@ export default function JobEventNotificationsList({
                             </span>
                           </div>
                           <div className="relative">
-                            <LoadingOverlay isLoading={loading}>
+                            <LoadingOverlay isLoading={!notificationServices}>
                               <div className="flex items-start gap-2">
                                 <div className="flex-shrink-0">
                                   {service?.image ? (

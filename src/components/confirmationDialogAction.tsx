@@ -13,7 +13,7 @@ import type { buttonVariants } from "@/components/ui/button"
 import type * as React from "react"
 import type { VariantProps } from "class-variance-authority"
 import useDialogueManager from "@/hooks/useDialogManager"
-import { useCallback, useRef } from "react"
+import { isValidElement, useCallback, useRef } from "react"
 
 export enum ConfirmationDialogActionType {
   CONFIRM,
@@ -72,8 +72,15 @@ export default function ConfirmationDialogAction(
       >
         <AlertDialogHeader>
           <AlertDialogTitle>{props.title}</AlertDialogTitle>
-          <AlertDialogDescription>{props.description}</AlertDialogDescription>
+          <AlertDialogDescription>
+            {typeof props.description === "string" && props.description}
+          </AlertDialogDescription>
         </AlertDialogHeader>
+        {isValidElement(props.description) && (
+          <div className="text-sm text-muted-foreground">
+            {props.description}
+          </div>
+        )}
         <AlertDialogFooter>
           <AlertDialogCancel
             title={props.cancelText ?? "Cancel"}

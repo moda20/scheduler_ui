@@ -1,8 +1,11 @@
 import SheetActionDialog from "@/components/sheet-action-dialog"
-import type { ReactNode } from "react"
+import { ReactNode, useMemo } from "react"
 import JobEventNotificationsList from "@/components/custom/jobsTable/JobEvents/JobEventNotificationsList"
 import type { JobEventHandlerConfig } from "@/models/jobs"
 import type { jobsTableData } from "@/features/jobsTable/interfaces"
+import { useQuery } from "@tanstack/react-query"
+import { notificationService } from "@/services/notificationsService"
+import type { NotificationService } from "@/models/notifications"
 
 interface JobEventNotificationsSheetProps {
   eventHandlers: JobEventHandlerConfig[]
@@ -10,7 +13,13 @@ interface JobEventNotificationsSheetProps {
   JobDetails: jobsTableData
   modal?: boolean
   onNotificationChange: (handlerData: any) => Promise<void>
-  onNotificationDelete?: (configId: string) => Promise<void>
+  onNotificationDelete?: ({
+    configId,
+    cb,
+  }: {
+    configId: string
+    cb?: () => Promise<void>
+  }) => Promise<void>
 }
 
 export default function JobEventNotificationsDrawer({
@@ -21,6 +30,29 @@ export default function JobEventNotificationsDrawer({
   onNotificationChange,
   onNotificationDelete,
 }: JobEventNotificationsSheetProps) {
+  const serviceIds = useMemo(
+    () => eventHandlers.map(h => h.notification_service_id),
+    [eventHandlers],
+  )
+
+  const { data: notificationServices, isLoading: loadingServices } = useQuery({
+    queryKey: ["notificationServices"],
+    queryFn: () =>
+      notificationService.getAllNotificationServices(
+        0,
+        serviceIds.length,
+        serviceIds,
+      ),
+    placeholderData: { data: [] },
+    select: (d: any) => {
+      const servicesMap = new Map<number, NotificationService>()
+      d.data.forEach((service: NotificationService, index: number) => {
+        servicesMap.set(service.id as number, service)
+      })
+      return servicesMap
+    },
+  })
+
   return (
     <SheetActionDialog
       side="right"
@@ -36,6 +68,7 @@ export default function JobEventNotificationsDrawer({
           JobDetails={JobDetails}
           onUpdate={onNotificationChange}
           onDelete={onNotificationDelete}
+          notificationServices={notificationServices}
         />
       </div>
     </SheetActionDialog>

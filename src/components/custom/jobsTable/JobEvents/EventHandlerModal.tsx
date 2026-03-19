@@ -44,13 +44,27 @@ import ConfirmationDialogAction, {
   ConfirmationDialogActionType,
 } from "@/components/confirmationDialogAction"
 import EventHandlerTitle from "@/components/custom/jobsTable/JobEvents/EventHandlerTitle"
+import { debounce, delayOnce } from "@/utils/generalUtils"
+import { useQuery } from "@tanstack/react-query"
 
 export interface EventHandlerModalProps {
   children: React.ReactNode
   isCreateMode: boolean
   eventHandler?: JobEventHandlerConfig
-  onSave: (eventHandler: JobEventHandlerConfig) => void
-  onDelete?: (configId: string) => Promise<void>
+  onSave: ({
+    handler,
+    cb,
+  }: {
+    handler: JobEventHandlerConfig
+    cb?: () => Promise<void>
+  }) => void
+  onDelete?: ({
+    configId,
+    cb,
+  }: {
+    configId: string
+    cb?: () => Promise<void>
+  }) => Promise<void>
   onOpenChange?: (open: boolean) => void
 }
 
@@ -90,45 +104,34 @@ export default function EventHandlerModal({
   const { isDialogOpen, setDialogState } = useDialogueManager()
   const [loading, setLoading] = useState(false)
 
-  const [notificationServices, setNotificationServices] = useState<
-    NotificationService[]
-  >([])
-  const [loadingServices, setLoadingServices] = useState(false)
-
-  useEffect(() => {
-    if (!isDialogOpen) return
-    setLoadingServices(true)
-    notificationService
-      .getAllNotificationServices()
-      .then((response: any) => {
-        setNotificationServices(response.data || [])
-      })
-      .catch(err => {
-        console.error("Failed to fetch notification services:", err)
-      })
-      .finally(() => {
-        setLoadingServices(false)
-      })
-  }, [isDialogOpen])
+  const { data: notificationServices, isLoading: loadingServices } = useQuery({
+    queryKey: ["notificationServices"],
+    queryFn: () => notificationService.getAllNotificationServices(),
+    placeholderData: { data: [] },
+    select: (d: any) => d.data,
+    enabled: isDialogOpen,
+  })
 
   const notificationServiceOptions =
     useMemo((): NotificationServiceDropdownItem[] => {
-      return notificationServices.map(service => ({
-        value: service.id as number,
-        label: service.name,
-        image: service.image,
-        description: service.description,
-      }))
+      return (
+        notificationServices?.map(service => ({
+          value: service.id as number,
+          label: service.name,
+          image: service.image,
+          description: service.description,
+        })) ?? []
+      )
     }, [notificationServices])
 
   const serviceId = form.watch("notification_service_id")
 
   const selectedNotificationServiceOption = useMemo(() => {
-    return notificationServiceOptions.find(s => s.value === serviceId)
+    return notificationServiceOptions.find(s => s.value === Number(serviceId))
   }, [notificationServices, serviceId])
 
   const selectedNotificationService = useMemo(() => {
-    return notificationServices.find(s => s.id === serviceId)
+    return notificationServices.find(s => s.id === Number(serviceId))
   }, [notificationServices, serviceId])
 
   const triggerType = form.watch("trigger")
@@ -168,7 +171,10 @@ export default function EventHandlerModal({
             : undefined,
       }
 
-      onSave(newEventHandler)
+      onSave({
+        handler: newEventHandler,
+        cb: () => delayOnce(() => handleClose(false), 200),
+      })
       handleClose(false)
     },
     [isCreateMode, eventHandler, onSave, handleClose],
@@ -179,9 +185,13 @@ export default function EventHandlerModal({
       if (action === ConfirmationDialogActionType.CANCEL) return
       if (onDelete) {
         setLoading(true)
-        await onDelete(eventHandler.config_id)
+        await onDelete({
+          configId: eventHandler.config_id,
+          cb: () => delayOnce(() => handleClose(false), 200),
+        }).catch(err => {
+          setLoading(false)
+        })
         setLoading(false)
-        handleClose(false)
       }
     },
     [isCreateMode, eventHandler, onDelete],
@@ -276,7 +286,7 @@ export default function EventHandlerModal({
                                 id={`type-${type}`}
                                 checked={field.value === type}
                                 onCheckedChange={checked =>
-                                  toggleConditionType(type, checked as boolean)
+                                  toggleConditionType(type)
                                 }
                               />
                               <Label

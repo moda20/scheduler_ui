@@ -20,10 +20,22 @@ import { Card, CardContent } from "@/components/ui/card"
 
 export interface EventHandlerCardProps {
   handler: JobEventHandlerConfig
-  notificationService: NotificationService
+  notificationService?: NotificationService
   serviceLoader?: boolean
-  handleUpdateEventHandler: (handler: JobEventHandlerConfig) => Promise<void>
-  onDelete?: (configId: string) => Promise<void>
+  handleUpdateEventHandler: ({
+    handler,
+    cb,
+  }: {
+    handler: JobEventHandlerConfig
+    cb?: () => void
+  }) => Promise<void>
+  onDelete?: ({
+    configId,
+    cb,
+  }: {
+    configId: string
+    cb?: () => void
+  }) => Promise<void>
 }
 
 export default function EventHandlerCard({
@@ -36,6 +48,7 @@ export default function EventHandlerCard({
   const notificationTypes = Array.isArray(handler.notification_type)
     ? handler.notification_type
     : [handler.notification_type]
+  console.log(notificationService)
   return (
     <Card className="border-border ">
       <CardContent className="border-border p-4 py-2">
