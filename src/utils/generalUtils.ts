@@ -10,6 +10,13 @@ export const debounce = (fn: Function, ms = 300) => {
   }
 }
 
+export const delayOnce = (fn: Function, ms = 300) => {
+  return new Promise<void>(res => {
+    fn()
+    setTimeout(() => res(), ms)
+  })
+}
+
 export const getMimeTypeFromExtension = (extension = "txt") => {
   if (extension[0] === ".") {
     extension = extension.substr(1)

@@ -13,6 +13,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { initializeStore } from "@/utils/initializer"
 import Authentication from "@/features/auth/authentication"
 import { verifyUserConnection } from "@/utils/authUtils"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 const container = document.getElementById("root")
 
@@ -20,16 +21,19 @@ if (container) {
   const root = createRoot(container)
   initializeStore()
   verifyUserConnection()
+  const queryClient = new QueryClient()
 
   root.render(
     <React.StrictMode>
-      <Provider store={store}>
-        <Toaster />
-        <Authentication />
-        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-          <RouterProvider router={router} />
-        </ThemeProvider>
-      </Provider>
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store}>
+          <Toaster />
+          <Authentication />
+          <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+            <RouterProvider router={router} />
+          </ThemeProvider>
+        </Provider>
+      </QueryClientProvider>
     </React.StrictMode>,
   )
 } else {
