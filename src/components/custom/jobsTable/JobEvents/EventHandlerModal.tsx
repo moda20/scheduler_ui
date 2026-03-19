@@ -171,6 +171,8 @@ export default function EventHandlerModal({
             : undefined,
       }
 
+      // The delayOnce function is used to let the modal closing animation finish (and removing the pointer event none
+      // from the body before invalidating the eventHandler object and modal
       onSave({
         handler: newEventHandler,
         cb: () => delayOnce(() => handleClose(false), 200),
