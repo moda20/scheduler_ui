@@ -63,7 +63,7 @@ const EventItem = ({
           <p className="text-muted-foreground text-xs italic">{job?.name}</p>
           <p className="leading-relaxed">{message}</p>
         </div>
-        <div className="flex gap-2 items-center flex-1">
+        <div className="flex gap-2 items-center">
           {handled && (
             <time
               className="text-muted-foreground text-xs"

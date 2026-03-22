@@ -118,6 +118,7 @@ export default function DrawerJobEvents({
                 onHandle={setEventsToRead(ev.id)}
                 handled={ev.handled}
                 handleTime={ev.handled_on}
+                job={JobDetails}
               />
             ))}
           {latestEvents.length > 0 && <Separator />}
@@ -130,6 +131,7 @@ export default function DrawerJobEvents({
               onHandle={setEventsToRead(ev.id)}
               handled={ev.handled}
               handleTime={ev.handled_on}
+              job={JobDetails}
             />
           ))}
         </div>
