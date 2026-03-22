@@ -77,8 +77,8 @@ const eventHandlerFormSchema = z.object({
     message: "Select a notification service",
   }),
   regex: z.string().optional(),
-  durationThreshold: z.coerce.number().optional(),
-  occurrences: z.coerce.number().optional(),
+  durationThreshold: z.coerce.number().positive().optional(),
+  occurrences: z.coerce.number().positive().optional(),
 })
 
 export type EventHandlerFormValues = z.infer<typeof eventHandlerFormSchema>
