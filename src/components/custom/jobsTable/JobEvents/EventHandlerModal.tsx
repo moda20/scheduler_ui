@@ -73,11 +73,12 @@ const eventHandlerFormSchema = z.object({
   notification_type: z
     .array(z.string())
     .min(1, "Select at least one event type"),
-  notification_service_id: z.number({
+  notification_service_id: z.coerce.number({
     message: "Select a notification service",
   }),
   regex: z.string().optional(),
-  durationThreshold: z.number().optional(),
+  durationThreshold: z.coerce.number().optional(),
+  occurrences: z.coerce.number().optional(),
 })
 
 export type EventHandlerFormValues = z.infer<typeof eventHandlerFormSchema>
@@ -98,6 +99,7 @@ export default function EventHandlerModal({
       notification_service_id: eventHandler?.notification_service_id || 0,
       regex: eventHandler?.regex || "",
       durationThreshold: eventHandler?.durationThreshold || undefined,
+      occurrences: eventHandler?.occurrences,
     },
   })
 
@@ -142,6 +144,10 @@ export default function EventHandlerModal({
   const isDurationThresholdTrigger =
     triggerType === JobNotificationTriggers.DURATION_THRESHOLD
 
+  const isOccurrencesTrigger = !(
+    triggerType === JobNotificationTriggers.DURATION_DELTA
+  )
+
   const handleClose = useCallback(
     (open: boolean) => {
       setDialogState(open)
@@ -169,6 +175,11 @@ export default function EventHandlerModal({
           values.trigger === JobNotificationTriggers.DURATION_DELTA
             ? values.durationThreshold
             : undefined,
+        occurrences: !(
+          values.trigger === JobNotificationTriggers.DURATION_DELTA
+        )
+          ? values.occurrences
+          : 0,
       }
 
       // The delayOnce function is used to let the modal closing animation finish (and removing the pointer event none
@@ -400,12 +411,40 @@ export default function EventHandlerModal({
                   />
                 ) : null}
 
+                {isOccurrencesTrigger ? (
+                  <FormField
+                    control={form.control}
+                    name="occurrences"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Occurrence (number of times)</FormLabel>
+                        <FormControl className="w-full">
+                          <Input
+                            className="focus-visible:ring-0 focus-visible:border-2"
+                            type="number"
+                            placeholder="The number of times the condition is met before triggering the event"
+                            {...field}
+                            value={field.value || ""}
+                            onChange={e => {
+                              const value = e.target.value
+                                ? parseInt(e.target.value, 10)
+                                : undefined
+                              field.onChange(value)
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ) : null}
+
                 <FormField
                   control={form.control}
                   name="notification_service_id"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Notification Service</FormLabel>
+                      <FormLabel>Notification Service {field.value}</FormLabel>
                       <FormControl className="w-full">
                         <NotificationServiceDropdown
                           defaultValue={selectedNotificationServiceOption}

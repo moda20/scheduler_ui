@@ -15,8 +15,8 @@ import { cn } from "@/lib/utils"
 import EventHandlerModal from "@/components/custom/jobsTable/JobEvents/EventHandlerModal"
 import { Button } from "@/components/ui/button"
 import { NotificationService } from "@/models/notifications"
-import { jobsTableData } from "@/features/jobsTable/interfaces"
 import { Card, CardContent } from "@/components/ui/card"
+import { CounterClockwiseClockIcon } from "@radix-ui/react-icons"
 
 export interface EventHandlerCardProps {
   handler: JobEventHandlerConfig
@@ -48,7 +48,6 @@ export default function EventHandlerCard({
   const notificationTypes = Array.isArray(handler.notification_type)
     ? handler.notification_type
     : [handler.notification_type]
-  console.log(notificationService)
   return (
     <Card className="border-border ">
       <CardContent className="border-border p-4 py-2">
@@ -137,6 +136,21 @@ export default function EventHandlerCard({
                   handler.durationThreshold !== undefined && (
                     <div>{handler.durationThreshold}s</div>
                   )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Search className="h-3.5 w-3.5" />
+                <span className="font-medium">Occurrence</span>
+              </div>
+              <div className="flex gap-2 items-center">
+                <CounterClockwiseClockIcon className="h-5 w-5" />
+                <div>
+                  {handler.occurrences
+                    ? `${handler.occurrences} time(s)`
+                    : "Every time"}
+                </div>
               </div>
             </div>
           </div>
