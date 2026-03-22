@@ -58,7 +58,7 @@ const EventItem = ({
       )}
     >
       <div className="flex items-center justify-between w-full">
-        <div className="flex flex-col gap-1 font-mono text-sm flex-1">
+        <div className="flex flex-col gap-1 font-mono text-sm">
           <time className="text-muted-foreground text-xs">{timestamp}</time>
           <p className="text-muted-foreground text-xs italic">{job?.name}</p>
           <p className="leading-relaxed">{message}</p>

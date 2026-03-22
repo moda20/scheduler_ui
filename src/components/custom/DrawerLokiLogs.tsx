@@ -66,12 +66,6 @@ export default function DrawerLokiLogs(props: DrawerLokiLogsProps) {
     jobId: props.jobId,
   })
 
-  useEffect(() => {
-    return () => {
-      console.log("logFiles change")
-    }
-  }, [logFiles])
-
   const fetchLogs = (open?: boolean) => {
     setDialogOpen(!!open)
   }

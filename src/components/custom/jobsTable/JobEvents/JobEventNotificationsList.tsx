@@ -6,7 +6,6 @@ import {
 } from "@/components/ui/accordion"
 import { Bell, Briefcase, Edit, Plus, Search, Tag } from "lucide-react"
 import { EmptyState } from "@/components/custom/general/EmptyState"
-import { notificationService } from "@/services/notificationsService"
 import type { NotificationService } from "@/models/notifications"
 import {
   JNTypesNames,
@@ -26,8 +25,7 @@ import EventHandlerTitle, {
   getNotificationTypeIcon,
   getTriggerIcon,
 } from "@/components/custom/jobsTable/JobEvents/EventHandlerTitle"
-import { toast } from "@/hooks/use-toast"
-import { useQuery } from "@tanstack/react-query"
+import { CounterClockwiseClockIcon } from "@radix-ui/react-icons"
 
 interface JobEventNotificationsDrawerProps {
   eventHandlers: JobEventHandlerConfig[]
@@ -212,6 +210,21 @@ export default function JobEventNotificationsList({
                               handler.durationThreshold !== undefined && (
                                 <div>{handler.durationThreshold}s</div>
                               )}
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <Search className="h-3.5 w-3.5" />
+                            <span className="font-medium">Occurrence</span>
+                          </div>
+                          <div className="flex gap-2 items-center">
+                            <CounterClockwiseClockIcon className="h-5 w-5" />
+                            <div>
+                              {handler.occurrences
+                                ? `${handler.occurrences} time(s)`
+                                : "Every time"}
+                            </div>
                           </div>
                         </div>
                       </div>

@@ -114,4 +114,6 @@ export interface JobEventHandlerConfig {
   notification_service_id: number
   regex?: string
   durationThreshold?: number
+  occurrences?: number
+  updatedAt?: Date
 }
