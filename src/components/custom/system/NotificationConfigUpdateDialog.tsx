@@ -63,6 +63,7 @@ export function NotificationConfigUpdateDialog({
     if (!finalState) {
       form.reset()
       setConfigData(null)
+      setDefaultValues({})
     }
   }
 
