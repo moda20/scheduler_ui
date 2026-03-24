@@ -218,7 +218,9 @@ export function NotificationConfigUpdateDialog({
                           </FormControl>
                           {fieldData.is_encrypted && (
                             <FormDescription>
-                              Leave empty to keep the current encrypted value
+                              Leave as it is to keep the current encrypted
+                              value. Any changes should replace the entire
+                              value.
                             </FormDescription>
                           )}
                           <FormMessage />
