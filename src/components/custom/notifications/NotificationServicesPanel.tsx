@@ -4,9 +4,11 @@ import {
   CopyIcon,
   EditIcon,
   FileX2,
+  LoaderIcon,
   LoaderPinwheelIcon,
   Plus,
   PlusIcon,
+  TestTubeIcon,
   Unlock,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -33,6 +35,7 @@ import { CardStackIcon, Cross2Icon } from "@radix-ui/react-icons"
 import { NotificationConfigUpdateDialog } from "@/components/custom/system/NotificationConfigUpdateDialog"
 import ButtonWithStrCut from "@/components/custom/general/ButtonWithStrCut"
 import { NotificationCloneDialog } from "@/components/custom/system/NotificationCloneDialog"
+import { useMutation } from "@tanstack/react-query"
 
 export default function NotificationServicesPanel() {
   const [notificationServices, setNotificationServices] = useState<{
@@ -276,6 +279,28 @@ export default function NotificationServicesPanel() {
     [selectedService, selectedServicesAttachedJobs],
   )
 
+  const testNotificationService = useCallback(async () => {
+    return notificationService.testNotificationService(
+      Number(selectedService.id),
+    )
+  }, [selectedService])
+
+  const testNotificationServiceMutation = useMutation({
+    mutationFn: testNotificationService,
+    onError: () => {
+      toast({
+        title: "Error sending test message",
+        variant: "destructive",
+      })
+    },
+    onSuccess: data => {
+      toast({
+        title: `Test message was sent`,
+        duration: 2000,
+      })
+    },
+  })
+
   return (
     <div className="flex flex-col gap-4">
       <div className={"flex flex-col gap-1 mb-4"}>
@@ -289,7 +314,7 @@ export default function NotificationServicesPanel() {
       <Card className="border-0">
         <CardContent className="p-2 pt-0">
           <div className={"flex gap-2 h-full"}>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 pt-2">
               <NotificationConfigDialog
                 JobsList={getAllJobs}
                 serviceFileList={getAllServiceEntrypoints}
@@ -354,7 +379,7 @@ export default function NotificationServicesPanel() {
             <Spinner
               isLoading={infoLoading}
               icon={LoaderPinwheelIcon}
-              className="h-full w-full block"
+              className="h-full w-full block pt-2"
             >
               {notificationServices.data.length > 0 && (
                 <div className="flex flex-col gap-2 ">
@@ -404,6 +429,21 @@ export default function NotificationServicesPanel() {
                               Config
                             </ButtonWithStrCut>
                           </NotificationConfigUpdateDialog>
+                          <ButtonWithStrCut
+                            variant={"outline"}
+                            title="Send a test message"
+                            disabled={testNotificationServiceMutation.isPending}
+                            onClick={() =>
+                              testNotificationServiceMutation.mutateAsync()
+                            }
+                          >
+                            {testNotificationServiceMutation.isPending ? (
+                              <LoaderIcon className="animate-spin" />
+                            ) : (
+                              <TestTubeIcon />
+                            )}
+                            Test
+                          </ButtonWithStrCut>
                         </div>
                       </>
                     )}

@@ -68,6 +68,11 @@ export const notificationService = {
       name,
     })
   },
+  testNotificationService(id: number) {
+    return axios.post("/notifications/testNotificationService", {
+      id,
+    })
+  },
   updateEventHandler(jobId: number, handler: any) {
     return axios.post(`/notifications/updateJobEventHandlers`, {
       handler,
