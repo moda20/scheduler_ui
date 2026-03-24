@@ -7,6 +7,7 @@ import {
   LoaderPinwheelIcon,
   Plus,
   PlusIcon,
+  TestTubeIcon,
   Unlock,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -276,6 +277,24 @@ export default function NotificationServicesPanel() {
     [selectedService, selectedServicesAttachedJobs],
   )
 
+  const testNotificationService = useCallback(async () => {
+    try {
+      await notificationService.testNotificationService(
+        Number(selectedService.id),
+      )
+      toast({
+        title: `Test message sent successfully`,
+        duration: 2000,
+      })
+    } catch (err) {
+      toast({
+        title: `Error sending test message: ${err.message}`,
+        duration: 2000,
+        variant: "destructive",
+      })
+    }
+  }, [selectedService, selectedServicesAttachedJobs])
+
   return (
     <div className="flex flex-col gap-4">
       <div className={"flex flex-col gap-1 mb-4"}>
@@ -404,6 +423,14 @@ export default function NotificationServicesPanel() {
                               Config
                             </ButtonWithStrCut>
                           </NotificationConfigUpdateDialog>
+                          <ButtonWithStrCut
+                            variant={"outline"}
+                            title="Send a test message"
+                            onClick={testNotificationService}
+                          >
+                            <TestTubeIcon />
+                            Test
+                          </ButtonWithStrCut>
                         </div>
                       </>
                     )}

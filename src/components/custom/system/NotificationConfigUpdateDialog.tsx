@@ -59,6 +59,13 @@ export function NotificationConfigUpdateDialog({
     defaultValues: {},
   })
 
+  const resetState = (finalState: boolean) => {
+    if (!finalState) {
+      form.reset()
+      setConfigData(null)
+    }
+  }
+
   const fetchConfig = useCallback(
     async (name: string) => {
       setIsLoading(true)
@@ -130,7 +137,10 @@ export function NotificationConfigUpdateDialog({
   )
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setDialogState}>
+    <Dialog
+      open={isDialogOpen}
+      onOpenChange={v => setDialogState(v, resetState)}
+    >
       <DialogTrigger
         asChild
         className={cn(triggerClassName)}
@@ -145,7 +155,7 @@ export function NotificationConfigUpdateDialog({
         className="sm:max-w-[480px] text-foreground bg-background"
         onEscapeKeyDown={e => {
           e.preventDefault()
-          setDialogState(false)
+          setDialogState(false, resetState)
         }}
       >
         <DialogHeader>
