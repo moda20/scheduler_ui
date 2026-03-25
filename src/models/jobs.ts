@@ -66,3 +66,54 @@ export const eventPeriodUnits: { [key: string]: number } = {
   d: 1440,
   m: 43200,
 }
+
+export enum JobNotificationTypes {
+  JOB_EVENT = "JOB_EVENT",
+  JOB_EVENT_ERROR = "JOB_EVENT_ERROR",
+  JOB_EVENT_WARNING = "JOB_EVENT_WARNING",
+  JOB_EVENT_INFO = "JOB_EVENT_INFO",
+  JOB_DURATION = "JOB_DURATION",
+}
+
+export const JNTypesNames = {
+  [JobNotificationTypes.JOB_EVENT]: "Job Event",
+  [JobNotificationTypes.JOB_EVENT_ERROR]: "Job Event Error",
+  [JobNotificationTypes.JOB_EVENT_WARNING]: "Job Event Warning",
+  [JobNotificationTypes.JOB_EVENT_INFO]: "Job Event Info",
+  [JobNotificationTypes.JOB_DURATION]: "Job Duration",
+}
+
+export enum JobNotificationTriggers {
+  REGEX_MESSAGE_MATCH = "REGEX_MESSAGE_MATCH",
+  DURATION_DELTA = "DURATION_DELTA",
+  DURATION_THRESHOLD = "DURATION_THRESHOLD",
+}
+
+export const AvailableTypesPerTrigger = {
+  [JobNotificationTriggers.REGEX_MESSAGE_MATCH]: [
+    JobNotificationTypes.JOB_EVENT_ERROR,
+    JobNotificationTypes.JOB_EVENT_WARNING,
+    JobNotificationTypes.JOB_EVENT_INFO,
+  ],
+  [JobNotificationTriggers.DURATION_DELTA]: [JobNotificationTypes.JOB_DURATION],
+  [JobNotificationTriggers.DURATION_THRESHOLD]: [
+    JobNotificationTypes.JOB_DURATION,
+  ],
+}
+
+export const JNTriggerNames = {
+  [JobNotificationTriggers.REGEX_MESSAGE_MATCH]: "Regex Message Match",
+  [JobNotificationTriggers.DURATION_DELTA]: "Duration Delta",
+  [JobNotificationTriggers.DURATION_THRESHOLD]: "Duration Threshold",
+}
+
+export interface JobEventHandlerConfig {
+  config_id?: string
+  notification_type: JobNotificationTypes[]
+  trigger: JobNotificationTriggers
+  notification_service_id: number
+  regex?: string
+  durationThreshold?: number
+  occurrences?: number
+  updatedAt?: Date
+}

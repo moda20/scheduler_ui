@@ -50,7 +50,7 @@ services.forEach(s =>
     error => {
       console.log(error)
       let notificationParam = {
-        description: "",
+        description: error.message,
       }
 
       if (error.response?.status === 401) {
@@ -85,6 +85,9 @@ services.forEach(s =>
         error.response?.data?.error ??
         error.response?.data ??
         notificationParam.description
+
+      error.message = notificationParam.description
+
       toast({
         ...notificationParam,
         variant: "destructive",

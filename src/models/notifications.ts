@@ -8,3 +8,5 @@ export interface NotificationService {
   updated_at: any
   jobs?: any[]
 }
+
+export type NotificationType = "services" | "globalEventHandlers"

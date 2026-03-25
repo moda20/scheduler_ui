@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import * as React from "react"
 import { useImperativeHandle, useRef } from "react"
 
-interface ButtonWithStrCutProps extends ButtonProps {
+export interface ButtonWithStrCutProps extends ButtonProps {
   keyBinding?: string | string[]
   onAction?: (arg0: KeyboardEvent) => void
 }

@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import {
+  Bell,
   DockIcon,
   Edit2Icon,
   EllipsisVertical,
@@ -33,13 +34,14 @@ import { jobActions } from "@/features/jobsTable/interfaces"
 import type { DateRange } from "react-day-picker"
 import DrawerJobFiles from "@/components/custom/DrawerJobFiles"
 import type { ComponentPropsWithoutRef, ReactNode } from "react"
-import React, { useCallback } from "react"
+import React, { useCallback, useMemo } from "react"
 import DropdownMenuItemExtended from "@/components/custom/general/DropdownItemExtended"
 import DrawerLatestRuns from "@/components/custom/DrawerLatestRuns"
 import { CardStackIcon } from "@radix-ui/react-icons"
 import { JobExecutionDialog } from "@/components/job-execution-dialog"
 import DrawerJobEvents from "@/components/custom/DrawerJobEvents"
 import DrawerFilePreview from "@/components/custom/DrawerFilePreview"
+import JobEventNotificationsDrawer from "@/components/custom/jobsTable/JobEvents/JobEventNotificationsDrawer"
 
 export interface ActionDropdownProps {
   columnsProps: tableColumnsProps
@@ -49,6 +51,7 @@ export interface ActionDropdownProps {
   children?: ReactNode
   modal?: boolean
   dropdownContentProps?: ComponentPropsWithoutRef<typeof DropdownMenuContent>
+  refreshJob?: () => Promise<void>
 }
 export default function ActionDropdown({
   columnsProps,
@@ -58,6 +61,7 @@ export default function ActionDropdown({
   children,
   modal,
   dropdownContentProps,
+  refreshJob,
 }: ActionDropdownProps) {
   const { isDialogOpen, setDialogState, isTopOfTheStack } = useDialogueManager({
     inputGroup: inputGroup ?? "JobActions",
@@ -114,8 +118,30 @@ export default function ActionDropdown({
   )
 
   const handleJobUpdateAction = useCallback(
-    (jobData: any) => {
+    async (jobData: any) => {
       return columnsProps.takeAction(row, jobActions.UPDATE, jobData)
+    },
+    [row],
+  )
+
+  const handleJobEventHandlerAction = useCallback(
+    async (handlerData: any) => {
+      return columnsProps.takeAction(
+        row,
+        jobActions.UPDATE_EVENT_HANDLER,
+        handlerData,
+      )
+    },
+    [row],
+  )
+
+  const handleJobEventHandlerDelete = useCallback(
+    async ({ configId }: { configId: string; cb?: () => Promise<void> }) => {
+      return columnsProps.takeAction(
+        row,
+        jobActions.DELETE_EVENT_HANDLER,
+        configId,
+      )
     },
     [row],
   )
@@ -140,6 +166,15 @@ export default function ActionDropdown({
     if (!row.initialized && row.status === "STARTED") return
     return columnsProps.takeAction(row, jobActions.REFRESH)
   }, [row])
+
+  const eventHandlers = useMemo(() => {
+    try {
+      const params = JSON.parse(row.param || "{}")
+      return params.eventHandlers || []
+    } catch {
+      return []
+    }
+  }, [row.param])
 
   return (
     <DropdownMenu
@@ -266,6 +301,26 @@ export default function ActionDropdown({
                 <DropdownMenuShortcut>E</DropdownMenuShortcut>
               </DropdownMenuItemExtended>
             }
+          />
+        </DropdownMenuGroup>
+        <DropdownMenuGroup>
+          <JobEventNotificationsDrawer
+            eventHandlers={eventHandlers}
+            JobDetails={row}
+            trigger={
+              <DropdownMenuItemExtended
+                keyBinding="N"
+                onSelect={handleEventPrevention}
+                disabled={!isTopOfTheStack}
+              >
+                <Bell />
+                <span>Event Notifications</span>
+                <DropdownMenuShortcut>N</DropdownMenuShortcut>
+              </DropdownMenuItemExtended>
+            }
+            onNotificationChange={handleJobEventHandlerAction}
+            onNotificationDelete={handleJobEventHandlerDelete}
+            modal={modal}
           />
         </DropdownMenuGroup>
         <DropdownMenuGroup>
