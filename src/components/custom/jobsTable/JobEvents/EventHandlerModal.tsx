@@ -212,6 +212,9 @@ export default function EventHandlerModal({
 
   const toggleConditionType = (type: JobNotificationTriggers) => {
     form.setValue("trigger", type)
+    form.resetField("notification_type")
+    form.resetField("regex")
+    form.resetField("durationThreshold")
   }
 
   const toggleNotificationType = (
@@ -444,7 +447,7 @@ export default function EventHandlerModal({
                   name="notification_service_id"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Notification Service {field.value}</FormLabel>
+                      <FormLabel>Notification Service</FormLabel>
                       <FormControl className="w-full">
                         <NotificationServiceDropdown
                           defaultValue={selectedNotificationServiceOption}

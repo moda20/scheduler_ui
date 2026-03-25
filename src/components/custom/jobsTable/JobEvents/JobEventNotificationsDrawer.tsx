@@ -36,7 +36,7 @@ export default function JobEventNotificationsDrawer({
   )
 
   const { data: notificationServices, isLoading: loadingServices } = useQuery({
-    queryKey: ["notificationServices"],
+    queryKey: ["notificationServices", "serviceIds"],
     queryFn: () =>
       notificationService.getAllNotificationServices(
         0,

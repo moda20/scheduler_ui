@@ -61,8 +61,11 @@ export default function GlobalEventHandlersPanel() {
         title: "Event handler updated",
         duration: 1500,
       })
-      variables.cb?.().then(() => {
-        queryClient.invalidateQueries({ queryKey: ["globalEventHandlers"] })
+
+      return (variables.cb?.() ?? Promise.resolve()).then(() => {
+        return queryClient.invalidateQueries({
+          queryKey: ["globalEventHandlers"],
+        })
       })
     },
   })
@@ -93,8 +96,10 @@ export default function GlobalEventHandlersPanel() {
         title: "Event handler deleted",
         duration: 1500,
       })
-      variables.cb?.().then(() => {
-        queryClient.invalidateQueries({ queryKey: ["globalEventHandlers"] })
+      return (variables.cb?.() ?? Promise.resolve()).then(() => {
+        return queryClient.invalidateQueries({
+          queryKey: ["globalEventHandlers"],
+        })
       })
     },
   })
