@@ -1,13 +1,8 @@
-import type { ConfigItem } from "@/models/configs"
-
-export interface CategorizedConfigs {
-  system: ConfigItem[]
-  logging: ConfigItem[]
-  notifications: ConfigItem[]
-  custom: ConfigItem[]
-}
-
-export type ConfigCategory = keyof CategorizedConfigs
+import type {
+  CategorizedConfigs,
+  ConfigCategory,
+  ConfigItem,
+} from "@/models/configs"
 
 export function categorizeConfig(configs: ConfigItem[]): CategorizedConfigs {
   const categorized: CategorizedConfigs = {
@@ -40,21 +35,12 @@ function getConfigCategory(config: ConfigItem): ConfigCategory {
   ) {
     return "system"
   }
-  if (
-    key.startsWith("server.logToConsole") ||
-    key.startsWith("server.logSystemEvents") ||
-    key.startsWith("files")
-  ) {
+  if (key.startsWith("files")) {
     return "logging"
   }
 
   if (key.startsWith("notifications") || key.startsWith("grafana")) {
     return "notifications"
-  }
-
-  // Custom configs: everything else or user-added configs (no base flag)
-  if (!config.base) {
-    return "custom"
   }
 
   return "custom"

@@ -3,22 +3,17 @@ import React, { useCallback, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/hooks/use-toast"
 import { Switch } from "@/components/ui/switch"
-import type { ConfigItem, ConfigType } from "@/models/configs"
+import type { ConfigItem, ConfigType, ConfigViewType } from "@/models/configs"
 import configService from "@/services/configs"
 import ConfirmationDialogAction from "@/components/confirmationDialogAction"
 import { genUID, isEqual } from "@/utils/generalUtils"
 import { cn } from "@/lib/utils"
 import { categorizeConfig } from "@/utils/configUtils"
-import type { CategorizedConfigs } from "@/utils/configUtils"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import LoadingOverlay from "@/components/custom/LoadingOverlay"
 
 import { ConfigAside } from "@/components/custom/configs/ConfigAside"
 import { ConfigCenter } from "@/components/custom/configs/ConfigCenter"
-
-export type ConfigViewType = "system" | "logging" | "notifications" | "custom"
-
-export type { CategorizedConfigs }
 
 export default function ConfigsDashboard() {
   const queryClient = useQueryClient()
@@ -254,7 +249,7 @@ export default function ConfigsDashboard() {
           "flex items-center justify-between absolute top-4 right-4 z-50"
         }
       >
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="flex items-center gap-2 ml-auto h-6">
           {!configChanged && (
             <ConfirmationDialogAction
               title={"Save configuration Changes"}
@@ -276,7 +271,11 @@ export default function ConfigsDashboard() {
           <div className="flex items-center gap-2">
             <Eye className="h-4 w-4" />
             <span className="text-sm">View</span>
-            <Switch checked={editMode} onCheckedChange={setEditMode} />
+            <Switch
+              aria-label="Toggle edit mode"
+              checked={editMode}
+              onCheckedChange={setEditMode}
+            />
             <span className="text-sm">Edit</span>
             <Edit3 className="h-4 w-4" />
           </div>

@@ -1,14 +1,10 @@
 import { motion, AnimatePresence } from "framer-motion"
-import type { ConfigItem } from "@/models/configs"
 
 import { SystemPanel } from "./SystemPanel"
 import { LoggingPanel } from "./LoggingPanel"
 import { NotificationsPanel } from "./NotificationsPanel"
 import { CustomPanel } from "./CustomPanel"
-import {
-  ConfigViewType,
-  type CategorizedConfigs,
-} from "@/features/system/configs"
+import { CategorizedConfigs, ConfigViewType } from "@/models/configs"
 
 interface ConfigCenterProps {
   activeView: ConfigViewType
