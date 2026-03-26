@@ -17,3 +17,14 @@ export interface ConfigList {
 export type ConfigType = ConfigList & {
   [key: string]: { [key: string]: ConfigItem }
 }
+
+export interface CategorizedConfigs {
+  system: ConfigItem[]
+  logging: ConfigItem[]
+  notifications: ConfigItem[]
+  custom: ConfigItem[]
+}
+
+export type ConfigCategory = keyof CategorizedConfigs
+
+export type ConfigViewType = "system" | "logging" | "notifications" | "custom"
