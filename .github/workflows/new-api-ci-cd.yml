@@ -30,7 +30,7 @@ jobs:
           file: ./DOCKERFILE
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/scheduler_ui:new_api
-            ghcr.io/${{ github.repository_owner }}/scheduler_ui:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/type_scheduler_ui:new_api
+            ghcr.io/${{ github.repository_owner }}/type_scheduler_ui:${{ github.sha }}
           platforms: linux/amd64,linux/arm64
 
