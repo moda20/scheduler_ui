@@ -1,6 +1,5 @@
 import type { ConfigItem } from "@/models/configs"
 import ConfigBlock from "./configBlock"
-import { ConfigAddBlock } from "@/components/custom/configs/ConfigAddBlock"
 
 interface LoggingPanelProps {
   configs: ConfigItem[]
