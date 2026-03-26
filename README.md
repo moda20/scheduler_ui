@@ -1,8 +1,8 @@
 <div align="center">
 
-# Scheduler UI
+# Type Type Scheduler UI
 
-**A modern web interface for managing scheduled tasks, proxies, and more**
+**A SPA interface for managing Type scheduler scheduled tasks, proxies, and more**
 
 ![Project Status](https://img.shields.io/badge/status-pre--alpha-orange)
 ![License](https://img.shields.io/badge/license-TBD-blue)
@@ -21,7 +21,7 @@
 
 ## 📖 Overview
 
-Scheduler UI is a modern React-based web application that provides a clean, intuitive interface for managing the [Scheduler Backend](#). It enables seamless management of tasks, authentication, proxies, databases, and other system configurations.
+Type Scheduler UI is a modern React-based web application that provides a clean, intuitive interface for managing the [Backend component](https://github.com/moda20/TypeSchedulerBackend). It enables seamless management of tasks, authentication, proxies, databases, and other system configurations.
 
 ### Key Features
 
@@ -30,21 +30,23 @@ Scheduler UI is a modern React-based web application that provides a clean, intu
 - **Proxy Management**: Configure and manage proxy servers for task execution
 - **Database Management**: Handle database connections and configurations
 - **Event Logging**: View detailed execution logs and event streams
+- **Event handlers**: Extradite events based on regex and job duration changes
 - **Real-time Updates**: WebSocket integration for live status updates
 
 ---
 
 ## ✨ Features
 
-| Feature                 | Description                                                   |
-| ----------------------- | ------------------------------------------------------------- |
-| **Authentication**      | Secure login and session management for backend servers       |
-| **Task Management**     | Full CRUD operations for scheduled jobs with cron expressions |
-| **Proxy Configuration** | Add, edit, and manage proxy servers                           |
-| **Database Management** | Manage database connections and settings                      |
-| **Event Monitoring**    | Real-time event logs and execution history                    |
-| **File Preview**        | Built-in file viewer for job artifacts and outputs            |
-| **Dashboard**           | Visual overview of system status and task performance         |
+| Feature         | Description                                                             |
+|-----------------|-------------------------------------------------------------------------|
+| **Authentication** | Secure login and session management for backend servers                 |
+| **Task Management** | Full CRUD operations for scheduled jobs with cron expressions           |
+| **Proxy Configuration** | Add, edit, and manage proxy servers                                     |
+| **Database Management** | Manage database connections and settings                                |
+| **Event Monitoring** | Real-time event logs, execution history, and conditional event handling |
+| **File Preview** | Built-in file viewer for job artifacts and outputs                      |
+| **Logging**     | Built-in job log viewers                                                |
+| **Dashboard**   | Visual overview of system status and task performance                   |
 
 ---
 
@@ -59,7 +61,7 @@ The recommended deployment method uses Docker with nginx as a reverse proxy.
 docker compose up
 
 # Or run the container directly
-docker run -p 80:80 ghcr.io/moda20/scheduler_ui:latest
+docker run -p 80:80 ghcr.io/moda20/type_scheduler_ui:latest
 ```
 
 ### Environment Variables
@@ -80,10 +82,10 @@ A `compose.yml` file is included in the repository for reference. The recommende
 
 ### Tech Stack
 
-- **Framework**: React 18 + Vite
+- **Framework**: React 19 + Vite
 - **State Management**: Redux Toolkit + React Redux
 - **Routing**: React Router v6
-- **UI Components**: shadcn/ui (Radix UI primitives) + Tailwind CSS
+- **UI Components**: shadcn/ui (Radix UI primitives) + Tailwind CSS + framer motion
 - **Testing**: Vitest + React Testing Library
 - **Language**: TypeScript
 
@@ -91,7 +93,7 @@ A `compose.yml` file is included in the repository for reference. The recommende
 
 ```bash
 # Clone the repository
-git clone https://github.com/moda20/scheduler_ui.git
+git clone https://github.com/moda20/TypeSchedulerUI.git
 
 # Navigate to the project directory
 cd scheduler_ui
@@ -151,7 +153,6 @@ Please ensure your pull requests:
 
 - Pass all linting checks (`npm run lint`)
 - Pass all tests (`npm test`)
-- Have no TypeScript errors (`npm run type-check`)
 - Follow the project's code style
 
 ---
