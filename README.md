@@ -30,7 +30,7 @@ Type Scheduler UI is a modern React-based web application that provides a clean,
 - **Proxy Management**: Configure and manage proxy servers for task execution
 - **Database Management**: Handle database connections and configurations
 - **Event Logging**: View detailed execution logs and event streams
-- **Event handlers**: Extradite events based on regex and job duration changes
+- **Event handlers**: Send events via notification services based on regex message matching and job duration changes
 - **Real-time Updates**: WebSocket integration for live status updates
 
 ---
@@ -84,7 +84,7 @@ A `compose.yml` file is included in the repository for reference. The recommende
 
 - **Framework**: React 19 + Vite
 - **State Management**: Redux Toolkit + React Redux
-- **Routing**: React Router v6
+- **Routing**: React Router v7
 - **UI Components**: shadcn/ui (Radix UI primitives) + Tailwind CSS + framer motion
 - **Testing**: Vitest + React Testing Library
 - **Language**: TypeScript
@@ -96,7 +96,7 @@ A `compose.yml` file is included in the repository for reference. The recommende
 git clone https://github.com/moda20/TypeSchedulerUI.git
 
 # Navigate to the project directory
-cd scheduler_ui
+cd TypeSchedulerUI
 
 # Install dependencies
 npm install
