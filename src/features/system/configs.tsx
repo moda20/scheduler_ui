@@ -1,40 +1,26 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  DatabaseBackup,
-  Edit3,
-  Eye,
-  FolderKanban,
-  LucideDatabase,
-  LucideDatabaseZap,
-  Plus,
-  SaveIcon,
-} from "lucide-react"
-import React, { useCallback, useEffect, useState } from "react"
-import systemService from "@/services/SystemService"
+import { Edit3, Eye, SaveIcon } from "lucide-react"
+import React, { useCallback, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/hooks/use-toast"
 import { Switch } from "@/components/ui/switch"
-import type { ConfigItem, ConfigType } from "@/models/configs"
-import ConfigBlock from "@/components/custom/configs/configBlock"
+import type { ConfigItem, ConfigType, ConfigViewType } from "@/models/configs"
 import configService from "@/services/configs"
 import ConfirmationDialogAction from "@/components/confirmationDialogAction"
 import { genUID, isEqual } from "@/utils/generalUtils"
-import { useInView } from "@/hooks/useInView"
 import { cn } from "@/lib/utils"
+import { categorizeConfig } from "@/utils/configUtils"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import LoadingOverlay from "@/components/custom/LoadingOverlay"
+
+import { ConfigAside } from "@/components/custom/configs/ConfigAside"
+import { ConfigCenter } from "@/components/custom/configs/ConfigCenter"
 
 export default function ConfigsDashboard() {
+  const queryClient = useQueryClient()
+  const [activeView, setActiveView] = useState<ConfigViewType>("system")
   const [editMode, setEditMode] = useState(false)
   const [config, setConfig] = useState<Array<ConfigItem>>([])
   const [shadowConfig, setShadowConfig] = useState<Array<ConfigItem>>([])
-  const [configChanged, setConfigStatus] = useState<Boolean>(false)
-  const { ref, inView } = useInView()
 
   const convertConfigStructure = useCallback((config: ConfigType) => {
     const recParse = (parentKey: string, input: ConfigType): any => {
@@ -63,21 +49,21 @@ export default function ConfigsDashboard() {
     return parsedConfig.subGroups
   }, [])
 
-  const getFullConfig = useCallback(() => {
-    configService.getAllConfigs().then(data => {
-      const convertedConfig = convertConfigStructure(data)
+  const { data: rawConfig, isLoading } = useQuery({
+    queryKey: ["configs"],
+    queryFn: configService.getAllConfigs,
+  })
+
+  React.useEffect(() => {
+    if (rawConfig) {
+      const convertedConfig = convertConfigStructure(rawConfig)
       setConfig(convertedConfig)
       setShadowConfig(JSON.parse(JSON.stringify(convertedConfig)))
-    })
-  }, [convertConfigStructure])
+    }
+  }, [rawConfig, convertConfigStructure])
 
-  useEffect(() => {
-    getFullConfig()
-  }, [getFullConfig])
-
-  useEffect(() => {
-    const isEqualConfigs = isEqual(config, shadowConfig)
-    setConfigStatus(isEqualConfigs)
+  const configChanged = useMemo(() => {
+    return isEqual(config, shadowConfig)
   }, [config, shadowConfig])
 
   const addConfigItem = useCallback(
@@ -146,7 +132,7 @@ export default function ConfigsDashboard() {
           } else {
             targetConfigList = config
               .find(e => e.id === parentId)
-              ?.subGroups?.filter(e => e.id === itemId)
+              ?.subGroups?.filter(e => e.id !== itemId)
           }
         }
       }
@@ -185,6 +171,26 @@ export default function ConfigsDashboard() {
     [config],
   )
 
+  const updateConfigMutation = useMutation({
+    mutationFn: (fullDiffs: Array<ConfigItem>) => {
+      return configService.updateConfig(fullDiffs)
+    },
+    onSuccess: () => {
+      toast({
+        title: `System configuration updated`,
+        duration: 2000,
+      })
+      queryClient.invalidateQueries({ queryKey: ["configs"] })
+    },
+    onError: (error: any) => {
+      toast({
+        title: `Error updating configuration: ${error.message}`,
+        duration: 3000,
+        variant: "destructive",
+      })
+    },
+  })
+
   const saveDiffConfig = useCallback(() => {
     const convertedConfig = convertToConfigStructure(config)
     const shadowConfigConverted = convertToConfigStructure(shadowConfig)
@@ -210,14 +216,8 @@ export default function ConfigsDashboard() {
           mappedShadowConfig[e.key].encrypted !== e.encrypted),
     )
     const fullDiffs = [...newDiffs, ...deletedDiffs, ...updatedDiffs]
-    return configService.updateConfig(fullDiffs).then(response => {
-      toast({
-        title: `System configuration updated`,
-        duration: 2000,
-      })
-      return getFullConfig()
-    })
-  }, [config, shadowConfig])
+    updateConfigMutation.mutate(fullDiffs)
+  }, [config, shadowConfig, updateConfigMutation])
 
   const convertToConfigStructure = useCallback((config: Array<ConfigItem>) => {
     const recConvert = (parentKey: string, input: any): any => {
@@ -239,81 +239,59 @@ export default function ConfigsDashboard() {
     }
     return config.map(e => recConvert("", e).flat()).flat()
   }, [])
+
+  const categorizedConfigs = categorizeConfig(config)
+
   return (
-    <div className="h-full">
-      <div ref={ref} className="h-1"></div>
+    <div className="w-full h-full relative">
       <div
-        className={cn(
-          "z-10 transition-all duration-100 sticky pt-4",
-          !inView ? "bg-background/95 backdrop-blur-sm shadow-md top-16" : "",
-          editMode ? "pb-4" : "",
-        )}
+        className={
+          "flex items-center justify-between absolute top-4 right-4 z-50"
+        }
       >
-        <div className={"flex items-center justify-between"}>
-          <div className={"flex flex-col gap-1 mb-4"}>
-            <h2 className="text-2xl font-bold tracking-tight">
-              System configuration
-            </h2>
-            <p className="text-md font-light">
-              Manage basic configurations and secrets.
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            {!configChanged && (
-              <ConfirmationDialogAction
-                title={"Save configuration Changes"}
-                description={`This will update the server configuration, only new running jobs (instance) will be affected`}
-                takeAction={() => saveDiffConfig()}
-                confirmText={"Save configuration"}
-                confirmVariant={"default"}
+        <div className="flex items-center gap-2 ml-auto h-6">
+          {!configChanged && (
+            <ConfirmationDialogAction
+              title={"Save configuration Changes"}
+              description={`This will update the server configuration, only new running jobs (instance) will be affected`}
+              takeAction={() => saveDiffConfig()}
+              confirmText={"Save configuration"}
+              confirmVariant={"default"}
+            >
+              <Button
+                size="sm"
+                variant="destructive"
+                className="border-none focus:ring-0 outline-none"
               >
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  className="border-none focus:ring-0 outline-none"
-                >
-                  <SaveIcon />
-                  <span className="text-sm">Save</span>
-                </Button>
-              </ConfirmationDialogAction>
-            )}
-            <div className="flex items-center gap-2">
-              <Eye className="h-4 w-4" />
-              <span className="text-sm">View</span>
-              <Switch checked={editMode} onCheckedChange={setEditMode} />
-              <span className="text-sm">Edit</span>
-              <Edit3 className="h-4 w-4" />
-            </div>
+                <SaveIcon />
+                <span className="text-sm">Save</span>
+              </Button>
+            </ConfirmationDialogAction>
+          )}
+          <div className="flex items-center gap-2">
+            <Eye className="h-4 w-4" />
+            <span className="text-sm">View</span>
+            <Switch
+              aria-label="Toggle edit mode"
+              checked={editMode}
+              onCheckedChange={setEditMode}
+            />
+            <span className="text-sm">Edit</span>
+            <Edit3 className="h-4 w-4" />
           </div>
         </div>
-        {editMode && (
-          <div className="flex gap-4 items-center">
-            <Button
-              variant="ghost"
-              onClick={() => addConfigItem(undefined, "item")}
-              className="w-full gap-2 border-dashed border-2 border-border hover:border-solid hover:bg-transparent"
-            >
-              <Plus className="h-4 w-4" />
-              Add single config Item
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => addConfigItem(undefined, "block")}
-              className="w-full gap-2 border-dashed border-2 border-border hover:border-solid hover:bg-transparent"
-            >
-              <Plus className="h-4 w-4" />
-              Add a config block
-            </Button>
-          </div>
-        )}
       </div>
 
-      <div className="space-y-6">
-        {config?.map(snf => {
-          return (
-            <ConfigBlock
-              key={snf.id}
-              group={snf}
+      <LoadingOverlay isLoading={isLoading || updateConfigMutation.isPending}>
+        <div className="flex flex-1 overflow-hidden gap-2">
+          <div className={cn("h-full flex-shrink-0 sticky")}>
+            <ConfigAside activeView={activeView} onViewChange={setActiveView} />
+          </div>
+
+          <div className="flex-1 h-[calc(100vh-6rem)]">
+            <ConfigCenter
+              activeView={activeView}
+              categorizedConfigs={categorizedConfigs}
               editMode={editMode}
               addConfigItem={addConfigItem}
               removeConfigItem={removeConfigItem}
@@ -321,9 +299,9 @@ export default function ConfigsDashboard() {
               updateGroupTitle={updateGroupTitle}
               undoGroupRemoval={id => removeConfigItem(id, undefined, false)}
             />
-          )
-        })}
-      </div>
+          </div>
+        </div>
+      </LoadingOverlay>
     </div>
   )
 }

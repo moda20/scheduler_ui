@@ -1,15 +1,9 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Plus, SaveIcon, Trash2, Unlock } from "lucide-react"
-import { Separator } from "@/components/ui/separator"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
+import { Plus, Trash2, Unlock } from "lucide-react"
 import { cn } from "@/lib/utils"
-import PrefixedInput from "@/components/custom/configs/prefixedInput"
-import type { ConfigItem } from "@/models/configs"
 import ConfigInputCombo from "@/components/custom/configs/configInputCombo"
 import ConfirmationDialogAction from "@/components/confirmationDialogAction"
 
@@ -52,6 +46,10 @@ export default function ConfigBlock({
   undoGroupRemoval,
 }: ConfigBlockProps = defaultConfigBlockProps) {
   const [isHovering, setIsHovering] = useState(false)
+  const isBaseGroup = useMemo(
+    () => group.subGroups?.some((sg: any) => sg.base),
+    [group],
+  )
 
   return (
     <div
@@ -68,9 +66,9 @@ export default function ConfigBlock({
             : "",
         )}
       >
-        <CardHeader className="pb-2">
+        <CardHeader className="p-4 pb-2">
           <div className="flex items-center justify-between text-foreground bg-background">
-            {editMode ? (
+            {editMode && !isBaseGroup ? (
               <Input
                 value={group.title ?? ""}
                 onChange={e => updateGroupTitle(group.id, e.target.value)}
@@ -92,7 +90,7 @@ export default function ConfigBlock({
                 <Button
                   variant={"destructive"}
                   size="sm"
-                  disabled={group.subGroups?.some((sg: any) => sg.base)}
+                  disabled={isBaseGroup}
                   className="border-none focus:ring-0 outline-none"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -102,8 +100,8 @@ export default function ConfigBlock({
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-6 text-foreground bg-background rounded-xl">
-          <div className="grid gap-4">
+        <CardContent className="space-y-6 text-foreground bg-background rounded-xl p-4 pt-0">
+          <div className="grid gap-2">
             {group.subGroups ? (
               group.subGroups.map((sg: any) =>
                 sg.subGroups ? (
