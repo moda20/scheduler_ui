@@ -1,7 +1,5 @@
-import { Card } from "@/components/ui/card"
 import type { ConfigItem } from "@/models/configs"
 import ConfigBlock from "./configBlock"
-import { ConfigAddBlock } from "@/components/custom/configs/ConfigAddBlock"
 
 interface SystemPanelProps {
   configs: ConfigItem[]
