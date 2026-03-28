@@ -1,6 +1,8 @@
 <div align="center">
 
-# Type Type Scheduler UI
+# Type Scheduler UI
+
+<img src="src/assets/images/TypeSchedulerLogo.png" alt="Type Scheduler UI Logo" width="200" />
 
 **A SPA interface for managing Type scheduler scheduled tasks, proxies, and more**
 
@@ -30,23 +32,23 @@ Type Scheduler UI is a modern React-based web application that provides a clean,
 - **Proxy Management**: Configure and manage proxy servers for task execution
 - **Database Management**: Handle database connections and configurations
 - **Event Logging**: View detailed execution logs and event streams
-- **Event handlers**: Extradite events based on regex and job duration changes
+- **Event handlers**: Send events via notification services based on regex message matching and job duration changes
 - **Real-time Updates**: WebSocket integration for live status updates
 
 ---
 
 ## ✨ Features
 
-| Feature         | Description                                                             |
-|-----------------|-------------------------------------------------------------------------|
-| **Authentication** | Secure login and session management for backend servers                 |
-| **Task Management** | Full CRUD operations for scheduled jobs with cron expressions           |
+| Feature                 | Description                                                             |
+| ----------------------- | ----------------------------------------------------------------------- |
+| **Authentication**      | Secure login and session management for backend servers                 |
+| **Task Management**     | Full CRUD operations for scheduled jobs with cron expressions           |
 | **Proxy Configuration** | Add, edit, and manage proxy servers                                     |
 | **Database Management** | Manage database connections and settings                                |
-| **Event Monitoring** | Real-time event logs, execution history, and conditional event handling |
-| **File Preview** | Built-in file viewer for job artifacts and outputs                      |
-| **Logging**     | Built-in job log viewers                                                |
-| **Dashboard**   | Visual overview of system status and task performance                   |
+| **Event Monitoring**    | Real-time event logs, execution history, and conditional event handling |
+| **File Preview**        | Built-in file viewer for job artifacts and outputs                      |
+| **Logging**             | Built-in job log viewers                                                |
+| **Dashboard**           | Visual overview of system status and task performance                   |
 
 ---
 
@@ -69,7 +71,7 @@ docker run -p 80:80 ghcr.io/moda20/type_scheduler_ui:latest
 The following environment variable can be set at build time:
 
 | Variable          | Description                               | Default |
-| ----------------- |-------------------------------------------| ------- |
+| ----------------- | ----------------------------------------- | ------- |
 | `SERVER_ENDPOINT` | The default endpoint of the target server | `/`     |
 
 ### Example Docker Compose
@@ -84,7 +86,7 @@ A `compose.yml` file is included in the repository for reference. The recommende
 
 - **Framework**: React 19 + Vite
 - **State Management**: Redux Toolkit + React Redux
-- **Routing**: React Router v6
+- **Routing**: React Router v7
 - **UI Components**: shadcn/ui (Radix UI primitives) + Tailwind CSS + framer motion
 - **Testing**: Vitest + React Testing Library
 - **Language**: TypeScript
@@ -96,7 +98,7 @@ A `compose.yml` file is included in the repository for reference. The recommende
 git clone https://github.com/moda20/TypeSchedulerUI.git
 
 # Navigate to the project directory
-cd scheduler_ui
+cd TypeSchedulerUI
 
 # Install dependencies
 npm install
