@@ -20,13 +20,16 @@ export function VersionSwitcher() {
       <SidebarMenuItem>
         <SidebarMenuButton
           size="lg"
-          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-4"
         >
-          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-            <ListBulletIcon className="size-4" />
+          <div className="flex border-primary border-2 aspect-square size-12 items-center justify-center rounded-lg bg-white text-sidebar-primary-foreground">
+            <img
+              src="src/assets/images/TypeSchedulerLogoSimplified.png"
+              className="size-9"
+            />
           </div>
           <div className="flex flex-col gap-0.5 leading-none">
-            <span className="font-semibold">Scheduler</span>
+            <span className="font-semibold">TypeScheduler</span>
           </div>
         </SidebarMenuButton>
       </SidebarMenuItem>
