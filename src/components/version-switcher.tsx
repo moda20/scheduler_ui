@@ -24,7 +24,7 @@ export function VersionSwitcher() {
         >
           <div className="flex border-primary border-2 aspect-square size-12 items-center justify-center rounded-lg bg-white text-sidebar-primary-foreground">
             <img
-              src="src/assets/images/TypeSchedulerLogoSimplified.png"
+              src="/images/TypeSchedulerLogoSimplified.png"
               className="size-9"
             />
           </div>
