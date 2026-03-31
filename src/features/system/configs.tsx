@@ -3,12 +3,16 @@ import React, { useCallback, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/hooks/use-toast"
 import { Switch } from "@/components/ui/switch"
-import type { ConfigItem, ConfigType, ConfigViewType } from "@/models/configs"
+import type {
+  CategorizedConfigs,
+  ConfigItem,
+  ConfigType,
+  ConfigViewType,
+} from "@/models/configs"
 import configService from "@/services/configs"
 import ConfirmationDialogAction from "@/components/confirmationDialogAction"
 import { genUID, isEqual } from "@/utils/generalUtils"
 import { cn } from "@/lib/utils"
-import { categorizeConfig } from "@/utils/configUtils"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import LoadingOverlay from "@/components/custom/LoadingOverlay"
 
@@ -19,6 +23,8 @@ export default function ConfigsDashboard() {
   const queryClient = useQueryClient()
   const [activeView, setActiveView] = useState<ConfigViewType>("system")
   const [editMode, setEditMode] = useState(false)
+  const [categorizedConfigs, setCategorizedConfigs] =
+    useState<CategorizedConfigs>({} as CategorizedConfigs)
   const [config, setConfig] = useState<Array<ConfigItem>>([])
   const [shadowConfig, setShadowConfig] = useState<Array<ConfigItem>>([])
 
@@ -31,7 +37,7 @@ export default function ConfigsDashboard() {
             title: input.doc || "",
             key: parentKey,
             value: input.value,
-            encrypted: input.is_encrypted,
+            is_encrypted: input.is_encrypted,
             base: input.base,
             format: input.format,
           }
@@ -45,20 +51,27 @@ export default function ConfigsDashboard() {
       }
       return input
     }
-    const parsedConfig = recParse("", config)
-    return parsedConfig.subGroups
+    const parsedConfig = Object.keys(config).reduce((p, cfgKey: string) => {
+      p[cfgKey] = recParse("", config[cfgKey]).subGroups
+      return p
+    }, {} as CategorizedConfigs)
+    return {
+      parsedConfig,
+      configList: Object.values(parsedConfig).flat(),
+    }
   }, [])
 
   const { data: rawConfig, isLoading } = useQuery({
     queryKey: ["configs"],
-    queryFn: configService.getAllConfigs,
+    queryFn: configService.getCategorizedConfigs,
   })
 
   React.useEffect(() => {
     if (rawConfig) {
-      const convertedConfig = convertConfigStructure(rawConfig)
-      setConfig(convertedConfig)
-      setShadowConfig(JSON.parse(JSON.stringify(convertedConfig)))
+      const { configList, parsedConfig } = convertConfigStructure(rawConfig)
+      setCategorizedConfigs(parsedConfig)
+      setConfig(configList)
+      setShadowConfig(JSON.parse(JSON.stringify(configList)))
     }
   }, [rawConfig, convertConfigStructure])
 
@@ -213,7 +226,7 @@ export default function ConfigsDashboard() {
       e =>
         e.key in mappedShadowConfig &&
         (mappedShadowConfig[e.key].value !== e.value ||
-          mappedShadowConfig[e.key].encrypted !== e.encrypted),
+          mappedShadowConfig[e.key].is_encrypted !== e.is_encrypted),
     )
     const fullDiffs = [...newDiffs, ...deletedDiffs, ...updatedDiffs]
     updateConfigMutation.mutate(fullDiffs)
@@ -239,9 +252,6 @@ export default function ConfigsDashboard() {
     }
     return config.map(e => recConvert("", e).flat()).flat()
   }, [])
-
-  const categorizedConfigs = categorizeConfig(config)
-
   return (
     <div className="w-full h-full relative">
       <div
