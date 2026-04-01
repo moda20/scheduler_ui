@@ -2,7 +2,7 @@
 
 # Type Scheduler UI
 
-<img src="src/assets/images/TypeSchedulerLogo.png" alt="Type Scheduler UI Logo" width="200" />
+<img src="public/images/TypeSchedulerLogo.png" alt="Type Scheduler UI Logo" width="200" />
 
 **A SPA interface for managing Type scheduler scheduled tasks, proxies, and more**
 
