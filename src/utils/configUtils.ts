@@ -1,47 +1,18 @@
-import type {
-  CategorizedConfigs,
-  ConfigCategory,
-  ConfigItem,
-} from "@/models/configs"
-
-export function categorizeConfig(configs: ConfigItem[]): CategorizedConfigs {
-  const categorized: CategorizedConfigs = {
-    system: [],
-    logging: [],
-    notifications: [],
-    custom: [],
-  }
-
-  configs.forEach(config => {
-    const category = getConfigCategory(config)
-    categorized[category].push(config)
-  })
-
-  return categorized
-}
-
-function getConfigCategory(config: ConfigItem): ConfigCategory {
-  // key or title base categorization
-  const key = config.key || config.title
-  if (!key) return "custom"
-  if (
-    key === "env" ||
-    key === "appName" ||
-    key === "swaggerServer" ||
-    key.startsWith("server") ||
-    key.startsWith("jobs") ||
-    key.startsWith("DB") ||
-    key.startsWith("baseDB")
-  ) {
-    return "system"
-  }
-  if (key.startsWith("files")) {
-    return "logging"
-  }
-
-  if (key.startsWith("notifications") || key.startsWith("grafana")) {
-    return "notifications"
-  }
-
-  return "custom"
+export const categorizeConfigArray = (
+  inputConfigArray: any,
+  transposedConfigMap,
+) => {
+  return inputConfigArray.reduce(
+    (p: any, c: any) => {
+      const targetKey = c.key ?? c.title
+      const categoryName = transposedConfigMap[targetKey] ?? "custom"
+      if (p[categoryName]) {
+        p[categoryName].push(c)
+      } else {
+        p[categoryName] = [c]
+      }
+      return p
+    },
+    {} as { [key: string]: any[] },
+  )
 }
