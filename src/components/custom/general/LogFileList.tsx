@@ -33,7 +33,7 @@ export default function LogFileList(props: LogfileListProps) {
           fileName: logFile.name,
           fileSize: humanFileSize(logFile.fileStats?.size!),
           index: i,
-          createAt: logFile.date,
+          createAt: logFile.date?.toString(),
           originName: props.originName,
           deletionDate: logFile.deletionDate,
         },

@@ -41,6 +41,7 @@ export function useJobEvents({
   const [handler, setHandler] = useState<any>()
   const [wsReady, setWsReady] = useState(false)
   const [latestEvents, setLatestEvents] = useState<any[]>([])
+  const [changeCounter, setChangeCounter] = useState(0)
   const parsedEvents = useMemo(
     () => eventTypes.map(type => `JOB_EVENT_${jobId}_${type}`),
     [eventTypes, jobId],
@@ -120,6 +121,7 @@ export function useJobEvents({
         })
         .finally(() => {
           setLoading(false)
+          setChangeCounter(changeCounter + 1)
         })
     },
     [eventTypes, jobId, offset, limit, jobLogId, handled, period],
@@ -155,6 +157,7 @@ export function useJobEvents({
       })
       return handleEvents(eventIds).finally(() => {
         setLoading(false)
+        setChangeCounter(changeCounter + 1)
         // TODO: check if it's necessary to ask for status via the socket again after reading events
       })
     },
@@ -184,6 +187,7 @@ export function useJobEvents({
             }),
           )
           setLoading(false)
+          setChangeCounter(changeCounter + 1)
           // TODO: check if it's necessary to ask for status via the socket again after reading events
         })
     },
@@ -230,5 +234,6 @@ export function useJobEvents({
     getNextPage,
     canGetNextPage,
     total,
+    changeCounter,
   }
 }
