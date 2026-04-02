@@ -81,7 +81,7 @@ export default function ConfigInputCombo({
               }
             />
           ) : (
-            item.encrypted && <Badge variant="secondary">Encrypted</Badge>
+            item.is_encrypted && <Badge variant="secondary">Encrypted</Badge>
           )}
           {editMode && (
             <Label htmlFor={`encrypted-${item.id}`} className="text-sm">
