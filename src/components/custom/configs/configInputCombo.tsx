@@ -75,13 +75,13 @@ export default function ConfigInputCombo({
             <Checkbox
               id={`encrypted-${item.id}`}
               disabled={item.base}
-              checked={item.encrypted}
+              checked={item.is_encrypted}
               onCheckedChange={checked =>
-                updateConfigItem("encrypted", item.id, checked as boolean)
+                updateConfigItem("is_encrypted", item.id, checked as boolean)
               }
             />
           ) : (
-            item.encrypted && <Badge variant="secondary">Encrypted</Badge>
+            item.is_encrypted && <Badge variant="secondary">Encrypted</Badge>
           )}
           {editMode && (
             <Label htmlFor={`encrypted-${item.id}`} className="text-sm">

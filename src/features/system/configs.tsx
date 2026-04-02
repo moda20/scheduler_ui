@@ -8,46 +8,53 @@ import configService from "@/services/configs"
 import ConfirmationDialogAction from "@/components/confirmationDialogAction"
 import { genUID, isEqual } from "@/utils/generalUtils"
 import { cn } from "@/lib/utils"
-import { categorizeConfig } from "@/utils/configUtils"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import LoadingOverlay from "@/components/custom/LoadingOverlay"
 
 import { ConfigAside } from "@/components/custom/configs/ConfigAside"
 import { ConfigCenter } from "@/components/custom/configs/ConfigCenter"
+import { categorizeConfigArray } from "@/utils/configUtils"
 
 export default function ConfigsDashboard() {
   const queryClient = useQueryClient()
   const [activeView, setActiveView] = useState<ConfigViewType>("system")
   const [editMode, setEditMode] = useState(false)
+  const [configMap, setConfigMap] = useState<any>({})
   const [config, setConfig] = useState<Array<ConfigItem>>([])
   const [shadowConfig, setShadowConfig] = useState<Array<ConfigItem>>([])
 
-  const convertConfigStructure = useCallback((config: ConfigType) => {
-    const recParse = (parentKey: string, input: ConfigType): any => {
-      if (typeof input === "object") {
-        if ("db_mirror" in input) {
-          return {
-            id: genUID(),
-            title: input.doc || "",
-            key: parentKey,
-            value: input.value,
-            encrypted: input.is_encrypted,
-            base: input.base,
-            format: input.format,
-          }
-        } else {
-          return {
-            id: genUID(),
-            title: input.doc || parentKey || "",
-            subGroups: Object.keys(input).map(e => recParse(e, input[e])),
+  const convertConfigStructure = useCallback(
+    (config: ConfigType, transposedConfigMap: any) => {
+      const recParse = (parentKey: string, input: ConfigType): any => {
+        if (typeof input === "object") {
+          if ("db_mirror" in input) {
+            return {
+              id: genUID(),
+              title: input.doc || "",
+              key: parentKey,
+              value: input.value,
+              is_encrypted: input.is_encrypted,
+              base: input.base,
+              format: input.format,
+            }
+          } else {
+            return {
+              id: genUID(),
+              title: input.doc || parentKey || "",
+              subGroups: Object.keys(input).map(e => recParse(e, input[e])),
+            }
           }
         }
+        return input
       }
-      return input
-    }
-    const parsedConfig = recParse("", config)
-    return parsedConfig.subGroups
-  }, [])
+
+      const basicConfig = recParse("", config)
+      return {
+        configList: basicConfig.subGroups,
+      }
+    },
+    [],
+  )
 
   const { data: rawConfig, isLoading } = useQuery({
     queryKey: ["configs"],
@@ -56,11 +63,22 @@ export default function ConfigsDashboard() {
 
   React.useEffect(() => {
     if (rawConfig) {
-      const convertedConfig = convertConfigStructure(rawConfig)
-      setConfig(convertedConfig)
-      setShadowConfig(JSON.parse(JSON.stringify(convertedConfig)))
+      setConfigMap(rawConfig.categoriesMap)
+      const { configList } = convertConfigStructure(
+        rawConfig.configArray,
+        rawConfig.categoriesMap,
+      )
+      setConfig(configList)
+      setShadowConfig(JSON.parse(JSON.stringify(configList)))
     }
   }, [rawConfig, convertConfigStructure])
+
+  const categorizedConfigs = useMemo(() => {
+    if (configMap) {
+      return categorizeConfigArray(config, configMap)
+    }
+    return []
+  }, [config, configMap])
 
   const configChanged = useMemo(() => {
     return isEqual(config, shadowConfig)
@@ -130,9 +148,9 @@ export default function ConfigsDashboard() {
               targetConfig.subGroups?.find(e => e.id === itemId) as ConfigItem
             ).deleted = setValue
           } else {
-            targetConfigList = config
-              .find(e => e.id === parentId)
-              ?.subGroups?.filter(e => e.id !== itemId)
+            targetConfig.subGroups = targetConfig.subGroups?.filter(
+              e => e.id !== itemId,
+            )
           }
         }
       }
@@ -213,7 +231,7 @@ export default function ConfigsDashboard() {
       e =>
         e.key in mappedShadowConfig &&
         (mappedShadowConfig[e.key].value !== e.value ||
-          mappedShadowConfig[e.key].encrypted !== e.encrypted),
+          mappedShadowConfig[e.key].is_encrypted !== e.is_encrypted),
     )
     const fullDiffs = [...newDiffs, ...deletedDiffs, ...updatedDiffs]
     updateConfigMutation.mutate(fullDiffs)
@@ -239,9 +257,6 @@ export default function ConfigsDashboard() {
     }
     return config.map(e => recConvert("", e).flat()).flat()
   }, [])
-
-  const categorizedConfigs = categorizeConfig(config)
-
   return (
     <div className="w-full h-full relative">
       <div
