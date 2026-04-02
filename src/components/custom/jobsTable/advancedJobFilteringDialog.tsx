@@ -455,7 +455,7 @@ export const AdvancedJobFilteringDialog = forwardRef<
             </div>
             <Separator
               orientation="vertical"
-              className="mr-2 w-1 rounded h-full"
+              className="mr-2 w-1 rounded self-stretch"
             />
             <div className="flex flex-col gap-2 w-6/12">
               <h4>Manual queue execution</h4>

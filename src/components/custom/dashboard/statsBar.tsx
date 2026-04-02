@@ -1,11 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  FileWarningIcon,
-  FolderKanban,
-  Calendar,
-  Play,
-  Database,
-} from "lucide-react"
+import { FileWarningIcon, Calendar, Play, Database } from "lucide-react"
 import type { ReactNode } from "react"
 import { useEffect, useState } from "react"
 import jobsService from "@/services/JobsService"
@@ -25,7 +19,7 @@ interface MetricSectionProps {
   title: string
   value: ReactNode
   icon: ReactNode
-  iconSize: string
+  textSize: string
   bgColor: string
   bgColorLight: string
   hasError?: boolean
@@ -36,7 +30,7 @@ function MetricSection({
   title,
   value,
   icon,
-  iconSize,
+  textSize,
   bgColor,
   bgColorLight,
   hasError,
@@ -62,9 +56,9 @@ function MetricSection({
               <span
                 className={cn(
                   "font-bold",
-                  iconSize === "text-4xl"
+                  textSize === "text-4xl"
                     ? "text-4xl"
-                    : iconSize === "text-3xl"
+                    : textSize === "text-3xl"
                       ? "text-3xl"
                       : "text-2xl",
                   hasError ? "text-destructive" : "text-foreground",
@@ -84,7 +78,7 @@ function MetricSection({
           {hasError ? (
             <Tooltip>
               <TooltipTrigger>
-                <FileWarningIcon />
+                <FileWarningIcon size={28} />
               </TooltipTrigger>
               <TooltipContent className="text-destructive border-destructive">
                 {tooltipContent || "Error fetching data"}
@@ -133,7 +127,7 @@ export default function StatsBar(props: StatsBarProps) {
                 title="Registered Jobs"
                 value={jobMetrics.job_count}
                 icon={<Database size={28} />}
-                iconSize="text-4xl"
+                textSize="text-4xl"
                 bgColor="text-metric1"
                 bgColorLight="bg-metric1-light"
                 hasError={hasError}
@@ -149,7 +143,7 @@ export default function StatsBar(props: StatsBarProps) {
                 title="Scheduled Jobs"
                 value={jobMetrics.running_jobs_count}
                 icon={<Calendar size={28} />}
-                iconSize="text-3xl"
+                textSize="text-3xl"
                 bgColor="text-metric2"
                 bgColorLight="bg-metric2-light"
                 hasError={hasError}
@@ -165,7 +159,7 @@ export default function StatsBar(props: StatsBarProps) {
                 title="Running Jobs"
                 value={jobMetrics.runningJobsCount}
                 icon={<Play size={28} className="fill-current" />}
-                iconSize="text-2xl"
+                textSize="text-2xl"
                 bgColor="text-metric3"
                 bgColorLight="bg-metric3-light"
                 hasError={hasError}

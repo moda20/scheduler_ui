@@ -116,7 +116,7 @@ export function FlexibleInput({
         onChange?.({ value1: "", value2: "" })
       }
     },
-    [onChange, onError],
+    [onChange, onError, name],
   )
 
   // Handle exact value change
@@ -156,14 +156,14 @@ export function FlexibleInput({
       setBetweenValue(updated)
       onChange?.(updated)
     },
-    [onChange, setBetweenValue],
+    [onChange, setBetweenValue, betweenValue],
   )
 
   useEffect(() => {
     if (type) {
       handleTypeChange(type)
     }
-  }, [type])
+  }, [type, handleTypeChange])
 
   const renderInput = () => {
     switch (inputType) {

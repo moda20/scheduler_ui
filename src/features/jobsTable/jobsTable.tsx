@@ -76,7 +76,7 @@ export function DataTable<TData, TValue>({
       ref={tableContainerRef}
     >
       <Table className="grid">
-        <TableHeader className="grid sticky top-0 z-1">
+        <TableHeader className="grid sticky top-0 z-10">
           {table.getHeaderGroups().map(headerGroup => (
             <TableRow
               key={headerGroup.id}
@@ -104,6 +104,7 @@ export function DataTable<TData, TValue>({
         <TableBodyVirtualized
           table={table}
           tableContainerRef={tableContainerRef}
+          columnsLength={columns.length}
         />
       </Table>
     </div>
@@ -113,9 +114,14 @@ export function DataTable<TData, TValue>({
 interface TableBodyProps {
   table: ReactTable<any>
   tableContainerRef: React.RefObject<HTMLDivElement>
+  columnsLength: number
 }
 
-function TableBodyVirtualized({ table, tableContainerRef }: TableBodyProps) {
+function TableBodyVirtualized({
+  table,
+  tableContainerRef,
+  columnsLength,
+}: TableBodyProps) {
   const { rows } = table.getRowModel()
   const rowVirtualizer = useVirtualizer<HTMLDivElement, HTMLTableRowElement>({
     count: rows.length,
@@ -132,17 +138,25 @@ function TableBodyVirtualized({ table, tableContainerRef }: TableBodyProps) {
         height: `${rowVirtualizer.getTotalSize()}px`,
       }}
     >
-      {rowVirtualizer.getVirtualItems().map(virtualRow => {
-        const row = rows[virtualRow.index] as Row<any>
-        return (
-          <TableBodyRow
-            key={row.id}
-            row={row}
-            virtualRow={virtualRow}
-            rowVirtualizer={rowVirtualizer}
-          />
-        )
-      })}
+      {rows.length === 0 ? (
+        <TableRow>
+          <TableCell colSpan={columnsLength} className="h-24 text-center">
+            No results.
+          </TableCell>
+        </TableRow>
+      ) : (
+        rowVirtualizer.getVirtualItems().map(virtualRow => {
+          const row = rows[virtualRow.index] as Row<any>
+          return (
+            <TableBodyRow
+              key={row.id}
+              row={row}
+              virtualRow={virtualRow}
+              rowVirtualizer={rowVirtualizer}
+            />
+          )
+        })
+      )}
     </TableBody>
   )
 }

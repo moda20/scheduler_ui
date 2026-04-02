@@ -142,9 +142,9 @@ export function DatePickerWithPresets(props: DatePickerWithPresetsProps) {
         className="z-50 flex w-auto flex-col space-y-2 p-2 bg-background text-foreground pointer-events-auto border-2"
       >
         <Select onValueChange={setPresetDates} value={parseDateToPreset()}>
-          <SelectTrigger>
+          <SelectTrigger className="border-2 border-border">
             <SelectValue
-              className="bg-background text-foreground border-2 border-border"
+              className="bg-background text-foreground"
               placeholder="Select"
             />
           </SelectTrigger>

@@ -330,7 +330,7 @@ export default function NotificationServicesPanel() {
                 </Button>
               </NotificationConfigDialog>
               <ScrollableList
-                className="min-w-[230px] sm:min-w-[260px] md:min-w-[290px] flex-grow overflow-y-auto h-full"
+                className="min-w-[230px] sm:min-w-[260px] md:min-w-[290px] flex-grow overflow-y-auto"
                 originalList={getAllServices}
                 autoFocus={true}
                 loadMore={
@@ -382,7 +382,7 @@ export default function NotificationServicesPanel() {
               className="h-full w-full block pt-2"
             >
               {notificationServices.data.length > 0 && (
-                <div className="flex flex-col gap-2 overflow-y-auto">
+                <div className="flex flex-col gap-2">
                   <div className="text-l font-bold tracking-tight italic flex gap-2 items-center">
                     <span>Basic info</span>
                     {selectedService && (
