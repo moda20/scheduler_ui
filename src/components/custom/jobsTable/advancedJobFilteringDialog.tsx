@@ -215,9 +215,9 @@ export const AdvancedJobFilteringDialog = forwardRef<
               value2: values.latestRun.to,
             }
           : undefined,
-        name: values.name ?? undefined,
-        cronSetting: values.cronSetting ?? undefined,
-        consumer: values.consumer ?? undefined,
+        name: values.name?.value ? values.name : undefined,
+        cronSetting: values.cronSetting?.value ? values.cronSetting : undefined,
+        consumer: values.consumer?.value ? values.consumer : undefined,
         isRunning: values.isRunning ?? undefined,
         averageTime: values.averageTime ?? undefined,
       }
