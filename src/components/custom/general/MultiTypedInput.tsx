@@ -129,7 +129,7 @@ export function FlexibleInput({
       setExactValue(typedValue)
       onChange?.(typedValue)
     },
-    [onChange, setExactValue],
+    [onChange],
   )
 
   // Handle regex value change
@@ -143,10 +143,12 @@ export function FlexibleInput({
       const error = validateRegex(newValue)
       if (error) {
         onError?.({ name }, error)
+      } else {
+        onError?.({ name })
       }
       onChange?.(typedValue)
     },
-    [onChange, onError, setRegexValue],
+    [onChange, onError],
   )
 
   // Handle between value change

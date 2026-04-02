@@ -80,6 +80,7 @@ export default function DrawerJobEvents({
     lanes: 1,
     enabled: allEvents.length > 0,
     initialOffset: 0,
+    getItemKey: index => String(allEvents[index].id),
   })
 
   const refreshVirtualizer = useCallback(() => {
