@@ -56,11 +56,7 @@ function MetricSection({
               <span
                 className={cn(
                   "font-bold",
-                  textSize === "text-4xl"
-                    ? "text-4xl"
-                    : textSize === "text-3xl"
-                      ? "text-3xl"
-                      : "text-2xl",
+                  textSize ?? "text-2xl",
                   hasError ? "text-destructive" : "text-foreground",
                 )}
               >
@@ -76,14 +72,16 @@ function MetricSection({
           )}
         >
           {hasError ? (
-            <Tooltip>
-              <TooltipTrigger>
-                <FileWarningIcon size={28} />
-              </TooltipTrigger>
-              <TooltipContent className="text-destructive border-destructive">
-                {tooltipContent || "Error fetching data"}
-              </TooltipContent>
-            </Tooltip>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <FileWarningIcon size={28} />
+                </TooltipTrigger>
+                <TooltipContent className="text-destructive border-destructive">
+                  {tooltipContent || "Error fetching data"}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           ) : (
             icon
           )}

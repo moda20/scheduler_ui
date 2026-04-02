@@ -103,7 +103,10 @@ export default function DrawerLatestRuns({
       })
       .catch(err => {
         console.error(err)
-        return []
+        return {
+          data: [],
+          total: 0,
+        }
       })
       .finally(() => setLoading(false))
   }, [inputSchema, loading])

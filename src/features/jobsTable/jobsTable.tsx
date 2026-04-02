@@ -127,7 +127,7 @@ function TableBodyVirtualized({
     count: rows.length,
     estimateSize: () => 76,
     getScrollElement: () => tableContainerRef.current,
-    overscan: 42,
+    overscan: 24,
     lanes: 1,
   })
 
@@ -173,7 +173,7 @@ function TableBodyRow({ row, virtualRow, rowVirtualizer }: TableBodyRowProps) {
       data-index={virtualRow.index}
       ref={node => rowVirtualizer.measureElement(node)}
       key={row.id}
-      className=" flex absolute w-full border-b-border"
+      className="flex absolute w-full border-b-border"
       style={{
         transform: `translateY(${virtualRow.start}px)`,
       }}
