@@ -21,6 +21,7 @@ import {
   VirtualItem,
   Virtualizer,
 } from "@tanstack/react-virtual"
+import { cn } from "@/lib/utils"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -34,6 +35,7 @@ interface DataTableProps<TData, TValue> {
     sorting: SortingState
   }
   rowSelection?: {}
+  size?: string
 }
 
 export function DataTable<TData, TValue>({
@@ -42,6 +44,7 @@ export function DataTable<TData, TValue>({
   events,
   filters,
   rowSelection,
+  size,
 }: DataTableProps<TData, TValue>) {
   const tableContainerRef = useRef(null)
 
@@ -65,7 +68,11 @@ export function DataTable<TData, TValue>({
 
   return (
     <div
-      className="rounded-md border border-border w-full overflow-auto relative h-[800px]"
+      className={cn(
+        "rounded-md border border-border w-full overflow-auto relative",
+        size,
+        data.length > 0 ? "" : "min-h-[800px]",
+      )}
       ref={tableContainerRef}
     >
       <Table className="grid">
