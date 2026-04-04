@@ -228,20 +228,20 @@ function ScrollableList<T>(
       })}
       {items.length === 0 && renderNoItems && renderNoItems()}
 
-      <div
-        ref={loaderRef}
-        className={cn(
-          "flex items-center justify-center py-8",
-          loading ? "opacity-100" : "opacity-0",
-        )}
-      >
-        {loading && (
+      {loading && (
+        <div
+          ref={loaderRef}
+          className={cn(
+            "flex items-center justify-center py-8",
+            loading ? "opacity-100" : "opacity-0",
+          )}
+        >
           <div className="flex items-center gap-2">
             <Loader2 className="h-5 w-5 animate-spin" />
             <span className="text-sm">Loading previous runs...</span>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }
