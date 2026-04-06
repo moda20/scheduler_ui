@@ -19,20 +19,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon, Download, LucideScanEye, Search } from "lucide-react"
-import { format } from "date-fns"
+import { Download, LucideScanEye, Search } from "lucide-react"
 import { DatePickerWithPresets } from "@/components/ui/date-picker-presets"
 import type { InputType } from "@/components/custom/general/MultiTypedInput"
-import { defaultMultiTypeNullValue } from "@/components/custom/general/MultiTypedInput"
 import { FlexibleInput } from "@/components/custom/general/MultiTypedInput"
 import {
   forwardRef,
@@ -41,14 +31,6 @@ import {
   useImperativeHandle,
   useState,
 } from "react"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { proxyProtocolOptions } from "@/models/proxies"
 import ManagedSelect from "@/components/custom/ManagedSelect"
 import type { advancedJobExecutionFormSchemaType } from "@/components/custom/jobsTable/AdvancedJobExecutionForm"
 import { AdvancedJobExecutionForm } from "@/components/custom/jobsTable/AdvancedJobExecutionForm"
@@ -148,7 +130,6 @@ export const AdvancedJobFilteringDialog = forwardRef<
 
     useEffect(() => {
       if (isDialogOpen && inputJobIds?.length) {
-        console.log("inputJobIds", inputJobIds)
         jobsService
           .getAllJobs(null, undefined, undefined, undefined, inputJobIds)
           .then(d => {
