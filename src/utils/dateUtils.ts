@@ -15,6 +15,11 @@ const EPOCHS = {
 }
 
 export type EpochsType = keyof typeof EPOCHS
+export enum momentDateKey {
+  day = "hours",
+  week = "weekdays",
+  month = "date",
+}
 export function getTimeIndex(date = new Date(), type: EpochsType = "day") {
   switch (type) {
     case "day":
@@ -22,7 +27,7 @@ export function getTimeIndex(date = new Date(), type: EpochsType = "day") {
 
     case "week":
       return differenceInCalendarWeeks(date, EPOCHS.week, {
-        weekStartsOn: 1,
+        weekStartsOn: 0,
       })
 
     case "month":
@@ -46,7 +51,7 @@ export function formatDiff(date1: Date, date2: Date) {
   }
 
   const hours = Math.abs(differenceInHours(date1, date2))
-  if (hours < 2) {
+  if (hours < 24) {
     return `${hours} h`
   }
 

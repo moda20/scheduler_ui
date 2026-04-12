@@ -240,6 +240,7 @@ export function useSocketLogs({
     unsubscribeFromEvents,
     logs,
     logsLoading,
+    latestLogs,
   }
 }
 

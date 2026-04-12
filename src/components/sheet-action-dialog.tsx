@@ -12,6 +12,7 @@ import { useEffect, useRef } from "react"
 import type React from "react"
 import { cn } from "@/lib/utils"
 import useDialogueManager from "@/hooks/useDialogManager"
+import { isReactFragment } from "@/utils/generalUtils"
 
 export interface SheetActionDialogProps
   extends React.ComponentProps<typeof Sheet> {
@@ -45,9 +46,13 @@ export default function SheetActionDialog(
     }, 100)
   }, [])
   const isTitleElement =
-    isValidElement(props.title) && typeof props.title !== "string"
+    isValidElement(props.title) &&
+    !isReactFragment(props.title) &&
+    typeof props.title !== "string"
   const isDescriptionElement =
-    isValidElement(props.description) && typeof props.description !== "string"
+    isValidElement(props.description) &&
+    !isReactFragment(props.description) &&
+    typeof props.description !== "string"
   return (
     <Sheet
       key={props.side}

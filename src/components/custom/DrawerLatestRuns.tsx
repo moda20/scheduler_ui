@@ -22,7 +22,12 @@ import { CardStackIcon } from "@radix-ui/react-icons"
 import ScrollableList from "@/components/custom/general/ScrollableList"
 import { useSocketLogs } from "@/lib/socketUtils"
 import { LiveLogViewer } from "@/components/custom/general/LogViewer"
-import { EpochsType, formatDiff, getTimeIndex } from "@/utils/dateUtils"
+import {
+  EpochsType,
+  formatDiff,
+  getTimeIndex,
+  momentDateKey,
+} from "@/utils/dateUtils"
 import ManagedSelect, {
   ManagedSelectInputValue,
 } from "@/components/custom/ManagedSelect"
@@ -93,6 +98,7 @@ export default function DrawerLatestRuns({
     })
     setLoading(false)
     setShowLogs(false)
+    setItemDateArray([])
   }, [inputSchema])
 
   const getLatestRuns = useCallback(
@@ -126,7 +132,7 @@ export default function DrawerLatestRuns({
               newItemDateArray[newItemDateArray.length - 1] > weekIndex
             ) {
               log.isGroupHead = true
-              log.groupHead = `${groupingKey} ${moment(log.start_time).set("date", 1).format("YYYY-MM-DD")}`
+              log.groupHead = `${groupingKey} ${moment(log.start_time).set(momentDateKey[groupingKey], 1).format("YYYY-MM-DD")}`
               newItemDateArray[newItemDateArray.length ?? 0] = weekIndex
             }
           })
