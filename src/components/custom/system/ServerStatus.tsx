@@ -5,6 +5,8 @@ import { ConnectionStatus, connectionStatus } from "@/app/reducers/authReducer"
 import { Clock, GitBranchIcon, Server } from "lucide-react"
 import systemService from "@/services/SystemService"
 import { ButtonWithTooltip } from "@/components/custom/general/ButtonWithTooltip"
+import { toast } from "@/hooks/use-toast"
+import { useCallback, useState } from "react"
 
 const REFETCH_INTERVAL_MS = 60000
 const STALE_TIME_MS = 59000
@@ -12,6 +14,7 @@ const STALE_TIME_MS = 59000
 export default function ServerStatus() {
   const targetConnectionStatus = useAppSelector(connectionStatus)
   const isConnected = targetConnectionStatus === ConnectionStatus.CONNECTED
+  const [copied, setCopied] = useState(false)
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["serverStatus", "version"],
@@ -21,6 +24,20 @@ export default function ServerStatus() {
     staleTime: STALE_TIME_MS,
     placeholderData: {},
   })
+
+  const handleCopy = useCallback(() => {
+    try {
+      navigator.clipboard.writeText(data.version)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      toast({
+        title: "Failed to copy API key",
+        variant: "destructive",
+        duration: 1000,
+      })
+    }
+  }, [data])
 
   if (!isConnected) {
     return null
@@ -53,13 +70,16 @@ export default function ServerStatus() {
         {data.name}
       </div>
       <ButtonWithTooltip
-        tooltipContent="Click to copy version"
+        tooltipContent={
+          copied ? "Copied to clipboard" : "Click to copy version"
+        }
         tooltipContentClassName="text-foreground bg-background"
         variant="ghost"
         className="flex gap-2 p-0 px-1 justify-start text-xs h-5"
+        onClick={handleCopy}
       >
         <GitBranchIcon className="!h-3 !w-3" />
-        <span className="truncate  min-h-5 ">{data.version}</span>
+        <span className="truncate">{data.version}</span>
       </ButtonWithTooltip>
       <div className="flex items-center gap-1 ps-1">
         <Clock className="h-3 w-3" />
