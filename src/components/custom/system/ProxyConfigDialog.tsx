@@ -184,6 +184,7 @@ export function ProxyConfigDialog({
                       onChange={field.onChange}
                       inputOptions={proxyProtocolOptions}
                       defaultValue={field.value}
+                      exportOnlyValue={true}
                     />
                     <FormMessage />
                   </FormItem>
@@ -265,35 +266,6 @@ export function ProxyConfigDialog({
                 </CardContent>
               </Card>
             </div>
-            {/*<FormField
-              control={form.control}
-              name="consumer"
-              render={({ field }) => (
-                <div>
-                  <FormItem>
-                    <FormLabel>Consumer script</FormLabel>
-                    <br />
-                    <FormControl ref={field.ref}>
-                      <ComboBox
-                        selectedItemValue={proxyDetails?.consumer}
-                        itemList={itemList}
-                        {...field}
-                        noFieldsFoundText={"No consumer scripts found"}
-                        searchFieldPlaceholder={"Search consumer scripts..."}
-                        inputFieldsText={"Select consumer script..."}
-                        className="w-[--radix-popover-trigger-width]"
-                        triggerClassName={"w-full"}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      This is the consumer script that will be run when the job
-                      is triggered
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                </div>
-              )}
-            />*/}
             <DialogFooter>
               <Button variant={"default"} type="submit">
                 {isCreateDialog ? <PlusIcon /> : <SaveIcon />}

@@ -21,6 +21,7 @@ if (container) {
   const root = createRoot(container)
   initializeStore()
   verifyUserConnection()
+  // TODO: check if the query client should be created in the root component
   const queryClient = new QueryClient()
 
   root.render(

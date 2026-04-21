@@ -32,8 +32,22 @@ const systemService = {
       })
       .then(response => downloadFile(response, "application/zip"))
   },
-  getAllProxies(): Promise<Array<ProxyTableData>> {
-    return axios.get("/proxies/getAllProxies")
+  getAllProxies({
+    limit,
+    offset,
+    search,
+  }: {
+    limit?: number
+    offset?: number
+    search?: string
+  } = {}): Promise<Array<ProxyTableData>> {
+    return axios.get("/proxies/getAllProxies", {
+      params: {
+        limit,
+        offset,
+        search,
+      },
+    })
   },
   updateProxy(id: number, proxyData: ProxyConfigUpdateType): Promise<any> {
     return axios.put("/proxies/updateProxy", {
