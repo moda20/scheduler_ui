@@ -17,7 +17,7 @@ export function useProxies(props?: UseProxyProps) {
   const queryClient = useQueryClient()
 
   const { data, isLoading } = useQuery({
-    queryKey: ["proxies", "all", props.filters],
+    queryKey: ["proxies", "all", props?.filters],
     queryFn: () =>
       systemService.getAllProxies({
         limit: props?.filters?.limit,
