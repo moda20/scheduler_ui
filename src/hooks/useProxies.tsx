@@ -5,7 +5,7 @@ import { Row } from "@tanstack/react-table"
 import { ProxyConfigUpdateType } from "@/components/custom/system/ProxyConfigDialog"
 import { toast } from "@/hooks/use-toast"
 
-export interface useProxyProps {
+export interface UseProxyProps {
   filters?: {
     limit?: number
     offset?: number
@@ -13,11 +13,11 @@ export interface useProxyProps {
   }
 }
 
-export function useProxies(props?: useProxyProps) {
+export function useProxies(props?: UseProxyProps) {
   const queryClient = useQueryClient()
 
   const { data, isLoading } = useQuery({
-    queryKey: ["proxies", "all"],
+    queryKey: ["proxies", "all", props.filters],
     queryFn: () =>
       systemService.getAllProxies({
         limit: props?.filters?.limit,
@@ -49,9 +49,9 @@ export function useProxies(props?: useProxyProps) {
   })
   const updateMutation = useMutation({
     mutationFn: (d: any) => systemService.updateProxy(d.id, d),
-    onSuccess: async (data, id) => {
+    onSuccess: async (data, vars) => {
       toast({
-        title: `Proxy with id = ${id} updated`,
+        title: `Proxy with id = ${vars.id} updated`,
         duration: 2000,
       })
       await queryClient.invalidateQueries({
@@ -88,9 +88,9 @@ export function useProxies(props?: useProxyProps) {
 
   const linkMutation = useMutation({
     mutationFn: (d: any) => systemService.addProxyToJob(d.id, d.jobs),
-    onSuccess: async (data, id) => {
+    onSuccess: async (data, vars) => {
       toast({
-        title: `Proxy with id = ${id} linked to jobs`,
+        title: `Proxy with id = ${vars.id} linked to jobs`,
         duration: 2000,
       })
       await queryClient.invalidateQueries({
