@@ -16,26 +16,17 @@ import { PlusIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ComboBoxItem } from "@/components/ui/combo-box"
 import jobsService from "@/services/JobsService"
-import { ProxyLinkUpdateType } from "@/components/custom/system/ProxyLinkDialog"
+import LoadingOverlay from "@/components/custom/LoadingOverlay"
+import { useProxies } from "@/hooks/useProxies"
 
 export interface ProxiesPageProps {}
 
 export const proxyDefaultSortingState = [{ id: "id", desc: true }]
 
 export default function Proxies(props: ProxiesPageProps) {
-  const [tableData, setTableData] = useState<ProxyTableData[]>([])
   const [sorting, setSorting] = useState<SortingState>(proxyDefaultSortingState)
-  const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    getAllProxies()
-  }, [])
-
-  const getAllProxies = async () => {
-    const data = await systemService.getAllProxies()
-    setTableData(data)
-  }
-
+  const { proxies, isLoading, proxyActions } = useProxies()
   const onPageChange = ({ sorting }: { sorting: SortingState }) => {
     setSorting(sorting)
   }
@@ -53,72 +44,8 @@ export default function Proxies(props: ProxiesPageProps) {
       })
   }
 
-  const proxyAction = async (
-    action: ProxyActions,
-    row?: Row<ProxyTableData>,
-    proxyData?: ProxyConfigUpdateType,
-  ) => {
-    setLoading(true)
-
-    switch (action) {
-      case ProxyActions.UPDATE:
-        if (proxyData?.status !== undefined)
-          await systemService
-            .updateProxy(Number(row?.original?.id), proxyData!)
-            .then(data => {
-              toast({
-                title: `Proxy ${row?.original?.proxy_ip}:${row?.original?.proxy_port} updated`,
-                duration: 2000,
-              })
-            })
-            .finally(() => {
-              setLoading(false)
-            })
-        break
-      case ProxyActions.CREATE: {
-        await systemService
-          .addProxy(proxyData!)
-          .then(data => {
-            toast({
-              title: `Proxy ${proxyData?.proxy_ip}:${proxyData?.proxy_port} created`,
-              duration: 2000,
-            })
-          })
-          .finally(() => {
-            setLoading(false)
-          })
-        break
-      }
-      case ProxyActions.DELETE:
-        await systemService.deleteProxy(row!.original?.id).then(data => {
-          setLoading(false)
-          toast({
-            title: `Proxy ${row?.original?.proxy_ip}:${row?.original?.proxy_port} deleted`,
-            duration: 3000,
-          })
-        })
-        break
-      case ProxyActions.LINK:
-        await systemService
-          .addProxyToJob(
-            proxyData!.id!,
-            proxyData!.jobs!.map(e => Number(e)),
-          )
-          .then(data => {
-            toast({
-              title: `Proxy ${proxyData?.proxy_ip}:${proxyData?.proxy_port} link updated`,
-              duration: 2000,
-            })
-          })
-        break
-      default:
-        break
-    }
-    await getAllProxies()
-  }
-
   const columns = proxyTableInterfaces({
-    proxyAction,
+    proxyAction: proxyActions,
     getAllJobs,
   })
   return (
@@ -129,7 +56,7 @@ export default function Proxies(props: ProxiesPageProps) {
             <div className={"flex flex-row gap-2"}>
               <ProxyConfigDialog
                 onChange={proxyData =>
-                  proxyAction(ProxyActions.CREATE, undefined, proxyData)
+                  proxyActions(ProxyActions.CREATE, undefined, proxyData)
                 }
                 isCreateDialog={true}
               >
@@ -138,15 +65,17 @@ export default function Proxies(props: ProxiesPageProps) {
                 </Button>
               </ProxyConfigDialog>
             </div>
-            <GenericTable<ProxyTableData>
-              columns={columns}
-              data={tableData}
-              filters={{ sorting }}
-              events={{
-                onPageChange: onPageChange,
-                actionConfirmed: () => {},
-              }}
-            />
+            <LoadingOverlay isLoading={isLoading}>
+              <GenericTable<ProxyTableData>
+                columns={columns}
+                data={proxies}
+                filters={{ sorting }}
+                events={{
+                  onPageChange: onPageChange,
+                  actionConfirmed: () => {},
+                }}
+              />
+            </LoadingOverlay>
           </div>
         </CardContent>
       </Card>
