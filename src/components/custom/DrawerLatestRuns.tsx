@@ -148,14 +148,7 @@ export default function DrawerLatestRuns({
         })
         .finally(() => setLoading(false))
     },
-    [
-      inputSchema,
-      loading,
-      itemDateArray,
-      setItemDateArray,
-      LogItems,
-      groupingKey,
-    ],
+    [inputSchema, itemDateArray, groupingKey],
   )
 
   const getMoreRuns = useCallback(
@@ -187,7 +180,7 @@ export default function DrawerLatestRuns({
       resetDrawer()
       scrollableListRef?.current?.resetList()
     },
-    [groupingKey],
+    [resetDrawer],
   )
 
   const SheetDescription = useMemo(() => {
@@ -205,7 +198,7 @@ export default function DrawerLatestRuns({
         </div>
       </div>
     )
-  }, [])
+  }, [handleGroupingChange, GroupingOptions])
 
   return (
     <SheetActionDialog
