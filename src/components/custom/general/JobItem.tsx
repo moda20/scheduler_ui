@@ -12,15 +12,15 @@ export default function JobItem({ job, className }: JobItemProps) {
   return (
     <div
       className={cn(
-        "flex items-center justify-between border border-border rounded-xl p-2",
+        "flex items-center justify-between border border-border rounded-xl p-2 w-full",
         className,
       )}
     >
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 w-full truncate">
         <span>{job.name}</span>
         <div className="flex gap-2 text-[12px] items-center font-light">
           <FileArchive size="10" className="!h-4 !w-4" />
-          {job.consumer}
+          <span className="truncate min-w-0">{job.consumer}</span>
         </div>
       </div>
       <div className="flex flex-col gap-1 items-center">
