@@ -1,6 +1,5 @@
 import { Row } from "@tanstack/react-table"
 import { ProxyActions, ProxyTableData } from "@/models/proxies"
-import type { tableColumnsProps } from "@/features/jobsTable/interfaces"
 import { ProxyTableInterfaceProps } from "@/features/network/interfaces"
 import useDialogueManager from "@/hooks/useDialogManager"
 import {
@@ -10,27 +9,14 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import {
-  DockIcon,
-  Edit2Icon,
-  EllipsisVertical,
-  LinkIcon,
-  LogsIcon,
-  Settings,
-  Trash2Icon,
-} from "lucide-react"
+import { Edit2Icon, EllipsisVertical, LinkIcon, Settings } from "lucide-react"
 import ConfirmationDialogAction, {
   ConfirmationDialogActionType,
 } from "@/components/confirmationDialogAction"
-import { jobActions } from "@/features/jobsTable/interfaces"
-import { JobUpdateDialog } from "@/components/job-update-dialog"
-import DrawerLokiLogs from "@/components/custom/DrawerLokiLogs"
 import { ProxyConfigDialog } from "@/components/custom/system/ProxyConfigDialog"
-import { useEffect } from "react"
 import { ProxyLinkDialog } from "@/components/custom/system/ProxyLinkDialog"
 
 export interface proxyListActionDropdownProps {
