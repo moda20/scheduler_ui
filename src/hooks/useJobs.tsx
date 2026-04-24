@@ -48,7 +48,7 @@ export function useJobs({
       }
       return jobsService.getAllJobs(sorting, status, limit, offset)
     },
-    [limit, offset, status, sorting, advancedFilters],
+    [],
   )
 
   const { data: jobs, isFetching } = useQuery({

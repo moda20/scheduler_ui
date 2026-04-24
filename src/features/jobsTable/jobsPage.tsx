@@ -113,10 +113,10 @@ export default function JobsPage() {
   const tableEventsMemoized = useMemo(
     () => ({
       onPageChange: filterAndPaginationChange,
-      actionConfirmed: () => forceJobRefresh(),
+      actionConfirmed: forceJobRefresh,
       onRowSelectionChange: setSelectedRowIds,
     }),
-    [filterAndPaginationChange, selectedRowIds],
+    [filterAndPaginationChange, forceJobRefresh],
   )
 
   const takeJobsAction = useCallback(
@@ -136,7 +136,7 @@ export default function JobsPage() {
 
       await forceJobRefresh()
     },
-    [sorting, selectedRowIds],
+    [forceJobRefresh],
   )
 
   const takeBatchJobsAction = useCallback(
@@ -153,7 +153,7 @@ export default function JobsPage() {
         if (dialogAction === ConfirmationDialogActionType.CANCEL) return
         return takeBatchJobsAction(action)
       },
-    [selectedRowIds, JobsList, takeJobsAction],
+    [takeBatchJobsAction],
   )
 
   const getRowRange = (
@@ -204,25 +204,27 @@ export default function JobsPage() {
     }
   }, [sorting])
 
-  const importJobs = useCallback(async (jobsList: any[]) => {
-    await jobsService
-      .importJobsFromJSON(jobsList)
-      .then(res => {
-        toast({
-          title: `${jobsList.length} Jobs imported successfully`,
-          duration: 2000,
+  const importJobs = useCallback(
+    async (jobsList: any[]) => {
+      await jobsService
+        .importJobsFromJSON(jobsList)
+        .then(res => {
+          toast({
+            title: `${jobsList.length} Jobs imported successfully`,
+            duration: 2000,
+          })
+          return forceJobRefresh()
         })
-        return forceJobRefresh()
-      })
-      .catch(err => {
-        toast({
-          title: err.message,
-          duration: 2000,
-          variant: "destructive",
+        .catch(err => {
+          toast({
+            title: err.message,
+            duration: 2000,
+            variant: "destructive",
+          })
         })
-      })
-      .finally(() => {})
-  }, [])
+    },
+    [forceJobRefresh],
+  )
 
   return (
     <div className="h-full">
